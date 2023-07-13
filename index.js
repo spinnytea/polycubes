@@ -21,6 +21,14 @@ yargs(hideBin(process.argv))
 	})
 	.parse()
 
+// TODO uhm… get started with something simple
+// TODO file format?
+// TODO render it?
+// TODO workflow + testing
+//  - generate next
+//  - rotations
+//  - compare to existing
+// TODO speed it all up
 function generate(n) {
 	console.error(`nothing to do with ${n}!\n`);
 }
