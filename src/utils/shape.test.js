@@ -1,6 +1,6 @@
 const utils = require('.');
 
-describe('shape', () => {
+describe('utils.shape', () => {
 	test('clone', async () => {
 		expect(utils.shape.clone([[[1]]])).toEqual([[[1]]]);
 		expect(utils.shape.clone([[[1, 1], [1, 0]], [[1, 0], [1, 1]]])).toEqual([[[1, 1], [1, 0]], [[1, 0], [1, 1]]]);
@@ -21,11 +21,21 @@ describe('shape', () => {
 			expect(utils.shape.equals([[[1]]], [[[1]]])).toBe(true);
 			expect(utils.shape.equals([[[1, 1], [1, 1]], [[1, 1], [1, 1]]], [[[1, 1], [1, 1]], [[1, 1], [1, 1]]])).toBe(true);
 			expect(utils.shape.equals([[[1, 1], [0, 0]], [[1, 1], [1, 1]]], [[[1, 1], [0, 0]], [[1, 1], [1, 1]]])).toBe(true);
+			expect(utils.shape.equals([[[1]], [[1]], [[1]]], [[[1]], [[1]], [[1]]])).toBe(true);
 		});
 
 		test('false', () => {
 			expect(utils.shape.equals([[[1]]], [[[0]]])).toBe(false);
 			expect(utils.shape.equals([[[1, 1], [1, 1]], [[1, 1], [1, 1]]], [[[1, 0], [1, 1]], [[1, 1], [1, 1]]])).toBe(false);
+
+			expect(utils.shape.equals([[[1]], [[1]], [[1]]], [[[1], [1]], [[1], [0]]])).toBe(false);
+			expect(utils.shape.equals([[[1]], [[1]], [[1]]], [[[1], [1]], [[0], [1]]])).toBe(false);
+			expect(utils.shape.equals([[[1]], [[1]], [[1]]], [[[1, 1]], [[1, 0]]])).toBe(false);
+			expect(utils.shape.equals([[[1]], [[1]], [[1]]], [[[1, 1]], [[0, 1]]])).toBe(false);
+			expect(utils.shape.equals([[[1]], [[1]], [[1]]], [[[1], [0]], [[1], [1]]])).toBe(false);
+			expect(utils.shape.equals([[[1]], [[1]], [[1]]], [[[0], [1]], [[1], [1]]])).toBe(false);
+			expect(utils.shape.equals([[[1]], [[1]], [[1]]], [[[1, 0]], [[1, 1]]])).toBe(false);
+			expect(utils.shape.equals([[[1]], [[1]], [[1]]], [[[0, 1]], [[1, 1]]])).toBe(false);
 		});
 
 		test('mismatched length', () => {
@@ -49,15 +59,15 @@ describe('shape', () => {
 			expect(shape[2]?.[0][0]).toBe(undefined);
 			expect(shape[2]?.[0][0]).toBe(undefined);
 
-			utils.shape.expand.x(shape, 2, 2, 2);
+			utils.shape.expand.x(shape);
 
 			expect(utils.shape.size(shape)).toEqual([3, 2, 2]);
 			expect(shape[0][0][0]).toBe(1);
 			expect(shape[0][0][0]).toBe(1);
 			expect(shape[1][0][0]).toBe(1);
 			expect(shape[1][0][0]).toBe(1);
-			expect(shape[2]?.[0][0]).toBe(0);
-			expect(shape[2]?.[0][0]).toBe(0);
+			expect(shape[2][0][0]).toBe(0);
+			expect(shape[2][0][0]).toBe(0);
 		});
 
 		test('negX', () => {
@@ -70,23 +80,99 @@ describe('shape', () => {
 			expect(shape[2]?.[0][0]).toBe(undefined);
 			expect(shape[2]?.[0][0]).toBe(undefined);
 
-			utils.shape.expand.negX(shape, 2, 2, 2);
+			utils.shape.expand.negX(shape);
 
 			expect(utils.shape.size(shape)).toEqual([3, 2, 2]);
 			expect(shape[0][0][0]).toBe(0);
 			expect(shape[0][0][0]).toBe(0);
 			expect(shape[1][0][0]).toBe(1);
 			expect(shape[1][0][0]).toBe(1);
-			expect(shape[2]?.[0][0]).toBe(1);
-			expect(shape[2]?.[0][0]).toBe(1);
+			expect(shape[2][0][0]).toBe(1);
+			expect(shape[2][0][0]).toBe(1);
 		});
 
-		test.todo('y');
+		test('y', () => {
+			const shape = [[[1, 1], [1, 0]], [[1, 0], [1, 1]]];
+			expect(utils.shape.size(shape)).toEqual([2, 2, 2]);
+			expect(shape[0][0][0]).toBe(1);
+			expect(shape[0][0][0]).toBe(1);
+			expect(shape[0][1][0]).toBe(1);
+			expect(shape[0][1][0]).toBe(1);
+			expect(shape[0][2]?.[0]).toBe(undefined);
+			expect(shape[0][2]?.[0]).toBe(undefined);
 
-		test.todo('negY');
+			utils.shape.expand.y(shape);
 
-		test.todo('z');
+			expect(utils.shape.size(shape)).toEqual([2, 3, 2]);
+			expect(shape[0][0][0]).toBe(1);
+			expect(shape[0][0][0]).toBe(1);
+			expect(shape[0][1][0]).toBe(1);
+			expect(shape[0][1][0]).toBe(1);
+			expect(shape[0][2][0]).toBe(0);
+			expect(shape[0][2][0]).toBe(0);
+		});
 
-		test.todo('negZ');
+		test('negY', () => {
+			const shape = [[[1, 1], [1, 0]], [[1, 0], [1, 1]]];
+			expect(utils.shape.size(shape)).toEqual([2, 2, 2]);
+			expect(shape[0][0][0]).toBe(1);
+			expect(shape[0][0][0]).toBe(1);
+			expect(shape[0][1][0]).toBe(1);
+			expect(shape[0][1][0]).toBe(1);
+			expect(shape[0][2]?.[0]).toBe(undefined);
+			expect(shape[0][2]?.[0]).toBe(undefined);
+
+			utils.shape.expand.negY(shape);
+
+			expect(utils.shape.size(shape)).toEqual([2, 3, 2]);
+			expect(shape[0][0][0]).toBe(0);
+			expect(shape[0][0][0]).toBe(0);
+			expect(shape[0][1][0]).toBe(1);
+			expect(shape[0][1][0]).toBe(1);
+			expect(shape[0][2][0]).toBe(1);
+			expect(shape[0][2][0]).toBe(1);
+		});
+
+		test('z', () => {
+			const shape = [[[1, 1], [1, 0]], [[1, 0], [1, 1]]];
+			expect(utils.shape.size(shape)).toEqual([2, 2, 2]);
+			expect(shape[0][0][0]).toBe(1);
+			expect(shape[0][0][0]).toBe(1);
+			expect(shape[0][0][1]).toBe(1);
+			expect(shape[0][0][1]).toBe(1);
+			expect(shape[0][0][2]).toBe(undefined);
+			expect(shape[0][0][2]).toBe(undefined);
+
+			utils.shape.expand.z(shape);
+
+			expect(utils.shape.size(shape)).toEqual([2, 2, 3]);
+			expect(shape[0][0][0]).toBe(1);
+			expect(shape[0][0][0]).toBe(1);
+			expect(shape[0][0][1]).toBe(1);
+			expect(shape[0][0][1]).toBe(1);
+			expect(shape[0][0][2]).toBe(0);
+			expect(shape[0][0][2]).toBe(0);
+		});
+
+		test('negZ', () => {
+			const shape = [[[1, 1], [1, 0]], [[1, 0], [1, 1]]];
+			expect(utils.shape.size(shape)).toEqual([2, 2, 2]);
+			expect(shape[0][0][0]).toBe(1);
+			expect(shape[0][0][0]).toBe(1);
+			expect(shape[0][0][1]).toBe(1);
+			expect(shape[0][0][1]).toBe(1);
+			expect(shape[0][0][2]).toBe(undefined);
+			expect(shape[0][0][2]).toBe(undefined);
+
+			utils.shape.expand.negZ(shape);
+
+			expect(utils.shape.size(shape)).toEqual([2, 2, 3]);
+			expect(shape[0][0][0]).toBe(0);
+			expect(shape[0][0][0]).toBe(0);
+			expect(shape[0][0][1]).toBe(1);
+			expect(shape[0][0][1]).toBe(1);
+			expect(shape[0][0][2]).toBe(1);
+			expect(shape[0][0][2]).toBe(1);
+		});
 	});
 });

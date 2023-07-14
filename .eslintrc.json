@@ -16,7 +16,7 @@
 		"class-methods-use-this": ["off"],
 		"indent": ["error", "tab"],
 		"max-len": ["warn", { "code": 160 }],
-		"no-console": ["off", { "allow": ["info", "warn", "error", "time", "timeEnd"] }],
+		"no-console": ["warn", { "allow": ["info", "warn", "error", "time", "timeEnd"] }],
 		"no-param-reassign": ["off"],
 		"no-return-assign": ["error", "except-parens"],
 		"no-tabs": ["error", { "allowIndentationTabs": true }],

@@ -51,10 +51,10 @@ function listLocationsToGrow(polycube) {
 					// we can do any of the adjacent squares
 					locations.push([x + 1, y, z]);
 					locations.push([x - 1, y, z]);
-					// locations.push([x, y + 1, z]); // FIXME use when impl
-					// locations.push([x, y - 1, z]); // FIXME use when impl
-					// locations.push([x, y, z + 1]); // FIXME use when impl
-					// locations.push([x, y, z - 1]); // FIXME use when impl
+					locations.push([x, y + 1, z]);
+					locations.push([x, y - 1, z]);
+					locations.push([x, y, z + 1]);
+					locations.push([x, y, z - 1]);
 				}
 			});
 		});
@@ -79,25 +79,31 @@ function grow(polycube, [x, y, z]) {
 	// if (z > zLength) throw new Error('z is too large');
 
 	if (x === -1) {
-		utils.shape.expand.negX(shape, xLength, yLength, zLength);
+		utils.shape.expand.negX(shape);
 		// we shifted the whole thing over to make room for this
 		x = 0;
 	}
 	else if (x === xLength) {
-		utils.shape.expand.x(shape, xLength, yLength, zLength);
+		utils.shape.expand.x(shape);
 		// x is now valid
 	}
 	else if (y === -1) {
-		throw new Error('impl expand neg y'); // FIXME expand neg y
+		utils.shape.expand.negY(shape);
+		// we shifted the whole thing over to make room for this
+		y = 0;
 	}
 	else if (y === yLength) {
-		throw new Error('impl expand y'); // FIXME expand y
+		utils.shape.expand.y(shape);
+		// y is now valid
 	}
 	else if (z === -1) {
-		throw new Error('impl expand neg z'); // FIXME expand neg z
+		utils.shape.expand.negZ(shape);
+		// we shifted the whole thing over to make room for this
+		z = 0;
 	}
 	else if (z === zLength) {
-		throw new Error('impl expand z'); // FIXME expand z
+		utils.shape.expand.z(shape);
+		// z is now valid
 	}
 	else if (shape[x][y][z] === 1) {
 		return null;
@@ -125,16 +131,16 @@ function aggregate(found, nextsRotated) {
 		}
 		else {
 			// find match
-			const alreadyExists = nextsRotated.some((rotations) => (
-				rotations.some((polycube) => (
-					found.some((p) => (
-						utils.shape.equals(polycube.shape, p.shape)
+			nextsRotated.forEach((rotations) => {
+				const alreadyExists = rotations.some((polycube) => (
+					found.some((f) => (
+						utils.shape.equals(f.shape, polycube.shape)
 					))
-				))
-			));
-			if (!alreadyExists) {
-				found.push(nextsRotated[0][0]);
-			}
+				));
+				if (!alreadyExists) {
+					found.push(rotations[0]);
+				}
+			});
 		}
 	});
 }

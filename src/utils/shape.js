@@ -23,11 +23,15 @@ const utilsShape = {
 			@sideeffects
 			@param {number[][][]} shape - is mutated
 		*/
-		x: (shape, xLength, yLength, zLength) => {
+		x: (shape) => {
+			const zLength = shape[0][0].length;
 			const zs = [];
 			while (zs.length < zLength) zs.push(0);
+
+			const yLength = shape[0].length;
 			const ys = [];
 			while (ys.length < yLength) ys.push([...zs]);
+
 			shape.push(ys);
 		},
 
@@ -35,12 +39,68 @@ const utilsShape = {
 			@sideeffects
 			@param {number[][][]} shape - is mutated
 		*/
-		negX: (shape, xLength, yLength, zLength) => {
+		negX: (shape) => {
+			const zLength = shape[0][0].length;
 			const zs = [];
 			while (zs.length < zLength) zs.push(0);
+
+			const yLength = shape[0].length;
 			const ys = [];
 			while (ys.length < yLength) ys.push([...zs]);
+
 			shape.unshift(ys);
+		},
+
+		/**
+			@sideeffects
+			@param {number[][][]} shape - is mutated
+		*/
+		y: (shape) => {
+			const zLength = shape[0][0].length;
+			const zs = [];
+			while (zs.length < zLength) zs.push(0);
+
+			shape.forEach((ys) => {
+				ys.push([...zs]);
+			});
+		},
+
+		/**
+			@sideeffects
+			@param {number[][][]} shape - is mutated
+		*/
+		negY: (shape) => {
+			const zLength = shape[0][0].length;
+			const zs = [];
+			while (zs.length < zLength) zs.push(0);
+
+			shape.forEach((ys) => {
+				ys.unshift([...zs]);
+			});
+		},
+
+		/**
+			@sideeffects
+			@param {number[][][]} shape - is mutated
+		*/
+		z: (shape) => {
+			shape.forEach((ys) => {
+				ys.forEach((zs) => {
+					zs.push(0);
+				});
+			});
+		},
+
+		/**
+			@sideeffects
+			@param {number[][][]} shape - is mutated
+		*/
+		negZ: (shape) => {
+			shape.forEach((ys) => {
+				ys.forEach((zs) => {
+					zs.unshift(0);
+				});
+			});
 		},
 	},
 
