@@ -1,9 +1,9 @@
 const path = require('path');
-const utilFile = require('./file');
+const utils = require('.');
 
 describe('file', () => {
 	test('loadJson', async () => {
-		const json = await utilFile.loadJson(path.join(__dirname, '..', '..', 'precomputed', '1.json'));
+		const json = await utils.file.loadJson(path.join(__dirname, '..', '..', 'precomputed', '1.json'));
 		expect(json).toEqual([[[[1]]]]);
 	});
 });

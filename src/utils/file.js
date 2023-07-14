@@ -1,8 +1,8 @@
 const fs = require('fs');
 
-const utilFile = {
+const utilsFile = {
 
-	loadJson: (filename) => utilFile.loadFile(filename).then((data) => JSON.parse(data)),
+	loadJson: (filename) => utilsFile.loadFile(filename).then((data) => JSON.parse(data)),
 
 	loadFile: (filename) => (
 		new Promise((resolve, reject) => {
@@ -35,4 +35,4 @@ const utilFile = {
 
 };
 
-module.exports = utilFile;
+module.exports = utilsFile;

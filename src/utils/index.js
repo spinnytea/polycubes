@@ -1,3 +1,7 @@
-const utilFile = require('./file');
+const utilsFile = require('./file');
+const utilsShape = require('./shape');
 
-module.exports = { file: utilFile };
+module.exports = {
+	file: utilsFile,
+	shape: utilsShape,
+};
