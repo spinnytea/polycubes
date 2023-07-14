@@ -130,8 +130,11 @@ function aggregate(found, nextsRotated) {
 			found.push(nextsRotated[0][0]);
 		}
 		else {
-			// find match
+			// each nexts is an option
 			nextsRotated.forEach((rotations) => {
+				// the first of the rotations is our vanguard, the one we want to add
+				// all the rest are other rotations, basically duplicates
+				// if any of the rotations are a match, then we don't add our vanguard
 				const alreadyExists = rotations.some((polycube) => (
 					found.some((f) => (
 						utils.shape.equals(f.shape, polycube.shape)
