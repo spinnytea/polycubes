@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>It's a Shape!</title>
+	<!-- TODO favicon becausewhynot -->
+
+	<style type="text/css">
+		* { box-sizing: border-box; }
+
+		section, footer, nav {
+			display: block;
+		}
+
+		body {
+			margin: 0;
+			padding: 1em;
+			font-family: 'Helvetica Neue', Arial, sans-serif;
+			color: #333;
+			line-height: 1.4em;
+		}
+	</style>
+
+	<style type="text/css">
+		.container {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+	</style>
+
+	<style type="text/css">
+		/* these styles adapted from https://3dtransforms.desandro.com/box */
+		.scene {
+			border: 1px solid #CCC;
+			margin: 70px;
+			position: relative;
+			transform-style: preserve-3d;
+			transition: transform 1s;
+		}
+
+		.cube {
+			--cube-size: 100px;
+			--cube-size-half: calc(var(--cube-size) / 2);
+			--cube-size-half-neg: calc(var(--cube-size) / -2);
+			--cube-text-size: calc(var(--cube-size) / 5);
+
+			width: var(--cube-size);
+			height: var(--cube-size);
+			position: absolute;
+			top: 0;
+			left: 0;
+			transform-style: preserve-3d;
+			transform: translateZ(var(--cube-size-half-neg));
+		}
+
+		.cube.is-spinning { animation: spinCube 8s infinite ease-in-out; }
+
+		@keyframes spinCube {
+			  0% { transform: translateZ(var(--cube-size-half-neg)) rotateX(  0deg) rotateY(  0deg); }
+			100% { transform: translateZ(var(--cube-size-half-neg)) rotateX(360deg) rotateY(360deg); }
+		}
+
+		.cube__face {
+			position: absolute;
+			width: var(--cube-size);
+			height: var(--cube-size);
+			border: 2px solid black;
+			line-height: var(--cube-size);
+			font-size: var(--cube-text-size);
+			font-weight: bold;
+			color: white;
+			text-align: center;
+		}
+
+		.cube.is-backface-hidden .cube__face {
+			backface-visibility: hidden;
+		}
+
+		.cube__face--front  { background: hsla(  0, 100%, 50%, 0.7); }
+		.cube__face--right  { background: hsla( 60, 100%, 50%, 0.7); }
+		.cube__face--back   { background: hsla(120, 100%, 50%, 0.7); }
+		.cube__face--left   { background: hsla(180, 100%, 50%, 0.7); }
+		.cube__face--top    { background: hsla(240, 100%, 50%, 0.7); }
+		.cube__face--bottom { background: hsla(300, 100%, 50%, 0.7); }
+
+		.cube__face--front  { transform: rotateY(  0deg) translateZ(var(--cube-size-half)); }
+		.cube__face--right  { transform: rotateY( 90deg) translateZ(var(--cube-size-half)); }
+		.cube__face--back   { transform: rotateY(180deg) translateZ(var(--cube-size-half)); }
+		.cube__face--left   { transform: rotateY(-90deg) translateZ(var(--cube-size-half)); }
+		.cube__face--top    { transform: rotateX( 90deg) translateZ(var(--cube-size-half)); }
+		.cube__face--bottom { transform: rotateX(-90deg) translateZ(var(--cube-size-half)); }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="scene" style="transform: rotate3d(1, 1, 1, 45deg);">
+			<div class="cube" style="transform: translate3d(0px, 0px, 0px);">
+				<div class="cube__face cube__face--front">front</div>
+				<div class="cube__face cube__face--back">back</div>
+				<div class="cube__face cube__face--right">right</div>
+				<div class="cube__face cube__face--left">left</div>
+				<div class="cube__face cube__face--top">top</div>
+				<div class="cube__face cube__face--bottom">bottom</div>
+			</div>
+			<div class="cube" style="transform: translate3d(100px, 0px, 0px);">
+				<div class="cube__face cube__face--front">front</div>
+				<div class="cube__face cube__face--back">back</div>
+				<div class="cube__face cube__face--right">right</div>
+				<div class="cube__face cube__face--left">left</div>
+				<div class="cube__face cube__face--top">top</div>
+				<div class="cube__face cube__face--bottom">bottom</div>
+			</div>
+			<div class="cube" style="transform: translate3d(0px, 100px, 0px);">
+				<div class="cube__face cube__face--front">front</div>
+				<div class="cube__face cube__face--back">back</div>
+				<div class="cube__face cube__face--right">right</div>
+				<div class="cube__face cube__face--left">left</div>
+				<div class="cube__face cube__face--top">top</div>
+				<div class="cube__face cube__face--bottom">bottom</div>
+			</div>
+			<div class="cube" style="transform: translate3d(0px, 0px, 100px);">
+				<div class="cube__face cube__face--front">front</div>
+				<div class="cube__face cube__face--back">back</div>
+				<div class="cube__face cube__face--right">right</div>
+				<div class="cube__face cube__face--left">left</div>
+				<div class="cube__face cube__face--top">top</div>
+				<div class="cube__face cube__face--bottom">bottom</div>
+			</div>
+		 </div>
+	</div>
+</body>
+</html>
