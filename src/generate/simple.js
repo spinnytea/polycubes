@@ -79,12 +79,12 @@ function grow(polycube, [x, y, z]) {
 	// if (z > zLength) throw new Error('z is too large');
 
 	if (x === -1) {
-		utils.shape.expandNegX(shape, xLength, yLength, zLength);
+		utils.shape.expand.negX(shape, xLength, yLength, zLength);
 		// we shifted the whole thing over to make room for this
 		x = 0;
 	}
 	else if (x === xLength) {
-		utils.shape.expandX(shape, xLength, yLength, zLength);
+		utils.shape.expand.x(shape, xLength, yLength, zLength);
 		// x is now valid
 	}
 	else if (y === -1) {
