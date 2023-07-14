@@ -18,7 +18,9 @@ function generateNext(polycubes) {
 	const nexts = [];
 	polycubes.forEach((polycube) => {
 		const locations = listLocationsToGrow(polycube);
-		const ns = locations.map((location) => grow(polycube, location));
+		const ns = locations
+			.map((location) => grow(polycube, location))
+			.filter((p) => !!p); // filter out failed grow attempts
 		Array.prototype.push.apply(nexts, ns);
 	});
 	// XXX dedup nexts

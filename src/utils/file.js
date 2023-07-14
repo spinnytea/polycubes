@@ -2,6 +2,8 @@ const fs = require('fs');
 
 const utilsFile = {
 
+	existsSync: (filename) => fs.existsSync(filename),
+
 	loadJson: (filename) => utilsFile.loadFile(filename).then((data) => JSON.parse(data)),
 
 	loadFile: (filename) => (
