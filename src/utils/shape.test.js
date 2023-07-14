@@ -175,4 +175,40 @@ describe('utils.shape', () => {
 			expect(shape[0][0][2]).toBe(1);
 		});
 	});
+
+	describe('rotate', () => {
+		test('x', () => {
+			// 1 2       4 1
+			// 4 3  -->  3 2
+			expect(utils.shape.rotate.x([[[1, 2], [4, 3]]]))
+				.toEqual([[[4, 1], [3, 2]]]);
+
+			// 1 2 3       6 1
+			// 6 5 4  -->  5 2
+			//             4 3
+			expect(utils.shape.rotate.x([[[1, 2, 3], [6, 5, 4]]]))
+				.toEqual([[[6, 1], [5, 2], [4, 3]]]);
+		});
+
+		test('negX', () => {
+			// 1 2       2 3
+			// 4 3  -->  1 4
+			expect(utils.shape.rotate.negX([[[1, 2], [4, 3]]]))
+				.toEqual([[[2, 3], [1, 4]]]);
+
+			// 1 2 3       3 4
+			// 6 5 4  -->  2 5
+			//             1 6
+			expect(utils.shape.rotate.negX([[[1, 2, 3], [6, 5, 4]]]))
+				.toEqual([[[3, 4], [2, 5], [1, 6]]]);
+		});
+
+		test.todo('y'); // FIXME test.todo
+
+		test.todo('negY'); // FIXME test.todo
+
+		test.todo('z'); // FIXME test.todo
+
+		test.todo('negZ'); // FIXME test.todo
+	});
 });
