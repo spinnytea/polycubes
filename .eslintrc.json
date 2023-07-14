@@ -1,0 +1,53 @@
+{
+	"env": {
+		"node": true,
+		"commonjs": true,
+		"es2021": true
+	},
+	"extends": [
+		"eslint:recommended",
+		"airbnb-base"
+	],
+	"parserOptions": {
+		"ecmaVersion": 12
+	},
+	"rules": {
+		"brace-style": ["warn", "stroustrup", { "allowSingleLine": true }],
+		"class-methods-use-this": ["off"],
+		"indent": ["error", "tab"],
+		"max-len": ["warn", { "code": 160 }],
+		"no-console": ["warn", { "allow": ["info", "warn", "error"] }],
+		"no-param-reassign": ["off"],
+		"no-return-assign": ["error", "except-parens"],
+		"no-tabs": ["error", { "allowIndentationTabs": true }],
+		"no-use-before-define": ["off"],
+		"no-warning-comments": ["warn", { "terms": ["fixme"] }],
+		"object-curly-newline": ["error", { "multiline": true }],
+		"quotes": ["error", "single", { "avoidEscape": true }]
+	},
+
+	"overrides": [
+		{
+			"files": ["*.test.js", "jest.setup.js"],
+			"env": {
+				"jest/globals": true
+			},
+			"globals": {
+				"it": "off"
+			},
+			"plugins": [
+				"jest"
+			],
+			"rules": {
+			  "eol-last": ["error", "never"],
+			  "no-proto": ["off"]
+			}
+		},
+		{
+			"files": ["test/**/*.test.js"],
+			"rules": {
+			  "jest/prefer-expect-assertions": ["warn"]
+			}
+		}
+	]
+}
