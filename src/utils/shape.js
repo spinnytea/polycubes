@@ -163,15 +163,83 @@ const utilsShape = {
 		},
 
 		y: (shape) => {
+			const [xLength, yLength, zLength] = utilsShape.size(shape);
+
+			// y is fixed
+			// x/z rotate
+			const newShape = utilsShape.create(zLength, yLength, xLength);
+
+			// copy values, but rotated clockwise
+			shape.forEach((ys, x) => {
+				ys.forEach((zs, y) => {
+					zs.forEach((v, z) => {
+						newShape[z][y][xLength - x - 1] = v;
+					});
+				});
+			});
+
+			// rotate matrix counter-clockwise
+			return newShape;
 		},
 
 		negY: (shape) => {
+			const [xLength, yLength, zLength] = utilsShape.size(shape);
+
+			// y is fixed
+			// x/z rotate
+			const newShape = utilsShape.create(zLength, yLength, xLength);
+
+			// copy values, but rotated clockwise
+			shape.forEach((ys, x) => {
+				ys.forEach((zs, y) => {
+					zs.forEach((v, z) => {
+						newShape[zLength - z - 1][y][x] = v;
+					});
+				});
+			});
+
+			// rotate matrix counter-clockwise
+			return newShape;
 		},
 
 		z: (shape) => {
+			const [xLength, yLength, zLength] = utilsShape.size(shape);
+
+			// z is fixed
+			// x/y rotate
+			const newShape = utilsShape.create(yLength, xLength, zLength);
+
+			// copy values, but rotated clockwise
+			shape.forEach((ys, x) => {
+				ys.forEach((zs, y) => {
+					zs.forEach((v, z) => {
+						newShape[y][xLength - x - 1][z] = v;
+					});
+				});
+			});
+
+			// rotate matrix counter-clockwise
+			return newShape;
 		},
 
 		negZ: (shape) => {
+			const [xLength, yLength, zLength] = utilsShape.size(shape);
+
+			// z is fixed
+			// x/y rotate
+			const newShape = utilsShape.create(yLength, xLength, zLength);
+
+			// copy values, but rotated clockwise
+			shape.forEach((ys, x) => {
+				ys.forEach((zs, y) => {
+					zs.forEach((v, z) => {
+						newShape[yLength - y - 1][x][z] = v;
+					});
+				});
+			});
+
+			// rotate matrix counter-clockwise
+			return newShape;
 		},
 	},
 
