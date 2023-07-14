@@ -13,10 +13,11 @@ describe('generate simple', () => {
 	const n3a = new Polycube({ shape: [[[1, 1, 1]]] });
 	const n3b = new Polycube({ shape: [[[1, 1], [1, 0]]] });
 
-	test.skip('generateNext n=2', () => {
+	test('generateNext n=2', () => {
 		const gs = generateNext([n1]);
-		expect(gs.length).toBe(1); // TODO currently producing 3 versions (one across each dimension)
-		expect(gs[0]).toEqual(n2); // TODO need to compare against a rotation, any of the three are valid
+		expect(gs.length).toBe(1);
+		// XXX should compare against a rotation, any of the three are valid
+		expect(gs[0]).toEqual(new Polycube({ shape: [[[1]], [[1]]] }));
 	});
 
 	describe('listLocationsToGrow', () => {
