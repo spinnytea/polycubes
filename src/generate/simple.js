@@ -115,13 +115,74 @@ function grow(polycube, [x, y, z]) {
 
 /**
 	rotate the polycube across all dimensions
-	FIXME finish
 
 	@param {Polycube} polycube
 	@return {Polycube[]} array of rotated items, the first is the same as the input
 */
 function rotate(polycube) {
-	return [polycube];
+	const rotations = [
+		// zero
+		polycube.shape,
+
+		// once
+		utils.shape.rotate.x(polycube.shape),
+		utils.shape.rotate.y(polycube.shape),
+		utils.shape.rotate.z(polycube.shape),
+		utils.shape.rotate.negX(polycube.shape),
+		utils.shape.rotate.negY(polycube.shape),
+		utils.shape.rotate.negZ(polycube.shape),
+
+		// twice
+		utils.shape.rotate.x(utils.shape.rotate.x(polycube.shape)),
+		utils.shape.rotate.x(utils.shape.rotate.y(polycube.shape)),
+		utils.shape.rotate.x(utils.shape.rotate.z(polycube.shape)),
+		utils.shape.rotate.x(utils.shape.rotate.negY(polycube.shape)),
+		utils.shape.rotate.x(utils.shape.rotate.negZ(polycube.shape)),
+		utils.shape.rotate.y(utils.shape.rotate.y(polycube.shape)),
+		utils.shape.rotate.y(utils.shape.rotate.negX(polycube.shape)),
+		utils.shape.rotate.y(utils.shape.rotate.negZ(polycube.shape)),
+		utils.shape.rotate.z(utils.shape.rotate.z(polycube.shape)),
+		utils.shape.rotate.z(utils.shape.rotate.negX(polycube.shape)),
+		utils.shape.rotate.negX(utils.shape.rotate.negZ(polycube.shape)),
+
+		// thrice
+		utils.shape.rotate.x(utils.shape.rotate.x(utils.shape.rotate.y(polycube.shape))),
+		utils.shape.rotate.x(utils.shape.rotate.x(utils.shape.rotate.z(polycube.shape))),
+		utils.shape.rotate.x(utils.shape.rotate.x(utils.shape.rotate.negY(polycube.shape))),
+		utils.shape.rotate.x(utils.shape.rotate.x(utils.shape.rotate.negZ(polycube.shape))),
+		utils.shape.rotate.x(utils.shape.rotate.y(utils.shape.rotate.y(polycube.shape))),
+		utils.shape.rotate.x(utils.shape.rotate.z(utils.shape.rotate.z(polycube.shape))),
+	];
+
+	/*
+	// brute force
+	const dirs = ['x', 'y', 'z', 'negX', 'negY', 'negZ'];
+	dirs.forEach((dir1) => {
+		dirs.forEach((dir2) => {
+			const newShape = utils.shape.rotate[dir1](utils.shape.rotate[dir2](polycube.shape));
+			const alreadyExists = rotations.some((s) => utils.shape.equals(s, newShape));
+			if (!alreadyExists) {
+				console.log('new Shape', dir1, dir2);
+				rotations.push(newShape);
+			}
+		});
+	});
+	dirs.forEach((dir1) => {
+		dirs.forEach((dir2) => {
+			dirs.forEach((dir3) => {
+				const newShape = utils.shape.rotate[dir1](utils.shape.rotate[dir2](utils.shape.rotate[dir3](polycube.shape)));
+				const alreadyExists = rotations.some((s) => utils.shape.equals(s, newShape));
+				if (!alreadyExists) {
+					console.log('new Shape', dir1, dir2, dir3);
+					rotations.push(newShape);
+				}
+			});
+		});
+	});
+	*/
+
+	// rotate should have a length of 24
+	return rotations.map((shape) => new Polycube({ shape }));
 }
 
 function aggregate(found, nextsRotated) {
@@ -150,3 +211,4 @@ function aggregate(found, nextsRotated) {
 
 exports.generateNext = generateNext;
 exports.listLocationsToGrow = listLocationsToGrow;
+exports.rotate = rotate;

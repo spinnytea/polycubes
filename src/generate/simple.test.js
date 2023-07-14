@@ -1,8 +1,10 @@
 const Polycube = require('../Polycube');
+const utils = require('../utils');
 
 const {
 	generateNext,
 	listLocationsToGrow,
+	rotate,
 } = require('./simple');
 
 describe('generate simple', () => {
@@ -45,6 +47,37 @@ describe('generate simple', () => {
 				[1, 0, 1], [-1, 0, 1], [0, 1, 1], [0, -1, 1], [0, 0, 2], [0, 0, 0], // from [0, 0, 1]
 				[1, 1, 0], [-1, 1, 0], [0, 2, 0], [0, 0, 0], [0, 1, 1], [0, 1, -1], // from [0, 1, 0]
 			]);
+		});
+	});
+
+	describe('rotate', () => {
+		test('identity', () => {
+			const identityShape = utils.shape.create(2, 3, 4);
+			identityShape[0][0][0] = 1;
+			identityShape[1][0][0] = 1;
+			identityShape[0][1][0] = 1;
+			identityShape[0][2][0] = 1;
+			identityShape[0][0][1] = 1;
+			identityShape[0][0][2] = 1;
+			identityShape[0][0][3] = 1;
+			expect(identityShape).toEqual([[[1, 1, 1, 1], [1, 0, 0, 0], [1, 0, 0, 0]], [[1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]]);
+
+			const rotations = rotate(new Polycube({ shape: identityShape }));
+
+			// the first one is the one we passed in
+			expect(rotations[0].shape).toBe(identityShape);
+
+			// they are all unique
+			rotations.forEach((r1, idx1) => {
+				rotations.forEach((r2, idx2) => {
+					if (idx1 !== idx2) {
+						expect(utils.shape.equals(r1.shape, r2.shape)).toBe(false);
+					}
+				});
+			});
+
+			// there are 24 unique rotations for a 3d cube
+			expect(rotations.length).toBe(24);
 		});
 	});
 });
