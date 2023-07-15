@@ -33,7 +33,6 @@ yargs(hideBin(process.argv))
 	.alias('help', 'h')
 	.parse();
 
-// TODO render shapes
 // TODO metrics? (how many polycubes created, pruned, spaces tested, etc)
 // TODO speed it all up
 async function enumerate(argv) {

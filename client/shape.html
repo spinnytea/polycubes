@@ -118,12 +118,25 @@
 			frag.firstElementChild.setAttribute('style', `transform: translate3d(${x * CUBE_SIZE}px, ${y * CUBE_SIZE}px, ${z * CUBE_SIZE}px);`);
 			scene.appendChild(frag);
 		}
+	</script>
 
-		addCube(0, 0, 0);
-		addCube(1, 0, 0);
-		addCube(0, 1, 0);
-		addCube(0, 0, 1);
-		addCube(1, 1, 1);
+	<script>
+		const n1 = [[[1]]];
+		const n2 = [[[1]],[[1]]];
+		const n3a = [[[1]],[[1]],[[1]]];
+		const n3b = [[[1],[1]],[[1],[0]]]
+		const shape = n3b;
+
+		shape.forEach((ys, x) => {
+			ys.forEach((zs, y) => {
+				zs.forEach((v, z) => {
+					if (v === 1) {
+						addCube(x, y, z);
+					}
+				});
+			});
+		});
+
 	</script>
 </body>
 </html>
