@@ -32,7 +32,7 @@ function generateNext(polycubes, { verbose } = {}) {
 	if (verbose) console.time(' … rotate');
 	if (verbose > 1) console.info();
 	const nextsRotated = nexts.map((next) => rotate(next));
-	// const nextsRotated = nexts.map((next) => next.rotations()); // FIXME all that and there's a bug; n=5 makes 31 total
+	// const nextsRotated = nexts.map((next) => next.rotations()); // FIXME all that and there's bugs; n=5 makes 31 in test and 32 from cli
 	// XXX dedup rotations of nexts
 	// XXX dedup nexts using rotations
 	if (verbose > 1) console.info(`   ${nexts.length} into total rotations ${nextsRotated.reduce((ret, r) => ret + r.length, 0)}`);
@@ -42,6 +42,7 @@ function generateNext(polycubes, { verbose } = {}) {
 	if (verbose > 1) console.info();
 	const found = [];
 	aggregate(found, nextsRotated);
+	found.sort((a, b) => b.serialized.localeCompare(a.serialized));
 	if (verbose) console.timeEnd(' … check');
 
 	return found;

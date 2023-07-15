@@ -10,6 +10,17 @@ class Polycube {
 		if (rotation) this.rotation = rotation;
 	}
 
+	get serialized() {
+		if (!this.$serialized) {
+			this.$serialized = this.shape.map((ys) => (
+				ys.map((zs) => (
+					zs.join('_') // these provide visual clarity, could use 'z' for technical clarity
+				)).join(' ') // these provide visual clarity, could use 'y' for technical clarity
+			)).join('/'); // these provide visual clarity, could use 'x' for technical clarity
+		}
+		return this.$serialized;
+	}
+
 	/**
 		returns the dimensions of the polycube
 
@@ -39,6 +50,7 @@ class Polycube {
 	*/
 	equals(polycube) {
 		if (!polycube?.shape) throw new Error('polycube.equals must compare against polycubes');
+		if (this.rotation) console.warn('this polycube probably should not have a rotation when checking equality');
 		if (polycube.rotation) {
 			return utils.rotation.equals[polycube.rotation](this.shape, polycube.shape);
 		}

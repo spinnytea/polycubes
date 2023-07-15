@@ -9,22 +9,43 @@ describe('Polycube', () => {
 			'equals',
 			'n',
 			'rotations',
+			'serialized',
 			'size',
 		]);
 	});
 
+	test('serialized', () => {
+		const polycube = new Polycube({ shape: [[[1]]] });
+		expect(polycube).not.toHaveProperty('$serialized');
+		expect(polycube.serialized).toBe('1');
+		expect(polycube.$serialized).toBe('1');
+		expect(new Polycube({ shape: [[[1, 1], [1, 0]], [[1, 0], [1, 1]], [[1, 0], [0, 0]]] }).serialized)
+			.toEqual('1_1 1_0/1_0 1_1/1_0 0_0');
+		expect(new Polycube({ shape: [[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]], [[13, 14, 15, 16], [17, 18, 19, 20], [21, 22, 23, 24]]] }).serialized)
+			.toEqual('1_2_3_4 5_6_7_8 9_10_11_12/13_14_15_16 17_18_19_20 21_22_23_24');
+
+		expect(new Polycube({ shape: [[[1, 2, 3], [6, 5, 4]]] }).serialized)
+			.toEqual('1_2_3 6_5_4');
+		expect(new Polycube({ shape: utils.shape.rotate.x([[[1, 2, 3], [6, 5, 4]]]) }).serialized)
+			.toEqual('6_1 5_2 4_3');
+		expect(new Polycube({ shape: utils.shape.rotate.y([[[1, 2, 3], [6, 5, 4]]]) }).serialized)
+			.toEqual('1 6/2 5/3 4');
+		expect(new Polycube({ shape: utils.shape.rotate.z([[[1, 2, 3], [6, 5, 4]]]) }).serialized)
+			.toEqual('1_2_3/6_5_4');
+	});
+
 	test('size', () => {
-		expect((new Polycube({ shape: [[[1]]] })).size()).toEqual([1, 1, 1]);
-		expect((new Polycube({ shape: [[[1]], [[1]]] })).size()).toEqual([2, 1, 1]);
-		expect((new Polycube({ shape: [[[1, 1], [1, 0]], [[1, 0], [1, 1]], [[1, 0], [0, 0]]] })).size()).toEqual([3, 2, 2]);
+		expect(new Polycube({ shape: [[[1]]] }).size()).toEqual([1, 1, 1]);
+		expect(new Polycube({ shape: [[[1]], [[1]]] }).size()).toEqual([2, 1, 1]);
+		expect(new Polycube({ shape: [[[1, 1], [1, 0]], [[1, 0], [1, 1]], [[1, 0], [0, 0]]] }).size()).toEqual([3, 2, 2]);
 	});
 
 	test('n', () => {
-		expect((new Polycube({ shape: [[[1]]] })).n()).toEqual(1);
-		expect((new Polycube({ shape: [[[1, 1]]] })).n()).toEqual(2);
-		expect((new Polycube({ shape: [[[1], [1]]] })).n()).toEqual(2);
-		expect((new Polycube({ shape: [[[1]], [[1]]] })).n()).toEqual(2);
-		expect((new Polycube({ shape: [[[1, 1], [1, 0]], [[1, 0], [1, 1]], [[1, 0], [0, 0]]] })).n()).toEqual(7);
+		expect(new Polycube({ shape: [[[1]]] }).n()).toEqual(1);
+		expect(new Polycube({ shape: [[[1, 1]]] }).n()).toEqual(2);
+		expect(new Polycube({ shape: [[[1], [1]]] }).n()).toEqual(2);
+		expect(new Polycube({ shape: [[[1]], [[1]]] }).n()).toEqual(2);
+		expect(new Polycube({ shape: [[[1, 1], [1, 0]], [[1, 0], [1, 1]], [[1, 0], [0, 0]]] }).n()).toEqual(7);
 	});
 
 	describe('equals', () => {

@@ -30,6 +30,7 @@ describe('generate simple', () => {
 		});
 
 		test('n=5', () => {
+			// FIXME bugfix: save the invalid 31, subtract out the valid 29, run them by hand to see what's now matching
 			const gs = generateNext(generateNext([n3a, n3b]));
 			expect(gs.length).toBe(29);
 		});
