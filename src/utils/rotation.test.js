@@ -31,10 +31,9 @@ describe('utils.rotation', () => {
 			expect(utils.rotation.equals.xy(original, rotated)).toBeTruthy();
 		});
 
-		test.todo('example: thrice');
+		// 'example: thrice' wasn't needed
 
-		// TODO finish and unskip test
-		test.skip('check that all are implemented', () => {
+		test('check that all are implemented', () => {
 			expect([undefined].concat(Object.keys(utils.rotation.equals)).sort()).toEqual([...utils.rotation.allNames].sort());
 		});
 

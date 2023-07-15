@@ -111,7 +111,7 @@ const utilsRotation = {
 		},
 
 		/**
-			check that rotated --xy-> original
+			check that rotated --xx-> original
 
 			x: [x][z][ryl - y - 1] \
 			x: [x][z][ryl - y - 1]
@@ -318,6 +318,126 @@ const utilsRotation = {
 			return oxl === rzl && oyl === rxl && ozl === ryl
 				&& utilsShape.every(rotated, (x, y, z, v) => (
 					v === original[z][x][y]
+				));
+		},
+
+		/**
+			check that rotated --xxy-> original
+
+			x: [x][z][ryl - y - 1] \
+			x: [x][z][ryl - y - 1] \
+			y: [z][y][rxl - x - 1]
+
+			@param {number[][][]} original
+			@param {number[][][]} rotated
+			@returns {boolean}
+		*/
+		xxy: (original, rotated) => {
+			const [oxl, oyl, ozl] = utilsShape.size(original);
+			const [rxl, ryl, rzl] = utilsShape.size(rotated);
+			return oxl === rzl && oyl === ryl && ozl === rxl
+				&& utilsShape.every(rotated, (x, y, z, v) => (
+					v === original[rzl - z - 1][ryl - y - 1][rxl - x - 1]
+				));
+		},
+
+		/**
+			check that rotated --xxz-> original
+
+			x: [x][z][ryl - y - 1] \
+			x: [x][z][ryl - y - 1] \
+			z: [y][rxl - x - 1][z]
+
+			@param {number[][][]} original
+			@param {number[][][]} rotated
+			@returns {boolean}
+		*/
+		xxz: (original, rotated) => {
+			const [oxl, oyl, ozl] = utilsShape.size(original);
+			const [rxl, ryl, rzl] = utilsShape.size(rotated);
+			return oxl === ryl && oyl === rxl && ozl === rzl
+				&& utilsShape.every(rotated, (x, y, z, v) => (
+					v === original[ryl - y - 1][rxl - x - 1][rzl - z - 1]
+				));
+		},
+
+		/**
+			check that rotated --xxnY-> original
+
+			x: [x][z][ryl - y - 1] \
+			x: [x][z][ryl - y - 1] \
+			nY: [rzl - z - 1][y][x]
+
+			@param {number[][][]} original
+			@param {number[][][]} rotated
+			@returns {boolean}
+		*/
+		xxnY: (original, rotated) => {
+			const [oxl, oyl, ozl] = utilsShape.size(original);
+			const [rxl, ryl, rzl] = utilsShape.size(rotated);
+			return oxl === rzl && oyl === ryl && ozl === rxl
+				&& utilsShape.every(rotated, (x, y, z, v) => (
+					v === original[z][ryl - y - 1][x]
+				));
+		},
+
+		/**
+			check that rotated --xxnZ-> original
+
+			x: [x][z][ryl - y - 1] \
+			x: [x][z][ryl - y - 1] \
+			nZ: [ryl - y - 1][x][z]
+
+			@param {number[][][]} original
+			@param {number[][][]} rotated
+			@returns {boolean}
+		*/
+		xxnZ: (original, rotated) => {
+			const [oxl, oyl, ozl] = utilsShape.size(original);
+			const [rxl, ryl, rzl] = utilsShape.size(rotated);
+			return oxl === ryl && oyl === rxl && ozl === rzl
+				&& utilsShape.every(rotated, (x, y, z, v) => (
+					v === original[y][x][rzl - z - 1]
+				));
+		},
+
+		/**
+			check that rotated --xyy-> original
+
+			x: [x][z][ryl - y - 1] \
+			y: [z][y][rxl - x - 1] \
+			y: [z][y][rxl - x - 1]
+
+			@param {number[][][]} original
+			@param {number[][][]} rotated
+			@returns {boolean}
+		*/
+		xyy: (original, rotated) => {
+			const [oxl, oyl, ozl] = utilsShape.size(original);
+			const [rxl, ryl, rzl] = utilsShape.size(rotated);
+			return oxl === rxl && oyl === rzl && ozl === ryl
+				&& utilsShape.every(rotated, (x, y, z, v) => (
+					v === original[rxl - x - 1][z][y]
+				));
+		},
+
+		/**
+			check that rotated --xzz-> original
+
+			x: [x][z][ryl - y - 1] \
+			z: [y][rxl - x - 1][z] \
+			z: [y][rxl - x - 1][z]
+
+			@param {number[][][]} original
+			@param {number[][][]} rotated
+			@returns {boolean}
+		*/
+		xzz: (original, rotated) => {
+			const [oxl, oyl, ozl] = utilsShape.size(original);
+			const [rxl, ryl, rzl] = utilsShape.size(rotated);
+			return oxl === rxl && oyl === rzl && ozl === ryl
+				&& utilsShape.every(rotated, (x, y, z, v) => (
+					v === original[rxl - x - 1][rzl - z - 1][ryl - y - 1]
 				));
 		},
 	},
