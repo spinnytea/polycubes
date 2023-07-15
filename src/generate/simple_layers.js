@@ -91,7 +91,7 @@ function grow(polycube, [x, y, z]) {
 	// if (z > zLength) throw new Error('z is too large');
 
 	if (x === -1) {
-		utils.shape.expand.negX(shape);
+		utils.shape.expand.nX(shape);
 		// we shifted the whole thing over to make room for this
 		x = 0;
 	}
@@ -100,7 +100,7 @@ function grow(polycube, [x, y, z]) {
 		// x is now valid
 	}
 	else if (y === -1) {
-		utils.shape.expand.negY(shape);
+		utils.shape.expand.nY(shape);
 		// we shifted the whole thing over to make room for this
 		y = 0;
 	}
@@ -109,7 +109,7 @@ function grow(polycube, [x, y, z]) {
 		// y is now valid
 	}
 	else if (z === -1) {
-		utils.shape.expand.negZ(shape);
+		utils.shape.expand.nZ(shape);
 		// we shifted the whole thing over to make room for this
 		z = 0;
 	}
@@ -145,35 +145,35 @@ function rotate(polycube) {
 		utils.shape.rotate.x(polycube.shape),
 		utils.shape.rotate.y(polycube.shape),
 		utils.shape.rotate.z(polycube.shape),
-		utils.shape.rotate.negX(polycube.shape),
-		utils.shape.rotate.negY(polycube.shape),
-		utils.shape.rotate.negZ(polycube.shape),
+		utils.shape.rotate.nX(polycube.shape),
+		utils.shape.rotate.nY(polycube.shape),
+		utils.shape.rotate.nZ(polycube.shape),
 
 		// twice
 		utils.shape.rotate.x(utils.shape.rotate.x(polycube.shape)),
 		utils.shape.rotate.x(utils.shape.rotate.y(polycube.shape)),
 		utils.shape.rotate.x(utils.shape.rotate.z(polycube.shape)),
-		utils.shape.rotate.x(utils.shape.rotate.negY(polycube.shape)),
-		utils.shape.rotate.x(utils.shape.rotate.negZ(polycube.shape)),
+		utils.shape.rotate.x(utils.shape.rotate.nY(polycube.shape)),
+		utils.shape.rotate.x(utils.shape.rotate.nZ(polycube.shape)),
 		utils.shape.rotate.y(utils.shape.rotate.y(polycube.shape)),
-		utils.shape.rotate.y(utils.shape.rotate.negX(polycube.shape)),
-		utils.shape.rotate.y(utils.shape.rotate.negZ(polycube.shape)),
+		utils.shape.rotate.y(utils.shape.rotate.nX(polycube.shape)),
+		utils.shape.rotate.y(utils.shape.rotate.nZ(polycube.shape)),
 		utils.shape.rotate.z(utils.shape.rotate.z(polycube.shape)),
-		utils.shape.rotate.z(utils.shape.rotate.negX(polycube.shape)),
-		utils.shape.rotate.negX(utils.shape.rotate.negZ(polycube.shape)),
+		utils.shape.rotate.z(utils.shape.rotate.nX(polycube.shape)),
+		utils.shape.rotate.nX(utils.shape.rotate.nZ(polycube.shape)),
 
 		// thrice
 		utils.shape.rotate.x(utils.shape.rotate.x(utils.shape.rotate.y(polycube.shape))),
 		utils.shape.rotate.x(utils.shape.rotate.x(utils.shape.rotate.z(polycube.shape))),
-		utils.shape.rotate.x(utils.shape.rotate.x(utils.shape.rotate.negY(polycube.shape))),
-		utils.shape.rotate.x(utils.shape.rotate.x(utils.shape.rotate.negZ(polycube.shape))),
+		utils.shape.rotate.x(utils.shape.rotate.x(utils.shape.rotate.nY(polycube.shape))),
+		utils.shape.rotate.x(utils.shape.rotate.x(utils.shape.rotate.nZ(polycube.shape))),
 		utils.shape.rotate.x(utils.shape.rotate.y(utils.shape.rotate.y(polycube.shape))),
 		utils.shape.rotate.x(utils.shape.rotate.z(utils.shape.rotate.z(polycube.shape))),
 	];
 
 	/*
 	// brute force
-	const dirs = ['x', 'y', 'z', 'negX', 'negY', 'negZ'];
+	const dirs = ['x', 'y', 'z', 'nX', 'nY', 'nZ'];
 	dirs.forEach((dir1) => {
 		dirs.forEach((dir2) => {
 			const newShape = utils.shape.rotate[dir1](utils.shape.rotate[dir2](polycube.shape));

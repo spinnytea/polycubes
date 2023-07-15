@@ -55,7 +55,7 @@ const utilsShape = {
 			@sideeffects
 			@param {number[][][]} shape - is mutated
 		*/
-		negX: (shape) => {
+		nX: (shape) => {
 			const zLength = shape[0][0].length;
 			const zs = [];
 			while (zs.length < zLength) zs.push(0);
@@ -85,7 +85,7 @@ const utilsShape = {
 			@sideeffects
 			@param {number[][][]} shape - is mutated
 		*/
-		negY: (shape) => {
+		nY: (shape) => {
 			const zLength = shape[0][0].length;
 			const zs = [];
 			while (zs.length < zLength) zs.push(0);
@@ -111,7 +111,7 @@ const utilsShape = {
 			@sideeffects
 			@param {number[][][]} shape - is mutated
 		*/
-		negZ: (shape) => {
+		nZ: (shape) => {
 			shape.forEach((ys) => {
 				ys.forEach((zs) => {
 					zs.unshift(0);
@@ -142,7 +142,7 @@ const utilsShape = {
 			return newShape;
 		},
 
-		negX: (shape) => {
+		nX: (shape) => {
 			const [xLength, yLength, zLength] = utilsShape.size(shape);
 
 			// x is fixed
@@ -182,7 +182,7 @@ const utilsShape = {
 			return newShape;
 		},
 
-		negY: (shape) => {
+		nY: (shape) => {
 			const [xLength, yLength, zLength] = utilsShape.size(shape);
 
 			// y is fixed
@@ -222,7 +222,7 @@ const utilsShape = {
 			return newShape;
 		},
 
-		negZ: (shape) => {
+		nZ: (shape) => {
 			const [xLength, yLength, zLength] = utilsShape.size(shape);
 
 			// z is fixed
