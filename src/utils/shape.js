@@ -30,6 +30,12 @@ const utilsShape = {
 		))
 	),
 
+	/**
+		returns the dimensions of the shape
+
+		@usage `const [xLength, yLength, zLength] = utils.shape.size(shape);`
+		@returns {number[]}
+	*/
 	size: (shape) => (
 		[shape.length, shape[0].length, shape[0][0].length]
 	),

@@ -1,3 +1,5 @@
+const utilsShape = require('./shape');
+
 const utilsRotation = {
 	equals: {
 		/**
@@ -9,15 +11,18 @@ const utilsRotation = {
 			@param {number[][][]} rotated
 			@returns {boolean}
 		*/
-		x: (original, rotated) => (
-			rotated.length === original.length && rotated.every((ys, x) => (
-				ys.length === original[0][0].length && ys.every((zs, y) => (
-					zs.length === original[0].length && zs.every((v, z) => (
+		x: (original, rotated) => {
+			const xs = rotated;
+			const [oxl, oyl, ozl] = utilsShape.size(original);
+			const [rxl, ryl, rzl] = utilsShape.size(rotated);
+			return oxl === rxl && xs.every((ys, x) => (
+				oyl === rzl && ys.every((zs, y) => (
+					ozl === ryl && zs.every((v, z) => (
 						v === original[x][z][ys.length - y - 1]
 					))
 				))
-			))
-		),
+			));
+		},
 
 		/**
 			check that rotated --nX-> original
@@ -29,9 +34,9 @@ const utilsRotation = {
 			@returns {boolean}
 		*/
 		nX: (original, rotated) => (
-			rotated.length === original.length && rotated.every((ys, x) => (
-				ys.length === original[0][0].length && ys.every((zs, y) => (
-					zs.length === original[0].length && zs.every((v, z) => (
+			original.length === rotated.length && rotated.every((ys, x) => (
+				original[0].length === rotated[0][0].length && ys.every((zs, y) => (
+					original[0][0].length === rotated[0].length && zs.every((v, z) => (
 						v === original[x][zs.length - z - 1][y]
 					))
 				))
@@ -48,9 +53,9 @@ const utilsRotation = {
 			@returns {boolean}
 		*/
 		y: (original, rotated) => (
-			rotated.length === original[0][0].length && rotated.every((ys, x) => (
-				ys.length === original[0].length && ys.every((zs, y) => (
-					zs.length === original.length && zs.every((v, z) => (
+			original.length === rotated[0][0].length && rotated.every((ys, x) => (
+				original[0].length === rotated[0].length && ys.every((zs, y) => (
+					original[0][0].length === rotated.length && zs.every((v, z) => (
 						v === original[z][y][rotated.length - x - 1]
 					))
 				))
@@ -67,9 +72,9 @@ const utilsRotation = {
 			@returns {boolean}
 		*/
 		nY: (original, rotated) => (
-			rotated.length === original[0][0].length && rotated.every((ys, x) => (
-				ys.length === original[0].length && ys.every((zs, y) => (
-					zs.length === original.length && zs.every((v, z) => (
+			original.length === rotated[0][0].length && rotated.every((ys, x) => (
+				original[0].length === rotated[0].length && ys.every((zs, y) => (
+					original[0][0].length === rotated.length && zs.every((v, z) => (
 						v === original[zs.length - z - 1][y][x]
 					))
 				))
@@ -86,9 +91,9 @@ const utilsRotation = {
 			@returns {boolean}
 		*/
 		z: (original, rotated) => (
-			rotated.length === original[0].length && rotated.every((ys, x) => (
-				ys.length === original.length && ys.every((zs, y) => (
-					zs.length === original[0][0].length && zs.every((v, z) => (
+			original.length === rotated[0].length && rotated.every((ys, x) => (
+				original[0].length === rotated.length && ys.every((zs, y) => (
+					original[0][0].length === rotated[0][0].length && zs.every((v, z) => (
 						v === original[y][rotated.length - x - 1][z]
 					))
 				))
@@ -105,14 +110,37 @@ const utilsRotation = {
 			@returns {boolean}
 		*/
 		nZ: (original, rotated) => (
-			rotated.length === original[0].length && rotated.every((ys, x) => (
-				ys.length === original.length && ys.every((zs, y) => (
-					zs.length === original[0][0].length && zs.every((v, z) => (
+			original.length === rotated[0].length && rotated.every((ys, x) => (
+				original[0].length === rotated.length && ys.every((zs, y) => (
+					original[0][0].length === rotated[0][0].length && zs.every((v, z) => (
 						v === original[ys.length - y - 1][x][z]
 					))
 				))
 			))
 		),
+
+		/**
+			check that rotated --xy-> original
+
+			x: [x][z][yLength - y - 1] \
+			y: [z][y][xLength - x - 1]
+
+			@param {number[][][]} original
+			@param {number[][][]} rotated
+			@returns {boolean}
+		*/
+		xy: (original, rotated) => {
+			const xs = rotated;
+			const [oxl, oyl, ozl] = utilsShape.size(original);
+			const [rxl, ryl, rzl] = utilsShape.size(rotated);
+			return oxl === ryl && xs.every((ys, x) => (
+				oyl === rzl && ys.every((zs, y) => (
+					ozl === rxl && zs.every((v, z) => (
+						v === original[ys.length - y - 1][z][xs.length - x - 1]
+					))
+				))
+			));
+		},
 	},
 
 	allNames: Object.freeze([
@@ -163,7 +191,7 @@ const utilsRotation = {
 
 		// twice
 		xx: undefined,
-		xy: undefined,
+		xy: Object.freeze(['nY', 'nX']),
 		xz: undefined,
 		xnY: undefined,
 		xnZ: undefined,

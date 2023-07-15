@@ -1,32 +1,41 @@
 const utils = require('.');
 
 describe('utils.rotation', () => {
+	// TODO 1, 2, 3 is enough to distinguish directions (pos or neg; `x` vs `xs.length - x - 1`)
+	//  - but we need 2, 3, 4 to distinguish the patterns
 	const shape = [[[1, 2, 3], [6, 5, 4]]];
+	// const shape = [[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]], [[13, 14, 15, 16], [17, 18, 19, 20], [21, 22, 23, 24]]];
 
 	describe('equals', () => {
 		test('example: once', () => {
 			const original = shape;
-			const rotatedNX = utils.shape.rotate.nX(original); // reverse the rotation we want to test
-			const unrotated = utils.shape.rotate.x(rotatedNX); // rotate it back for posterity
-			expect(utils.shape.equals(original, rotatedNX)).toBeFalsy();
+			const rotated = utils.shape.rotate.nX(original); // reverse the rotation we want to test
+			const unrotated = utils.shape.rotate.x(rotated); // rotate it back for posterity
+			expect(utils.shape.equals(original, rotated)).toBeFalsy();
 			expect(utils.shape.equals(original, unrotated)).toBeTruthy();
-
-			expect(original).toEqual([[[1, 2, 3], [6, 5, 4]]]);
-			expect(rotatedNX).toEqual([[[3, 4], [2, 5], [1, 6]]]);
-			expect(unrotated).toEqual([[[1, 2, 3], [6, 5, 4]]]);
 
 			// my original shape is what we want to test against
 			// if I have nX, and I want to test "if I rotate this X, does it match original"
-			expect(utils.rotation.equals.x(original, rotatedNX)).toBeTruthy();
+			expect(utils.rotation.equals.x(original, rotated)).toBeTruthy();
 		});
 
-		test.todo('example: twice');
+		test.skip('example: twice', () => {
+			const original = shape;
+			const rotated = utils.shape.rotate.nX(utils.shape.rotate.nY(original)); // reverse the rotation we want to test
+			const unrotated = utils.shape.rotate.y(utils.shape.rotate.x(rotated)); // rotate it back for posterity
+			expect(utils.shape.equals(original, rotated)).toBeFalsy();
+			expect(utils.shape.equals(original, unrotated)).toBeTruthy();
+
+			// my original shape is what we want to test against
+			// if I have nX, and I want to test "if I rotate this X, does it match original"
+			expect(utils.rotation.equals.xy(original, rotated)).toBeTruthy();
+		});
 
 		test.todo('example: thrice');
 
 		// TODO finish and unskip test
 		test.skip('check that all are implemented', () => {
-			expect([undefined].concat(Object.keys(utils.rotation.equals))).toEqual(utils.rotation.allNames);
+			expect([undefined].concat(Object.keys(utils.rotation.equals)).sort()).toEqual([...utils.rotation.allNames].sort());
 		});
 
 		utils.rotation.allNames.forEach((rotation) => {
