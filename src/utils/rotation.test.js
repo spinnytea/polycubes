@@ -170,4 +170,11 @@ describe('utils.rotation', () => {
 		expect(rotationNames.length).toBe(24);
 		expect(rotationNames).toEqual(utils.rotation.allNames);
 	});
+
+	// i guess i'm paranoid
+	test('forwardRotations definition', () => {
+		Object.entries(utils.rotation.forwardRotations).forEach(([k, v]) => {
+			expect(v.join('')).toEqual(k === 'undefined' ? '' : k);
+		});
+	});
 });
