@@ -78,7 +78,7 @@ function listLocationsToGrow(polycube) {
 /**
 	@param {Polycube} polycube
 	@param {number[]} location
-	@return {Polycube}
+	@returns {Polycube}
 */
 function grow(polycube, [x, y, z]) {
 	const shape = utils.shape.clone(polycube.shape);
@@ -130,7 +130,7 @@ function grow(polycube, [x, y, z]) {
 	rotate the polycube across all dimensions
 
 	@param {Polycube} polycube
-	@return {Polycube[]} array of rotated items, the first is the same as the input
+	@returns {Polycube[]} array of rotated items, the first is the same as the input
 */
 function rotate(polycube) {
 	const rotations = [

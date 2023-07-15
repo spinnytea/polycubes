@@ -14,7 +14,7 @@ class Polycube {
 		returns the dimensions of the polycube
 
 		@usage `const [xLength, yLength, zLength] = polycube.size();`
-		@return {number[]}
+		@returns {number[]}
 	*/
 	size() {
 		return utils.shape.size(this.shape);
@@ -25,7 +25,7 @@ class Polycube {
 		we shouldn't ever actually need this, it should just be implicit
 		this is mostly just to start getting a handled on the data
 
-		@return {number}
+		@returns {number}
 	*/
 	n() {
 		return this.shape.reduce((rx, ys) => (rx + ys.reduce((ry, zs) => (ry + zs.reduce((rz, v) => (rz + (v === 1 ? 1 : 0)), 0)), 0)), 0);
@@ -35,7 +35,7 @@ class Polycube {
 		checks to see if this polycube is the same shape as another
 
 		@param {Polycube} polycube
-		@return {boolean}
+		@returns {boolean}
 	*/
 	equals(polycube) {
 		if (!polycube?.shape) throw new Error('polycube.equals must compare against polycubes');
@@ -47,7 +47,7 @@ class Polycube {
 
 	/**
 		get all the rotations for this shape
-		@return {Polycube[]} rotations
+		@returns {Polycube[]} rotations
 	*/
 	rotations() {
 		const { shape, rotation } = this;
