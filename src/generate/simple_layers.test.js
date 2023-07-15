@@ -5,7 +5,7 @@ const {
 	generateNext,
 	listLocationsToGrow,
 	rotate,
-} = require('./simple');
+} = require('./simple_layers');
 
 describe('generate simple', () => {
 	const n1 = new Polycube({ shape: [[[1]]] });

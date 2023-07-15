@@ -60,6 +60,7 @@ function listLocationsToGrow(polycube) {
 				if (v === 1) {
 					// x,y,z is filled in
 					// we can do any of the adjacent squares
+					// (we could filter these locations, but they will very quickly get removed later)
 					locations.push([x + 1, y, z]);
 					locations.push([x - 1, y, z]);
 					locations.push([x, y + 1, z]);
@@ -126,6 +127,8 @@ function grow(polycube, [x, y, z]) {
 
 /**
 	rotate the polycube across all dimensions
+
+	TODO implement each of these rotations as a single action
 
 	@param {Polycube} polycube
 	@return {Polycube[]} array of rotated items, the first is the same as the input
