@@ -20,14 +20,13 @@ const utilsShape = {
 		return shape;
 	},
 
+	every: (shape, callback) => (
+		shape.every((ys, x) => ys.every((zs, y) => zs.every((v, z) => callback(x, y, z, v))))
+	),
+
 	equals: (a, b) => (
-		a.length === b.length && a.every((ys, x) => (
-			ys.length === b[x].length && ys.every((zs, y) => (
-				zs.length === b[x][y].length && zs.every((v, z) => (
-					v === b[x][y][z]
-				))
-			))
-		))
+		a.length === b.length && a[0].length === b[0].length && a[0][0].length === b[0][0].length
+			&& utilsShape.every(a, (x, y, z, v) => v === b[x][y][z])
 	),
 
 	/**
