@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
 <head>
 	<title>It's a Shape!</title>
@@ -93,40 +93,37 @@
 </head>
 <body>
 	<div class="container">
-		<div class="scene" style="transform: rotate3d(1, 1, 1, 45deg);">
-			<div class="cube" style="transform: translate3d(0px, 0px, 0px);">
-				<div class="cube__face cube__face--front">front</div>
-				<div class="cube__face cube__face--back">back</div>
-				<div class="cube__face cube__face--right">right</div>
-				<div class="cube__face cube__face--left">left</div>
-				<div class="cube__face cube__face--top">top</div>
-				<div class="cube__face cube__face--bottom">bottom</div>
-			</div>
-			<div class="cube" style="transform: translate3d(100px, 0px, 0px);">
-				<div class="cube__face cube__face--front">front</div>
-				<div class="cube__face cube__face--back">back</div>
-				<div class="cube__face cube__face--right">right</div>
-				<div class="cube__face cube__face--left">left</div>
-				<div class="cube__face cube__face--top">top</div>
-				<div class="cube__face cube__face--bottom">bottom</div>
-			</div>
-			<div class="cube" style="transform: translate3d(0px, 100px, 0px);">
-				<div class="cube__face cube__face--front">front</div>
-				<div class="cube__face cube__face--back">back</div>
-				<div class="cube__face cube__face--right">right</div>
-				<div class="cube__face cube__face--left">left</div>
-				<div class="cube__face cube__face--top">top</div>
-				<div class="cube__face cube__face--bottom">bottom</div>
-			</div>
-			<div class="cube" style="transform: translate3d(0px, 0px, 100px);">
-				<div class="cube__face cube__face--front">front</div>
-				<div class="cube__face cube__face--back">back</div>
-				<div class="cube__face cube__face--right">right</div>
-				<div class="cube__face cube__face--left">left</div>
-				<div class="cube__face cube__face--top">top</div>
-				<div class="cube__face cube__face--bottom">bottom</div>
-			</div>
+		<div id="scene" class="scene" style="transform: rotate3d(1, 1, 1, 45deg);">
 		 </div>
 	</div>
+
+	<template id="cube__template">
+		<div class="cube">
+			<div class="cube__face cube__face--front">front</div>
+			<div class="cube__face cube__face--back">back</div>
+			<div class="cube__face cube__face--right">right</div>
+			<div class="cube__face cube__face--left">left</div>
+			<div class="cube__face cube__face--top">top</div>
+			<div class="cube__face cube__face--bottom">bottom</div>
+		</div>
+	</template>
+
+	<script>
+		const CUBE_SIZE = 100;
+		const scene = document.getElementById('scene');
+		const temp = document.getElementById('cube__template');
+
+		function addCube(x, y, z) {
+			let frag = temp.content.cloneNode(true);
+			frag.firstElementChild.setAttribute('style', `transform: translate3d(${x * CUBE_SIZE}px, ${y * CUBE_SIZE}px, ${z * CUBE_SIZE}px);`);
+			scene.appendChild(frag);
+		}
+
+		addCube(0, 0, 0);
+		addCube(1, 0, 0);
+		addCube(0, 1, 0);
+		addCube(0, 0, 1);
+		addCube(1, 1, 1);
+	</script>
 </body>
 </html>
