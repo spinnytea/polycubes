@@ -14,23 +14,34 @@ const utils = require('../utils');
 /**
 	@param {Polycube[]} polycubes
 */
-function generateNext(polycubes) {
+function generateNext(polycubes, { verbose } = {}) {
+	if (verbose) console.time(' … find');
+	if (verbose > 1) console.info();
 	const nexts = [];
-	polycubes.forEach((polycube) => {
+	polycubes.forEach((polycube, idx) => {
 		const locations = listLocationsToGrow(polycube);
 		const ns = locations
 			.map((location) => grow(polycube, location))
 			.filter((p) => !!p); // filter out failed grow attempts
 		Array.prototype.push.apply(nexts, ns);
+		if (verbose > 1) console.info(`   ${idx + 1} of ${polycubes.length}: found ${nexts.length} options`);
 	});
 	// XXX dedup nexts
+	if (verbose) console.timeEnd(' … find');
 
+	if (verbose) console.time(' … rotate');
+	if (verbose > 1) console.info();
 	const nextsRotated = nexts.map((next) => rotate(next));
 	// XXX dedup rotations of nexts
 	// XXX dedup nexts using rotations
+	if (verbose > 1) console.info(`   ${nexts.length} into total rotations ${nextsRotated.reduce((ret, r) => ret + r.length, 0)}`);
+	if (verbose) console.timeEnd(' … rotate');
 
+	if (verbose) console.time(' … check');
+	if (verbose > 1) console.info();
 	const found = [];
 	aggregate(found, nextsRotated);
+	if (verbose) console.timeEnd(' … check');
 
 	return found;
 }

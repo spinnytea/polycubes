@@ -13,11 +13,26 @@ describe('generate simple', () => {
 	const n3a = new Polycube({ shape: [[[1, 1, 1]]] });
 	const n3b = new Polycube({ shape: [[[1, 1], [1, 0]]] });
 
-	test('generateNext n=2', () => {
-		const gs = generateNext([n1]);
-		expect(gs.length).toBe(1);
-		// XXX should compare against a rotation, any of the three are valid
-		expect(gs[0]).toEqual(new Polycube({ shape: [[[1]], [[1]]] }));
+	describe('generateNext', () => {
+		test('n=2', () => {
+			const gs = generateNext([n1]);
+			expect(gs.length).toBe(1);
+		});
+
+		test('n=3', () => {
+			const gs = generateNext([n2]);
+			expect(gs.length).toBe(2);
+		});
+
+		test('n=4', () => {
+			const gs = generateNext([n3a, n3b]);
+			expect(gs.length).toBe(8);
+		});
+
+		test('n=5', () => {
+			const gs = generateNext(generateNext([n3a, n3b]));
+			expect(gs.length).toBe(29);
+		});
 	});
 
 	describe('listLocationsToGrow', () => {

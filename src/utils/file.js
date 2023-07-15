@@ -1,14 +1,16 @@
 const fs = require('fs');
+const path = require('path');
 
 const utilsFile = {
 
-	existsSync: (filename) => fs.existsSync(filename),
+	existsSync: (filepath) => fs.existsSync(filepath),
+	unlinkSync: (filepath) => fs.unlinkSync(filepath),
 
-	loadJson: (filename) => utilsFile.loadFile(filename).then((data) => JSON.parse(data)),
+	loadJson: (filepath) => utilsFile.loadFile(filepath).then((data) => JSON.parse(data)),
 
-	loadFile: (filename) => (
+	loadFile: (filepath) => (
 		new Promise((resolve, reject) => {
-			fs.readFile(filename, 'utf8', (err, data) => {
+			fs.readFile(filepath, 'utf8', (err, data) => {
 				if (err) {
 					reject(err);
 				}
@@ -19,17 +21,30 @@ const utilsFile = {
 		})
 	),
 
-	saveArrayJson: (filename, array) => (
+	saveArrayJson: (filepath, array) => (
 		new Promise((resolve, reject) => {
 			const content = `[\n${array
 				.map((v) => JSON.stringify(v))
 				.join(',\n')}\n]`;
-			fs.writeFile(filename, content, (err) => {
+			fs.writeFile(filepath, content, (err) => {
 				if (err) {
 					reject(err);
 				}
 				else {
 					resolve();
+				}
+			});
+		})
+	),
+
+	listFiles: (folder) => (
+		new Promise((resolve, reject) => {
+			fs.readdir(folder, (err, filenames) => {
+				if (err) {
+					reject(err);
+				}
+				else {
+					resolve(filenames.map((filename) => path.join(folder, filename)));
 				}
 			});
 		})
