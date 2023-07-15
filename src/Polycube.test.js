@@ -118,14 +118,92 @@ describe('Polycube', () => {
 		});
 	});
 
-	describe('bugfixes', () => {
+	describe.only('bugfixes', () => {
 		describe('rotations', () => {
-			// test (invalid) // valid
-			test.todo('[[[0,1],[1,1]],[[1,1],[0,0]]]'); // FIXME [[[1,0],[1,1]],[[1,0],[0,1]]]
-			test.todo('[[[0,1],[1,1]],[[0,1],[0,1]]]'); // FIXME [[[1,1],[1,0]],[[1,1],[0,0]]]
-			test.todo('[[[0,1],[0,1]],[[1,1],[0,0]],[[0,1],[0,0]]]'); // FIXME [[[1,0],[1,0],[1,1]],[[0,0],[1,0],[0,0]]]
-			test.todo('[[[0,1],[0,1],[1,1]],[[0,0],[0,1],[0,0]]]'); // FIXME [[[1,0],[1,0]],[[1,1],[0,0]],[[1,0],[0,0]]]
-			test.todo('[[[0,0],[0,1]],[[0,1],[0,1]],[[1,1],[0,0]]]'); // FIXME [[[1,0],[1,1],[0,1]],[[1,0],[0,0],[0,0]]]
+			test('[[[0,1],[1,1]],[[1,1],[0,0]]]', () => {
+				const invalid = new Polycube({ shape: JSON.parse('[[[0,1],[1,1]],[[1,1],[0,0]]]') });
+				const actual = new Polycube({ shape: JSON.parse('[[[1,0],[1,1]],[[1,0],[0,1]]]') });
+
+				expect(invalid.rotations().some((r) => actual.equals(r))).toBe(false); // FIXME fix this
+				expect(actual.rotations().some((r) => invalid.equals(r))).toBe(true); // interesting
+				expect(actual.rotations().find((r) => invalid.equals(r)).rotation).toBe('xy'); // interesting
+
+				expect(utils.shape.rotate.y(utils.shape.rotate.x(actual.shape))).toEqual(invalid.shape);
+				expect(utils.shape.rotate.nX(utils.shape.rotate.nY(invalid.shape))).toEqual(actual.shape);
+				expect(utils.rotation.equals.xy(invalid.shape, actual.shape)).toBe(true);
+				// expect(utils.rotation.equals.nYnX(actual.shape, invalid.shape)).toBe(true); // hmmm
+				expect(utils.rotation.equals.nYnX).toBe(undefined);
+
+				// this _is_ what I just said
+				// there isn't a rotation that matches them in this direction,
+				// but then why didn't we find it in our brute force?
+				utils.rotation.allNames.forEach((rn) => {
+					if (!rn) return;
+					expect(utils.rotation.equals[rn](actual.shape, invalid.shape)).toBe(false);
+				});
+
+				// FIXME so now what?
+			});
+
+			test('[[[0,1],[1,1]],[[0,1],[0,1]]]', () => {
+				const invalid = new Polycube({ shape: JSON.parse('[[[0,1],[1,1]],[[0,1],[0,1]]]') });
+				const actual = new Polycube({ shape: JSON.parse('[[[1,1],[1,0]],[[1,1],[0,0]]]') });
+
+				expect(invalid.rotations().some((r) => actual.equals(r))).toBe(false); // FIXME fix this
+				expect(actual.rotations().some((r) => invalid.equals(r))).toBe(true); // interesting
+				expect(actual.rotations().find((r) => invalid.equals(r)).rotation).toBe('xz'); // interesting
+
+				expect(utils.shape.rotate.y(utils.shape.rotate.z(actual.shape))).toEqual(invalid.shape);
+				expect(utils.shape.rotate.nX(utils.shape.rotate.nZ(invalid.shape))).toEqual(actual.shape);
+				expect(utils.rotation.equals.xz(invalid.shape, actual.shape)).toBe(true);
+				// expect(utils.rotation.equals.nYnZ(actual.shape, invalid.shape)).toBe(true); // hmmm
+				expect(utils.rotation.equals.nYnZ).toBe(undefined);
+			});
+
+			test('[[[0,1],[0,1]],[[1,1],[0,0]],[[0,1],[0,0]]]', () => {
+				const invalid = new Polycube({ shape: JSON.parse('[[[0,1],[0,1]],[[1,1],[0,0]],[[0,1],[0,0]]]') });
+				const actual = new Polycube({ shape: JSON.parse('[[[1,0],[1,0],[1,1]],[[0,0],[1,0],[0,0]]]') });
+
+				expect(invalid.rotations().some((r) => actual.equals(r))).toBe(false); // FIXME fix this
+				expect(actual.rotations().some((r) => invalid.equals(r))).toBe(true); // interesting
+				expect(actual.rotations().find((r) => invalid.equals(r)).rotation).toBe('xy'); // interesting
+
+				expect(utils.shape.rotate.y(utils.shape.rotate.x(actual.shape))).toEqual(invalid.shape);
+				expect(utils.shape.rotate.nX(utils.shape.rotate.nY(invalid.shape))).toEqual(actual.shape);
+				expect(utils.rotation.equals.xy(invalid.shape, actual.shape)).toBe(true);
+				// expect(utils.rotation.equals.nYnX(actual.shape, invalid.shape)).toBe(true); // hmmm
+				expect(utils.rotation.equals.nYnX).toBe(undefined);
+			});
+
+			test('[[[0,1],[0,1],[1,1]],[[0,0],[0,1],[0,0]]]', () => {
+				const invalid = new Polycube({ shape: JSON.parse('[[[0,1],[0,1],[1,1]],[[0,0],[0,1],[0,0]]]') });
+				const actual = new Polycube({ shape: JSON.parse('[[[1,0],[1,0]],[[1,1],[0,0]],[[1,0],[0,0]]]') });
+
+				expect(invalid.rotations().some((r) => actual.equals(r))).toBe(false); // FIXME fix this
+				expect(actual.rotations().some((r) => invalid.equals(r))).toBe(true); // interesting
+				expect(actual.rotations().find((r) => invalid.equals(r)).rotation).toBe('xz'); // interesting
+
+				expect(utils.shape.rotate.y(utils.shape.rotate.z(actual.shape))).toEqual(invalid.shape);
+				expect(utils.shape.rotate.nX(utils.shape.rotate.nZ(invalid.shape))).toEqual(actual.shape);
+				expect(utils.rotation.equals.xz(invalid.shape, actual.shape)).toBe(true);
+				// expect(utils.rotation.equals.nYnZ(actual.shape, invalid.shape)).toBe(true); // hmmm
+				expect(utils.rotation.equals.nYnZ).toBe(undefined);
+			});
+
+			test('[[[0,0],[0,1]],[[0,1],[0,1]],[[1,1],[0,0]]]', () => {
+				const invalid = new Polycube({ shape: JSON.parse('[[[0,0],[0,1]],[[0,1],[0,1]],[[1,1],[0,0]]]') });
+				const actual = new Polycube({ shape: JSON.parse('[[[1,0],[1,1],[0,1]],[[1,0],[0,0],[0,0]]]') });
+
+				expect(invalid.rotations().some((r) => actual.equals(r))).toBe(false); // FIXME fix this
+				expect(actual.rotations().some((r) => invalid.equals(r))).toBe(true); // interesting
+				expect(actual.rotations().find((r) => invalid.equals(r)).rotation).toBe('xy'); // interesting
+
+				expect(utils.shape.rotate.y(utils.shape.rotate.x(actual.shape))).toEqual(invalid.shape);
+				expect(utils.shape.rotate.nX(utils.shape.rotate.nY(invalid.shape))).toEqual(actual.shape);
+				expect(utils.rotation.equals.xy(invalid.shape, actual.shape)).toBe(true);
+				// expect(utils.rotation.equals.nYnX(actual.shape, invalid.shape)).toBe(true); // hmmm
+				expect(utils.rotation.equals.nYnX).toBe(undefined);
+			});
 		});
 	});
 });

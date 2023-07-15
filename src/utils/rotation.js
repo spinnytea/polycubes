@@ -509,6 +509,40 @@ const utilsRotation = {
 		xyy: Object.freeze(['nY', 'nY', 'nX']),
 		xzz: Object.freeze(['nZ', 'nZ', 'nX']),
 	}),
+
+	forwardRotations: Object.freeze({
+		// same (none)
+		undefined: Object.freeze([]),
+
+		// once
+		x: Object.freeze(['x']),
+		y: Object.freeze(['y']),
+		z: Object.freeze(['z']),
+		nX: Object.freeze(['nX']),
+		nY: Object.freeze(['nY']),
+		nZ: Object.freeze(['nZ']),
+
+		// twice
+		xx: Object.freeze(['x', 'x']),
+		xy: Object.freeze(['x', 'y']),
+		xz: Object.freeze(['x', 'z']),
+		xnY: Object.freeze(['x', 'nY']),
+		xnZ: Object.freeze(['x', 'nZ']),
+		yy: Object.freeze(['y', 'y']),
+		ynX: Object.freeze(['y', 'nX']),
+		ynZ: Object.freeze(['y', 'nZ']),
+		zz: Object.freeze(['z', 'z']),
+		znX: Object.freeze(['z', 'nX']),
+		nXnZ: Object.freeze(['nX', 'nZ']),
+
+		// thrice
+		xxy: Object.freeze(['x', 'x', 'y']),
+		xxz: Object.freeze(['x', 'x', 'z']),
+		xxnY: Object.freeze(['x', 'x', 'nY']),
+		xxnZ: Object.freeze(['x', 'x', 'nZ']),
+		xyy: Object.freeze(['x', 'y', 'y']),
+		xzz: Object.freeze(['x', 'z', 'z']),
+	}),
 };
 
 module.exports = utilsRotation;

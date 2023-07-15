@@ -40,7 +40,8 @@ describe('utils.rotation', () => {
 				test.todo(rotation);
 				return;
 			}
-			test(rotation, () => {
+
+			test(`${rotation} reverse`, () => {
 				// actually do the inverse rotations
 				let rotated = shape;
 				utils.rotation.inverseRotations[rotation].forEach((dir) => {
@@ -52,6 +53,20 @@ describe('utils.rotation', () => {
 
 				// check that rotated (shape) --rotation-> shape
 				expect(utils.rotation.equals[rotation](shape, rotated)).toBeTruthy();
+			});
+
+			test(`${rotation} forward`, () => {
+				// actually do the inverse rotations
+				let rotated = shape;
+				utils.rotation.forwardRotations[rotation].forEach((dir) => {
+					rotated = utils.shape.rotate[dir](rotated);
+				});
+
+				// … we chose a shape where this should be an unecessary check
+				expect(utils.shape.equals(shape, rotated)).toBeFalsy();
+
+				// check that rotated (shape) --rotation-> shape
+				expect(utils.rotation.equals[rotation](rotated, shape)).toBeTruthy();
 			});
 		});
 	});
@@ -95,6 +110,20 @@ describe('utils.rotation', () => {
 						rotatedShapes.push(newShape);
 						rotatedDirs.push([dir1, dir2, dir3]);
 					}
+				});
+			});
+		});
+		dirs.forEach((dir1) => {
+			dirs.forEach((dir2) => {
+				dirs.forEach((dir3) => {
+					dirs.forEach((dir4) => {
+						const newShape = utils.shape.rotate[dir1](utils.shape.rotate[dir2](utils.shape.rotate[dir3](utils.shape.rotate[dir4](shape))));
+						const alreadyExists = rotatedShapes.some((s) => utils.shape.equals(s, newShape));
+						if (!alreadyExists) {
+							rotatedShapes.push(newShape);
+							rotatedDirs.push([dir1, dir2, dir3, dir4]);
+						}
+					});
 				});
 			});
 		});
