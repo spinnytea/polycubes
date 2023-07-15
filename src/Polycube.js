@@ -39,6 +39,9 @@ class Polycube {
 	*/
 	equals(polycube) {
 		if (!polycube?.shape) throw new Error('polycube.equals must compare against polycubes');
+		if (polycube.rotation) {
+			return utils.rotation.equals[polycube.rotation](this.shape, polycube.shape);
+		}
 		return utils.shape.equals(this.shape, polycube.shape);
 	}
 

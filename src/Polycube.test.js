@@ -1,4 +1,5 @@
 const Polycube = require('./Polycube');
+const utils = require('./utils');
 
 describe('Polycube', () => {
 	test('prototype', () => {
@@ -27,22 +28,47 @@ describe('Polycube', () => {
 	});
 
 	describe('equals', () => {
-		const polycube = new Polycube({ shape: [[[1]]] });
+		test('no rotation', () => {
+			const polycube = new Polycube({ shape: [[[1]]] });
 
-		expect(polycube.equals(polycube)).toBeTruthy();
-		expect(polycube.equals(new Polycube({ shape: [[[1]]] }))).toBeTruthy();
-		expect(polycube.equals(new Polycube({ shape: [[[0]]] }))).toBeFalsy();
-		expect(new Polycube({ shape: [[[1, 0]]] }).equals(new Polycube({ shape: [[[1, 0]]] }))).toBeTruthy();
-		expect(new Polycube({ shape: [[[1, 0]]] }).equals(new Polycube({ shape: [[[1, 1]]] }))).toBeFalsy();
-		expect(new Polycube({ shape: [[[1, 0]]] }).equals(new Polycube({ shape: [[[0, 1]]] }))).toBeFalsy();
+			expect(polycube.equals(polycube)).toBeTruthy();
+			expect(polycube.equals(new Polycube({ shape: [[[1]]] }))).toBeTruthy();
+			expect(polycube.equals(new Polycube({ shape: [[[0]]] }))).toBeFalsy();
+			expect(new Polycube({ shape: [[[1, 0]]] }).equals(new Polycube({ shape: [[[1, 0]]] }))).toBeTruthy();
+			expect(new Polycube({ shape: [[[1, 0]]] }).equals(new Polycube({ shape: [[[1, 1]]] }))).toBeFalsy();
+			expect(new Polycube({ shape: [[[1, 0]]] }).equals(new Polycube({ shape: [[[0, 1]]] }))).toBeFalsy();
 
-		expect(new Polycube({ shape: [[[1, 1], [1, 0]], [[1, 0], [1, 1]], [[1, 0], [0, 0]]] })
-			.equals(new Polycube({ shape: [[[1, 1], [1, 0]], [[1, 0], [1, 1]], [[1, 0], [0, 0]]] }))).toBeTruthy();
+			expect(new Polycube({ shape: [[[1, 1], [1, 0]], [[1, 0], [1, 1]], [[1, 0], [0, 0]]] })
+				.equals(new Polycube({ shape: [[[1, 1], [1, 0]], [[1, 0], [1, 1]], [[1, 0], [0, 0]]] }))).toBeTruthy();
 
-		// just in case
-		expect(() => polycube.equals([[[1]]])).toThrow();
-		expect(() => polycube.equals(null)).toThrow();
-		expect(() => polycube.equals(undefined)).toThrow();
+			// just in case
+			expect(() => polycube.equals([[[1]]])).toThrow();
+			expect(() => polycube.equals(null)).toThrow();
+			expect(() => polycube.equals(undefined)).toThrow();
+		});
+
+		test('rotation: x', () => {
+			const originalShape = [[[1, 2], [4, 3]]];
+			const xShape = [[[4, 1], [3, 2]]];
+			const nXShape = [[[2, 3], [1, 4]]];
+			// 1 2       4 1
+			// 4 3  -->  3 2
+			expect(utils.shape.rotate.x(originalShape)).toEqual(xShape);
+			// 1 2       2 3
+			// 4 3  -->  1 4
+			expect(utils.shape.rotate.nX(originalShape)).toEqual(nXShape);
+
+			// if we check first shape is our base; second needs to be rotated in X and checked against first
+			// nX --x-> original
+			// original --x-> x
+			expect(new Polycube({ shape: originalShape }).equals(new Polycube({ shape: nXShape, rotation: 'x' }))).toBeTruthy();
+			expect(new Polycube({ shape: xShape }).equals(new Polycube({ shape: originalShape, rotation: 'x' }))).toBeTruthy();
+
+			// these are going in the wrong direction
+			// if we rotate the x shape in x again, it is not the original
+			expect(new Polycube({ shape: originalShape }).equals(new Polycube({ shape: xShape, rotation: 'x' }))).toBeFalsy();
+			expect(new Polycube({ shape: nXShape }).equals(new Polycube({ shape: originalShape, rotation: 'x' }))).toBeFalsy();
+		});
 	});
 
 	describe('rotations', () => {

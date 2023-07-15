@@ -129,11 +129,6 @@ function grow(polycube, [x, y, z]) {
 /**
 	rotate the polycube across all dimensions
 
-	TODO all of these rotations are just different ways of iterating over an array
-	 - instead of actually _creating_ the arrays, just loop over them in a different order
-	 - (same x,y,z, but differnt math for getting to the index)
-	 - we can still dedup them, mark which ones are the same
-
 	@param {Polycube} polycube
 	@return {Polycube[]} array of rotated items, the first is the same as the input
 */
