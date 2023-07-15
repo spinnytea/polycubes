@@ -1,14 +1,11 @@
 const utils = require('.');
 
 describe('utils.rotation', () => {
-	// TODO 1, 2, 3 is enough to distinguish directions (pos or neg; `x` vs `rxl - x - 1`)
-	//  - but we need 2, 3, 4 to distinguish the patterns
-	const shape = [[[1, 2, 3], [6, 5, 4]]];
-	// const shape = [[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]], [[13, 14, 15, 16], [17, 18, 19, 20], [21, 22, 23, 24]]];
+	const shape = [[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]], [[13, 14, 15, 16], [17, 18, 19, 20], [21, 22, 23, 24]]];
 
 	describe('equals', () => {
 		test('example: once', () => {
-			const original = shape;
+			const original = [[[1, 2, 3], [6, 5, 4]]];
 			const rotated = utils.shape.rotate.nX(original); // reverse the rotation we want to test
 			const unrotated = utils.shape.rotate.x(rotated); // rotate it back for posterity
 			expect(utils.shape.equals(original, rotated)).toBeFalsy();
@@ -20,7 +17,7 @@ describe('utils.rotation', () => {
 		});
 
 		test('example: twice', () => {
-			const original = shape;
+			const original = [[[1, 2, 3], [6, 5, 4]]];
 			const rotated = utils.shape.rotate.nX(utils.shape.rotate.nY(original)); // reverse the rotation we want to test
 			const unrotated = utils.shape.rotate.y(utils.shape.rotate.x(rotated)); // rotate it back for posterity
 			expect(utils.shape.equals(original, rotated)).toBeFalsy();
