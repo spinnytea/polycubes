@@ -78,6 +78,7 @@ function listLocationsToGrow(polycube) {
 /**
 	@param {Polycube} polycube
 	@param {number[]} location
+	@return {Polycube}
 */
 function grow(polycube, [x, y, z]) {
 	const shape = utils.shape.clone(polycube.shape);
@@ -188,7 +189,7 @@ function aggregate(found, nextsRotated) {
 				// if any of the rotations are a match, then we don't add our vanguard
 				const alreadyExists = rotations.some((polycube) => (
 					found.some((f) => (
-						utils.shape.equals(f.shape, polycube.shape)
+						f.equals(polycube)
 					))
 				));
 				if (!alreadyExists) {
