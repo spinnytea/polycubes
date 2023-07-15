@@ -40,6 +40,7 @@ yargs(hideBin(process.argv))
 // TODO metrics? (how many polycubes created, pruned, spaces tested, etc)
 // TODO speed it all up
 // TODO is it useful to sort anything? can we find collisions faster?
+//  - maybe just the final output?
 function enumerate(argv) {
 	const { n, verbose } = argv;
 	return dynamic(generateNext, { n, verbose });

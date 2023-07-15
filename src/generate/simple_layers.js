@@ -171,33 +171,6 @@ function rotate(polycube) {
 		utils.shape.rotate.x(utils.shape.rotate.z(utils.shape.rotate.z(polycube.shape))),
 	];
 
-	/*
-	// brute force
-	const dirs = ['x', 'y', 'z', 'nX', 'nY', 'nZ'];
-	dirs.forEach((dir1) => {
-		dirs.forEach((dir2) => {
-			const newShape = utils.shape.rotate[dir1](utils.shape.rotate[dir2](polycube.shape));
-			const alreadyExists = rotations.some((s) => utils.shape.equals(s, newShape));
-			if (!alreadyExists) {
-				console.log('new Shape', dir1, dir2);
-				rotations.push(newShape);
-			}
-		});
-	});
-	dirs.forEach((dir1) => {
-		dirs.forEach((dir2) => {
-			dirs.forEach((dir3) => {
-				const newShape = utils.shape.rotate[dir1](utils.shape.rotate[dir2](utils.shape.rotate[dir3](polycube.shape)));
-				const alreadyExists = rotations.some((s) => utils.shape.equals(s, newShape));
-				if (!alreadyExists) {
-					console.log('new Shape', dir1, dir2, dir3);
-					rotations.push(newShape);
-				}
-			});
-		});
-	});
-	*/
-
 	// rotate should have a length of 24
 	return rotations.map((shape) => new Polycube({ shape }));
 }
