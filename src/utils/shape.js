@@ -20,16 +20,21 @@ const utilsShape = {
 		return shape;
 	},
 
-	equals: (a, b) => (
-		a.length === b.length && a.every((ys, x) => (
-			ys.length === b[x].length && ys.every((zs, y) => (
-				zs.length === b[x][y].length && zs.every((v, z) => (
-					v === b[x][y][z]
-				))
-			))
-		))
+	every: (shape, callback) => (
+		shape.every((ys, x) => ys.every((zs, y) => zs.every((v, z) => callback(x, y, z, v))))
 	),
 
+	equals: (a, b) => (
+		a.length === b.length && a[0].length === b[0].length && a[0][0].length === b[0][0].length
+			&& utilsShape.every(a, (x, y, z, v) => v === b[x][y][z])
+	),
+
+	/**
+		returns the dimensions of the shape
+
+		@usage `const [xLength, yLength, zLength] = utils.shape.size(shape);`
+		@returns {number[]}
+	*/
 	size: (shape) => (
 		[shape.length, shape[0].length, shape[0][0].length]
 	),
@@ -55,7 +60,7 @@ const utilsShape = {
 			@sideeffects
 			@param {number[][][]} shape - is mutated
 		*/
-		negX: (shape) => {
+		nX: (shape) => {
 			const zLength = shape[0][0].length;
 			const zs = [];
 			while (zs.length < zLength) zs.push(0);
@@ -85,7 +90,7 @@ const utilsShape = {
 			@sideeffects
 			@param {number[][][]} shape - is mutated
 		*/
-		negY: (shape) => {
+		nY: (shape) => {
 			const zLength = shape[0][0].length;
 			const zs = [];
 			while (zs.length < zLength) zs.push(0);
@@ -111,7 +116,7 @@ const utilsShape = {
 			@sideeffects
 			@param {number[][][]} shape - is mutated
 		*/
-		negZ: (shape) => {
+		nZ: (shape) => {
 			shape.forEach((ys) => {
 				ys.forEach((zs) => {
 					zs.unshift(0);
@@ -121,15 +126,18 @@ const utilsShape = {
 	},
 
 	rotate: {
-		// rotate matrix clockwise
+		/*
+			rotate matrix clockwise
+			 - x fixed
+			 - y/z rotate
+
+			@deprecated - use `utils.rotation` instead
+		*/
 		x: (shape) => {
 			const [xLength, yLength, zLength] = utilsShape.size(shape);
 
-			// x is fixed
-			// y/z rotate
 			const newShape = utilsShape.create(xLength, zLength, yLength);
 
-			// copy values, but rotated clockwise
 			shape.forEach((ys, x) => {
 				ys.forEach((zs, y) => {
 					zs.forEach((v, z) => {
@@ -138,18 +146,21 @@ const utilsShape = {
 				});
 			});
 
-			// rotate matrix counter-clockwise
 			return newShape;
 		},
 
-		negX: (shape) => {
+		/*
+			rotate matrix counter-clockwise
+			 - x fixed
+			 - y/z rotate
+
+			@deprecated - use `utils.rotation` instead
+		*/
+		nX: (shape) => {
 			const [xLength, yLength, zLength] = utilsShape.size(shape);
 
-			// x is fixed
-			// y/z rotate
 			const newShape = utilsShape.create(xLength, zLength, yLength);
 
-			// copy values, but rotated clockwise
 			shape.forEach((ys, x) => {
 				ys.forEach((zs, y) => {
 					zs.forEach((v, z) => {
@@ -158,18 +169,21 @@ const utilsShape = {
 				});
 			});
 
-			// rotate matrix counter-clockwise
 			return newShape;
 		},
 
+		/*
+			rotate matrix clockwise
+			 - y is fixed
+			 - x/z rotate
+
+			@deprecated - use `utils.rotation` instead
+		*/
 		y: (shape) => {
 			const [xLength, yLength, zLength] = utilsShape.size(shape);
 
-			// y is fixed
-			// x/z rotate
 			const newShape = utilsShape.create(zLength, yLength, xLength);
 
-			// copy values, but rotated clockwise
 			shape.forEach((ys, x) => {
 				ys.forEach((zs, y) => {
 					zs.forEach((v, z) => {
@@ -178,18 +192,21 @@ const utilsShape = {
 				});
 			});
 
-			// rotate matrix counter-clockwise
 			return newShape;
 		},
 
-		negY: (shape) => {
+		/*
+			rotate matrix counter-clockwise
+			 - y is fixed
+			 - x/z rotate
+
+			@deprecated - use `utils.rotation` instead
+		*/
+		nY: (shape) => {
 			const [xLength, yLength, zLength] = utilsShape.size(shape);
 
-			// y is fixed
-			// x/z rotate
 			const newShape = utilsShape.create(zLength, yLength, xLength);
 
-			// copy values, but rotated clockwise
 			shape.forEach((ys, x) => {
 				ys.forEach((zs, y) => {
 					zs.forEach((v, z) => {
@@ -198,18 +215,21 @@ const utilsShape = {
 				});
 			});
 
-			// rotate matrix counter-clockwise
 			return newShape;
 		},
 
+		/*
+			rotate matrix clockwise
+			 - z is fixed
+			 - x/y rotate
+
+			@deprecated - use `utils.rotation` instead
+		*/
 		z: (shape) => {
 			const [xLength, yLength, zLength] = utilsShape.size(shape);
 
-			// z is fixed
-			// x/y rotate
 			const newShape = utilsShape.create(yLength, xLength, zLength);
 
-			// copy values, but rotated clockwise
 			shape.forEach((ys, x) => {
 				ys.forEach((zs, y) => {
 					zs.forEach((v, z) => {
@@ -218,18 +238,21 @@ const utilsShape = {
 				});
 			});
 
-			// rotate matrix counter-clockwise
 			return newShape;
 		},
 
-		negZ: (shape) => {
+		/*
+			rotate matrix counter-clockwise
+			 - z is fixed
+			 - x/y rotate
+
+			@deprecated - use `utils.rotation` instead
+		*/
+		nZ: (shape) => {
 			const [xLength, yLength, zLength] = utilsShape.size(shape);
 
-			// z is fixed
-			// x/y rotate
 			const newShape = utilsShape.create(yLength, xLength, zLength);
 
-			// copy values, but rotated clockwise
 			shape.forEach((ys, x) => {
 				ys.forEach((zs, y) => {
 					zs.forEach((v, z) => {
@@ -238,9 +261,41 @@ const utilsShape = {
 				});
 			});
 
-			// rotate matrix counter-clockwise
 			return newShape;
 		},
+	},
+
+	/**
+	 	breadth first search to find a rotation to get from a to b
+		(image doing depth first, that's funny)
+
+		@param {number[][][]} from - starting shape
+		@param {number[][][]} to - target shape
+		@param {string[][]} skip - any rotations to skip
+	*/
+	findRotation: (from, to, skip = []) => {
+		const dirs = Object.keys(utilsShape.rotate);
+		const frontier = [[from, []]];
+		// we shouldn't need more than 3 rotations to get from/to anywhere
+		// 1s, 2s, 3s
+		// and if it's 2 away, then it's always an even number away
+		let steps = dirs.length * dirs.length * dirs.length * dirs.length;
+		while (steps > 0 && frontier.length > 0) {
+			steps -= 1;
+			const [next, rotations] = frontier.shift();
+
+			if (utilsShape.equals(next, to)) {
+				if (!skip.some((s) => (s.join('') === rotations.join('')))) {
+					return rotations;
+				}
+			}
+
+			dirs.forEach((dir) => {
+				frontier.push([utilsShape.rotate[dir](next), [...rotations, dir]]);
+			});
+		}
+
+		return null;
 	},
 
 };
