@@ -61,6 +61,10 @@ class Polycube {
 
 	/**
 		get all the rotations for this shape
+
+		TODO it's weird that `utils.rotation` is in Polycube, but `utils.shape` is in simple_layers
+		 - I think I was banking on this being definitively better
+
 		@returns {Polycube[]} rotations
 	*/
 	rotations() {

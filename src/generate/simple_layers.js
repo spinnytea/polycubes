@@ -1,5 +1,6 @@
 const Polycube = require('../Polycube');
 const utils = require('../utils');
+const { USE_ACTUAL_ROTATIONS } = require('../options');
 
 /*
 	This whole file is super un-optimized.
@@ -10,8 +11,6 @@ const utils = require('../utils');
 	But we can use it to verify we are generating the correct answers for low `n`.
 	We can use this as the baseline, and then start getting fancy.
 */
-
-const USE_ACTUAL_ROTATIONS = true;
 
 /**
 	@param {Polycube[]} polycubes
