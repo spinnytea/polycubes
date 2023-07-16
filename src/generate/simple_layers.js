@@ -11,6 +11,8 @@ const utils = require('../utils');
 	We can use this as the baseline, and then start getting fancy.
 */
 
+const USE_ACTUAL_ROTATIONS = true;
+
 /**
 	@param {Polycube[]} polycubes
 */
@@ -31,8 +33,10 @@ function generateNext(polycubes, { verbose } = {}) {
 
 	if (verbose) console.time(' … rotate');
 	if (verbose > 1) console.info();
-	const nextsRotated = nexts.map((next) => rotate(next));
-	// const nextsRotated = nexts.map((next) => next.rotations()); // FIXME all that and there's bugs; n=5 makes 31 in test and 32 (¿34?) from cli
+	const nextsRotated = USE_ACTUAL_ROTATIONS
+		? nexts.map((next) => rotate(next))
+		: nexts.map((next) => next.rotations());
+
 	// XXX dedup rotations of nexts
 	// XXX dedup nexts using rotations
 	if (verbose > 1) console.info(`   ${nexts.length} into total rotations ${nextsRotated.reduce((ret, r) => ret + r.length, 0)}`);

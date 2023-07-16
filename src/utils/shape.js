@@ -265,6 +265,39 @@ const utilsShape = {
 		},
 	},
 
+	/**
+	 	breadth first search to find a rotation to get from a to b
+		(image doing depth first, that's funny)
+
+		@param {number[][][]} from - starting shape
+		@param {number[][][]} to - target shape
+		@param {string[][]} skip - any rotations to skip
+	*/
+	findRotation: (from, to, skip = []) => {
+		const dirs = Object.keys(utilsShape.rotate);
+		const frontier = [[from, []]];
+		// we shouldn't need more than 3 rotations to get from/to anywhere
+		// 1s, 2s, 3s
+		// and if it's 2 away, then it's always an even number away
+		let steps = dirs.length * dirs.length * dirs.length * dirs.length;
+		while (steps > 0 && frontier.length > 0) {
+			steps -= 1;
+			const [next, rotations] = frontier.shift();
+
+			if (utilsShape.equals(next, to)) {
+				if (!skip.some((s) => (s.join('') === rotations.join('')))) {
+					return rotations;
+				}
+			}
+
+			dirs.forEach((dir) => {
+				frontier.push([utilsShape.rotate[dir](next), [...rotations, dir]]);
+			});
+		}
+
+		return null;
+	},
+
 };
 
 module.exports = utilsShape;
