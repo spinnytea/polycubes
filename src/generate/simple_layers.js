@@ -16,7 +16,7 @@ const { USE_ACTUAL_ROTATIONS } = require('../options');
 	@param {Polycube[]} polycubes
 */
 function generateNext(polycubes, { verbose } = {}) {
-	if (verbose) console.time(' … find');
+	if (verbose) console.time(' … additions');
 	if (verbose > 1) console.info();
 	const nexts = [];
 	polycubes.forEach((polycube, idx) => {
@@ -28,7 +28,7 @@ function generateNext(polycubes, { verbose } = {}) {
 		if (verbose > 1) console.info(`   ${idx + 1} of ${polycubes.length}: found ${nexts.length} options`);
 	});
 	// XXX dedup nexts
-	if (verbose) console.timeEnd(' … find');
+	if (verbose) console.timeEnd(' … additions');
 
 	if (verbose) console.time(' … rotate');
 	if (verbose > 1) console.info();
@@ -41,12 +41,12 @@ function generateNext(polycubes, { verbose } = {}) {
 	if (verbose > 1) console.info(`   ${nexts.length} into total rotations ${nextsRotated.reduce((ret, r) => ret + r.length, 0)}`);
 	if (verbose) console.timeEnd(' … rotate');
 
-	if (verbose) console.time(' … check');
+	if (verbose) console.time(' … unique');
 	if (verbose > 1) console.info();
 	const found = [];
 	aggregate(found, nextsRotated);
 	found.sort((a, b) => b.serialized.localeCompare(a.serialized));
-	if (verbose) console.timeEnd(' … check');
+	if (verbose) console.timeEnd(' … unique');
 
 	return found;
 }

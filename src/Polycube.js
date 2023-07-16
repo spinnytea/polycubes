@@ -54,6 +54,7 @@ class Polycube {
 		if (polycube.rotation) {
 			return utils.rotation.equals[polycube.rotation](this.shape, polycube.shape)
 				// XXX although… i'm not sure why straight rotations didn't have this problem
+				//  - maybe i should impl the set of `inverseRotations` too
 				|| utils.rotation.equals[polycube.rotation](polycube.shape, this.shape);
 		}
 		return utils.shape.equals(this.shape, polycube.shape);
