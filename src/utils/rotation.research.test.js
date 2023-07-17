@@ -109,7 +109,8 @@ describe('utils.rotation research', () => {
 		maybe i made mistakes
 	*/
 	describe('compound dirs', () => {
-		function inverseSingle(d) {
+		/** neg (inverseSingle) */
+		function neg(d) {
 			switch (d) {
 				case 'x': return 'nX';
 				case 'y': return 'nY';
@@ -117,6 +118,18 @@ describe('utils.rotation research', () => {
 				case 'nX': return 'x';
 				case 'nY': return 'y';
 				case 'nZ': return 'z';
+				default: throw new Error('whoops');
+			}
+		}
+
+		function rotateCoord([x, y, z], d) {
+			switch (d) {
+				case 'x': return [x, z, neg(y)];
+				case 'nX': return [x, neg(z), y];
+				case 'y': return [z, y, neg(x)];
+				case 'nY': return [neg(z), y, x];
+				case 'z': return [y, neg(x), z];
+				case 'nZ': return [neg(y), x, z];
 				default: throw new Error('whoops');
 			}
 		}
@@ -142,13 +155,13 @@ describe('utils.rotation research', () => {
 			return rotations;
 		}
 
-		test('inverseSingle', () => {
-			expect(inverseSingle('x')).toBe('nX');
-			expect(inverseSingle('y')).toBe('nY');
-			expect(inverseSingle('z')).toBe('nZ');
-			expect(inverseSingle('nX')).toBe('x');
-			expect(inverseSingle('nY')).toBe('y');
-			expect(inverseSingle('nZ')).toBe('z');
+		test('neg (inverseSingle)', () => {
+			expect(neg('x')).toBe('nX');
+			expect(neg('y')).toBe('nY');
+			expect(neg('z')).toBe('nZ');
+			expect(neg('nX')).toBe('x');
+			expect(neg('nY')).toBe('y');
+			expect(neg('nZ')).toBe('z');
 		});
 
 		test('splitStrToRotations', () => {
@@ -166,8 +179,67 @@ describe('utils.rotation research', () => {
 
 		test('inverseRotations', () => {
 			Object.entries(utils.rotation.inverseRotations).forEach(([k, v]) => {
-				expect(splitStrToRotations(k).map((d) => inverseSingle(d)).reverse()).toEqual(v);
+				expect(splitStrToRotations(k).map((d) => neg(d)).reverse()).toEqual(v);
 			});
+		});
+
+		test('rotateCoord', () => {
+			expect(rotateCoord(['x', 'y', 'z'], 'x')).toEqual(['x', 'z', 'nY']);
+			expect(rotateCoord(['x', 'y', 'z'], 'nX')).toEqual(['x', 'nZ', 'y']);
+			expect(rotateCoord(['x', 'y', 'z'], 'y')).toEqual(['z', 'y', 'nX']);
+			expect(rotateCoord(['x', 'y', 'z'], 'nY')).toEqual(['nZ', 'y', 'x']);
+			expect(rotateCoord(['x', 'y', 'z'], 'z')).toEqual(['y', 'nX', 'z']);
+			expect(rotateCoord(['x', 'y', 'z'], 'nZ')).toEqual(['nY', 'x', 'z']);
+		});
+
+		describe('utils.rotation.equals', () => {
+			const expected = {
+				// same (none)
+				undefined: Object.freeze([]),
+
+				// once
+				x: ['x', 'z', 'nY'],
+				y: ['z', 'y', 'nX'],
+				z: ['y', 'nX', 'z'],
+				nX: ['x', 'nZ', 'y'],
+				nY: ['nZ', 'y', 'x'],
+				nZ: ['nY', 'x', 'z'],
+
+				// twice
+				xx: ['x', 'nY', 'nZ'],
+				xy: ['nY', 'z', 'nX'],
+				xz: ['z', 'nX', 'nY'],
+				xnY: ['y', 'z', 'x'],
+				xnZ: ['nZ', 'x', 'nY'],
+				yy: ['nX', 'y', 'nZ'],
+				ynX: ['z', 'x', 'y'],
+				ynZ: ['nY', 'z', 'nX'],
+				zz: ['nX', 'nY', 'z'],
+				znX: ['y', 'nZ', 'nX'],
+				nXnZ: ['z', 'x', 'y'],
+
+				// thrice
+				xxy: ['nZ', 'nY', 'nX'],
+				xxz: ['nY', 'nX', 'nZ'],
+				xxnY: ['z', 'nY', 'x'],
+				xxnZ: ['y', 'x', 'nZ'],
+				xyy: ['nX', 'z', 'y'],
+				xzz: ['nX', 'nZ', 'nY'],
+			};
+
+			Object.keys(utils.rotation.equals).forEach((k) => {
+				test(k, () => {
+					expect(splitStrToRotations(k).reduce((coords, d) => rotateCoord(coords, d), ['x', 'y', 'z']))
+						.toEqual(expected[k]);
+				});
+			});
+
+			/**
+				it's not going to be _all possible_ orientations, some will need the rectangle matrix to be inverted
+				so simple iteration of all possible lists (one of [x, nX], each of [x, y, z], all orders) will have 2x as many
+				looks like i need the brute force thing again, but with rotateCoord instead of utils.shape.rotate
+			 */
+			test.todo('list all rotations');
 		});
 	});
 });
