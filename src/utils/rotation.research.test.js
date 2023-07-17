@@ -118,7 +118,7 @@ describe('utils.rotation research', () => {
 				case 'nX': return 'x';
 				case 'nY': return 'y';
 				case 'nZ': return 'z';
-				default: throw new Error('whoops');
+				default: throw new Error(`whoops: ${d}`);
 			}
 		}
 
@@ -130,7 +130,7 @@ describe('utils.rotation research', () => {
 				case 'nY': return [neg(z), y, x];
 				case 'z': return [y, neg(x), z];
 				case 'nZ': return [neg(y), x, z];
-				default: throw new Error('whoops');
+				default: throw new Error(`whoops: ${d}`);
 			}
 		}
 
@@ -207,16 +207,16 @@ describe('utils.rotation research', () => {
 
 				// twice
 				xx: ['x', 'nY', 'nZ'],
-				xy: ['nY', 'z', 'nX'],
+				xy: ['nY', 'z', 'nX'], // FIXME duplicate!
 				xz: ['z', 'nX', 'nY'],
 				xnY: ['y', 'z', 'x'],
 				xnZ: ['nZ', 'x', 'nY'],
 				yy: ['nX', 'y', 'nZ'],
-				ynX: ['z', 'x', 'y'],
-				ynZ: ['nY', 'z', 'nX'],
+				ynX: ['z', 'x', 'y'], // FIXME duplicate!
+				ynZ: ['nY', 'z', 'nX'], // FIXME duplicate!
 				zz: ['nX', 'nY', 'z'],
 				znX: ['y', 'nZ', 'nX'],
-				nXnZ: ['z', 'x', 'y'],
+				nXnZ: ['z', 'x', 'y'], // FIXME duplicate!
 
 				// thrice
 				xxy: ['nZ', 'nY', 'nX'],
@@ -234,12 +234,43 @@ describe('utils.rotation research', () => {
 				});
 			});
 
+			describe('duplicates', () => {
+				Object.entries(expected).forEach(([k, v]) => {
+					test(k, () => {
+						const found = Object.entries(expected).find(([k2, v2]) => k2 !== k && v2.join('') === v.join(''));
+						expect(found).toBe(undefined);
+					});
+				});
+			});
+
 			/**
 				it's not going to be _all possible_ orientations, some will need the rectangle matrix to be inverted
 				so simple iteration of all possible lists (one of [x, nX], each of [x, y, z], all orders) will have 2x as many
 				looks like i need the brute force thing again, but with rotateCoord instead of utils.shape.rotate
 			 */
 			test.todo('list all rotations');
+
+			describe('check a few redundant alternatives', () => {
+				test('xy', () => {
+					const invalid = JSON.parse('[[[0,1],[1,1]],[[1,1],[0,0]]]');
+					const actual = JSON.parse('[[[1,0],[1,1]],[[1,0],[0,1]]]');
+
+					expect(utils.shape.findRotation(actual, invalid)).toEqual(['x', 'y']);
+					const skipXY = [
+						['x', 'y'],
+						['y', 'nZ'],
+						['nZ', 'x'],
+						['x', 'x', 'nX', 'y'],
+						['x', 'x', 'y', 'z'],
+						['x', 'x', 'z', 'nX'],
+						['x', 'nX', 'x', 'y'],
+					];
+					expect(utils.shape.findRotation(actual, invalid, skipXY)).toEqual(['x', 'nX', 'y', 'nZ']);
+					skipXY.forEach((skip) => {
+						expect(skip.reduce((coords, d) => rotateCoord(coords, d), ['x', 'y', 'z'])).toEqual(['nY', 'z', 'nX']);
+					});
+				});
+			});
 		});
 	});
 });
