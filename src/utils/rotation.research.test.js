@@ -16,43 +16,49 @@ describe('utils.rotation research', () => {
 		// brute force
 		const dirs = ['x', 'y', 'z', 'nX', 'nY', 'nZ'];
 		dirs.forEach((dir1) => {
-			const newShape = utils.shape.rotate[dir1](shape);
-			const alreadyExists = rotatedShapes.some((s) => utils.shape.equals(s, newShape));
+			const newShape1 = utils.shape.rotate[dir1](shape);
+			const alreadyExists = rotatedShapes.some((s) => utils.shape.equals(s, newShape1));
 			if (!alreadyExists) {
-				rotatedShapes.push(newShape);
+				rotatedShapes.push(newShape1);
 				rotatedDirs.push([dir1]);
 			}
 		});
 		dirs.forEach((dir1) => {
+			const newShape1 = utils.shape.rotate[dir1](shape);
 			dirs.forEach((dir2) => {
-				const newShape = utils.shape.rotate[dir1](utils.shape.rotate[dir2](shape));
-				const alreadyExists = rotatedShapes.some((s) => utils.shape.equals(s, newShape));
+				const newShape2 = utils.shape.rotate[dir2](newShape1);
+				const alreadyExists = rotatedShapes.some((s) => utils.shape.equals(s, newShape2));
 				if (!alreadyExists) {
-					rotatedShapes.push(newShape);
+					rotatedShapes.push(newShape2);
 					rotatedDirs.push([dir1, dir2]);
 				}
 			});
 		});
 		dirs.forEach((dir1) => {
+			const newShape1 = utils.shape.rotate[dir1](shape);
 			dirs.forEach((dir2) => {
+				const newShape2 = utils.shape.rotate[dir2](newShape1);
 				dirs.forEach((dir3) => {
-					const newShape = utils.shape.rotate[dir1](utils.shape.rotate[dir2](utils.shape.rotate[dir3](shape)));
-					const alreadyExists = rotatedShapes.some((s) => utils.shape.equals(s, newShape));
+					const newShape3 = utils.shape.rotate[dir3](newShape2);
+					const alreadyExists = rotatedShapes.some((s) => utils.shape.equals(s, newShape3));
 					if (!alreadyExists) {
-						rotatedShapes.push(newShape);
+						rotatedShapes.push(newShape3);
 						rotatedDirs.push([dir1, dir2, dir3]);
 					}
 				});
 			});
 		});
 		dirs.forEach((dir1) => {
+			const newShape1 = utils.shape.rotate[dir1](shape);
 			dirs.forEach((dir2) => {
+				const newShape2 = utils.shape.rotate[dir2](newShape1);
 				dirs.forEach((dir3) => {
+					const newShape3 = utils.shape.rotate[dir3](newShape2);
 					dirs.forEach((dir4) => {
-						const newShape = utils.shape.rotate[dir1](utils.shape.rotate[dir2](utils.shape.rotate[dir3](utils.shape.rotate[dir4](shape))));
-						const alreadyExists = rotatedShapes.some((s) => utils.shape.equals(s, newShape));
+						const newShape4 = utils.shape.rotate[dir4](newShape3);
+						const alreadyExists = rotatedShapes.some((s) => utils.shape.equals(s, newShape4));
 						if (!alreadyExists) {
-							rotatedShapes.push(newShape);
+							rotatedShapes.push(newShape4);
 							rotatedDirs.push([dir1, dir2, dir3, dir4]);
 						}
 					});
@@ -82,11 +88,11 @@ describe('utils.rotation research', () => {
 			['x', 'nY'],
 			['x', 'nZ'],
 			['y', 'y'],
+			['y', 'z'],
 			['y', 'nX'],
-			['y', 'nZ'],
 			['z', 'z'],
-			['z', 'nX'],
-			['nX', 'nZ'],
+			['z', 'nY'],
+			['nX', 'nY'],
 
 			// thrice
 			['x', 'x', 'y'],
@@ -207,16 +213,16 @@ describe('utils.rotation research', () => {
 
 				// twice
 				xx: ['x', 'nY', 'nZ'],
-				xy: ['nY', 'z', 'nX'], // FIXME duplicate!
+				xy: ['nY', 'z', 'nX'],
 				xz: ['z', 'nX', 'nY'],
 				xnY: ['y', 'z', 'x'],
 				xnZ: ['nZ', 'x', 'nY'],
 				yy: ['nX', 'y', 'nZ'],
-				ynX: ['z', 'x', 'y'], // FIXME duplicate!
-				ynZ: ['nY', 'z', 'nX'], // FIXME duplicate!
+				yz: ['y', 'nZ', 'nX'],
+				ynX: ['z', 'x', 'y'],
 				zz: ['nX', 'nY', 'z'],
-				znX: ['y', 'nZ', 'nX'],
-				nXnZ: ['z', 'x', 'y'], // FIXME duplicate!
+				znY: ['nZ', 'nX', 'y'],
+				nXnY: ['nY', 'nZ', 'x'],
 
 				// thrice
 				xxy: ['nZ', 'nY', 'nX'],

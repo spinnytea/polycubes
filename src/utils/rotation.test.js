@@ -36,10 +36,6 @@ describe('utils.rotation', () => {
 
 		utils.rotation.allNames.forEach((rotation) => {
 			if (!rotation) return;
-			if (!utils.rotation.equals[rotation]) {
-				test.todo(rotation);
-				return;
-			}
 
 			test(`${rotation} reverse`, () => {
 				// actually do the inverse rotations
@@ -51,7 +47,7 @@ describe('utils.rotation', () => {
 				// … we chose a shape where this should be an unecessary check
 				expect(utils.shape.equals(shape, rotated)).toBeFalsy();
 
-				// check that rotated (shape) --rotation-> shape
+				// check that rotated --rotation-> shape
 				expect(utils.rotation.equals[rotation](shape, rotated)).toBeTruthy();
 			});
 
@@ -65,7 +61,7 @@ describe('utils.rotation', () => {
 				// … we chose a shape where this should be an unecessary check
 				expect(utils.shape.equals(shape, rotated)).toBeFalsy();
 
-				// check that rotated (shape) --rotation-> shape
+				// check that rotated --rotation-> shape
 				expect(utils.rotation.equals[rotation](rotated, shape)).toBeTruthy();
 			});
 		});

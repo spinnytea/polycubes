@@ -6,4 +6,5 @@
 	 - rotations are basically free to "have"
 	 - takes MUCH longer to compare them ?? the whole whole point was that this should be _faster_
 */
-exports.USE_ACTUAL_ROTATIONS = true;
+const USE_ACTUAL_ROTATIONS = true;
+exports.USE_ACTUAL_ROTATIONS = USE_ACTUAL_ROTATIONS;
