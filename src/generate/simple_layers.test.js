@@ -14,25 +14,31 @@ describe('generate simple', () => {
 	const n3b = new Polycube({ shape: [[[1, 1], [1, 0]]] });
 
 	describe('generateNext', () => {
-		test('n=2', () => {
+		test('n=2 => 1', () => {
 			const gs = generateNext([n1]);
 			expect(gs.length).toBe(1);
 		});
 
-		test('n=3', () => {
+		test('n=3 => 2', () => {
 			const gs = generateNext([n2]);
 			expect(gs.length).toBe(2);
 		});
 
-		test('n=4', () => {
+		test('n=4 => 8', () => {
 			const gs = generateNext([n3a, n3b]);
 			expect(gs.length).toBe(8);
 		});
 
-		test('n=5', () => {
+		test('n=5 => 29', () => {
 			const gs = generateNext(generateNext([n3a, n3b]));
 			expect(gs.length).toBe(29);
 		});
+
+		test.todo('n=6 => 166');
+
+		test.todo('n=7 => 1023');
+
+		test.todo('n=8 => 6922');
 	});
 
 	describe('listLocationsToGrow', () => {

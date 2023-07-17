@@ -3,7 +3,7 @@ const utils = require('./utils');
 class Polycube {
 	/**
 		@param {number[][][]} shape - rectangular matrix; 0s are empty, 1s are full
-		@param {string} rotation - which rotation order to use when comparing
+		@param {string} rotation - which logical rotation order to use when comparing
 	*/
 	constructor({ shape, rotation = undefined }) {
 		this.shape = shape;
@@ -17,6 +17,10 @@ class Polycube {
 					zs.join('_') // these provide visual clarity, could use 'z' for technical clarity
 				)).join(' ') // these provide visual clarity, could use 'y' for technical clarity
 			)).join('/'); // these provide visual clarity, could use 'x' for technical clarity
+
+			if (this.rotation) {
+				this.$serialized += `but ${this.rotation}`;
+			}
 		}
 		return this.$serialized;
 	}

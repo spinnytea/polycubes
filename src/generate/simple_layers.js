@@ -1,6 +1,6 @@
 const Polycube = require('../Polycube');
 const utils = require('../utils');
-const { USE_ACTUAL_ROTATIONS } = require('../options');
+const { DEDUP_ADDITIONS, USE_ACTUAL_ROTATIONS } = require('../options');
 
 /*
 	This whole file is super un-optimized.
@@ -24,10 +24,22 @@ function generateNext(polycubes, { verbose } = {}) {
 		const ns = locations
 			.map((location) => grow(polycube, location))
 			.filter((p) => !!p); // filter out failed grow attempts
-		Array.prototype.push.apply(nexts, ns);
+		if (DEDUP_ADDITIONS) {
+			ns.forEach((n) => {
+				const alreadyExists = nexts.some((next) => (
+					n.equals(next)
+				));
+				if (!alreadyExists) {
+					nexts.push(n);
+				}
+			});
+		}
+		else {
+			Array.prototype.push.apply(nexts, ns);
+		}
 		if (verbose > 1) console.info(`   ${idx + 1} of ${polycubes.length}: found ${nexts.length} options`);
 	});
-	// IDEA dedup nexts (if two of these are the same, we don't need to rotate them both)
+	// IDEA normalize shapes (i.e. rotate so polycube.size() is [lg, md, sm]])
 	// IDEA group by dimensions
 	//  - 1x1x3 will not match any 1x2x2
 	//  - 1x1x3 will match 1x3x1 and 3x1x1 etc
@@ -143,6 +155,8 @@ function grow(polycube, [x, y, z]) {
 	@returns {Polycube[]} array of rotated items, the first is the same as the input
 */
 function rotate(polycube) {
+	// TODO split this into a separate file
+	// TODO reuse intermediates (x, y, z, nX, xx, xy, xz)
 	const rotations = [
 		// zero
 		polycube.shape,
