@@ -70,7 +70,7 @@ describe('utils.shape', () => {
 			expect(shape[2][0][0]).toBe(0);
 		});
 
-		test('negX', () => {
+		test('nX', () => {
 			const shape = [[[1, 1], [1, 0]], [[1, 0], [1, 1]]];
 			expect(utils.shape.size(shape)).toEqual([2, 2, 2]);
 			expect(shape[0][0][0]).toBe(1);
@@ -80,7 +80,7 @@ describe('utils.shape', () => {
 			expect(shape[2]?.[0][0]).toBe(undefined);
 			expect(shape[2]?.[0][0]).toBe(undefined);
 
-			utils.shape.expand.negX(shape);
+			utils.shape.expand.nX(shape);
 
 			expect(utils.shape.size(shape)).toEqual([3, 2, 2]);
 			expect(shape[0][0][0]).toBe(0);
@@ -112,7 +112,7 @@ describe('utils.shape', () => {
 			expect(shape[0][2][0]).toBe(0);
 		});
 
-		test('negY', () => {
+		test('nY', () => {
 			const shape = [[[1, 1], [1, 0]], [[1, 0], [1, 1]]];
 			expect(utils.shape.size(shape)).toEqual([2, 2, 2]);
 			expect(shape[0][0][0]).toBe(1);
@@ -122,7 +122,7 @@ describe('utils.shape', () => {
 			expect(shape[0][2]?.[0]).toBe(undefined);
 			expect(shape[0][2]?.[0]).toBe(undefined);
 
-			utils.shape.expand.negY(shape);
+			utils.shape.expand.nY(shape);
 
 			expect(utils.shape.size(shape)).toEqual([2, 3, 2]);
 			expect(shape[0][0][0]).toBe(0);
@@ -154,7 +154,7 @@ describe('utils.shape', () => {
 			expect(shape[0][0][2]).toBe(0);
 		});
 
-		test('negZ', () => {
+		test('nZ', () => {
 			const shape = [[[1, 1], [1, 0]], [[1, 0], [1, 1]]];
 			expect(utils.shape.size(shape)).toEqual([2, 2, 2]);
 			expect(shape[0][0][0]).toBe(1);
@@ -164,7 +164,7 @@ describe('utils.shape', () => {
 			expect(shape[0][0][2]).toBe(undefined);
 			expect(shape[0][0][2]).toBe(undefined);
 
-			utils.shape.expand.negZ(shape);
+			utils.shape.expand.nZ(shape);
 
 			expect(utils.shape.size(shape)).toEqual([2, 2, 3]);
 			expect(shape[0][0][0]).toBe(0);
@@ -190,16 +190,16 @@ describe('utils.shape', () => {
 				.toEqual([[[6, 1], [5, 2], [4, 3]]]);
 		});
 
-		test('negX', () => {
+		test('nX', () => {
 			// 1 2       2 3
 			// 4 3  -->  1 4
-			expect(utils.shape.rotate.negX([[[1, 2], [4, 3]]]))
+			expect(utils.shape.rotate.nX([[[1, 2], [4, 3]]]))
 				.toEqual([[[2, 3], [1, 4]]]);
 
 			// 1 2 3       3 4
 			// 6 5 4  -->  2 5
 			//             1 6
-			expect(utils.shape.rotate.negX([[[1, 2, 3], [6, 5, 4]]]))
+			expect(utils.shape.rotate.nX([[[1, 2, 3], [6, 5, 4]]]))
 				.toEqual([[[3, 4], [2, 5], [1, 6]]]);
 		});
 
@@ -216,16 +216,16 @@ describe('utils.shape', () => {
 				.toEqual([[[6, 1]], [[5, 2]], [[4, 3]]]);
 		});
 
-		test('negY', () => {
+		test('nY', () => {
 			// 1 2       2 3
 			// 4 3  -->  1 4
-			expect(utils.shape.rotate.negY([[[1, 2]], [[4, 3]]]))
+			expect(utils.shape.rotate.nY([[[1, 2]], [[4, 3]]]))
 				.toEqual([[[2, 3]], [[1, 4]]]);
 
 			// 1 2 3       3 4
 			// 6 5 4  -->  2 5
 			//             1 6
-			expect(utils.shape.rotate.negY([[[1, 2, 3]], [[6, 5, 4]]]))
+			expect(utils.shape.rotate.nY([[[1, 2, 3]], [[6, 5, 4]]]))
 				.toEqual([[[3, 4]], [[2, 5]], [[1, 6]]]);
 		});
 
@@ -242,16 +242,16 @@ describe('utils.shape', () => {
 				.toEqual([[[6], [1]], [[5], [2]], [[4], [3]]]);
 		});
 
-		test('negZ', () => {
+		test('nZ', () => {
 			// 1 2       2 3
 			// 4 3  -->  1 4
-			expect(utils.shape.rotate.negZ([[[1], [2]], [[4], [3]]]))
+			expect(utils.shape.rotate.nZ([[[1], [2]], [[4], [3]]]))
 				.toEqual([[[2], [3]], [[1], [4]]]);
 
 			// 1 2 3       3 4
 			// 6 5 4  -->  2 5
 			//             1 6
-			expect(utils.shape.rotate.negZ([[[1], [2], [3]], [[6], [5], [4]]]))
+			expect(utils.shape.rotate.nZ([[[1], [2], [3]], [[6], [5], [4]]]))
 				.toEqual([[[3], [4]], [[2], [5]], [[1], [6]]]);
 		});
 	});
