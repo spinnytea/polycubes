@@ -1,6 +1,6 @@
 const Polycube = require('../Polycube');
 const utils = require('../utils');
-const { USE_ACTUAL_ROTATIONS } = require('../options');
+const { DEDUP_ADDITIONS, USE_ACTUAL_ROTATIONS } = require('../options');
 
 /*
 	This whole file is super un-optimized.
@@ -16,7 +16,7 @@ const { USE_ACTUAL_ROTATIONS } = require('../options');
 	@param {Polycube[]} polycubes
 */
 function generateNext(polycubes, { verbose } = {}) {
-	if (verbose) console.time(' … find');
+	if (verbose) console.time(' … additions');
 	if (verbose > 1) console.info();
 	const nexts = [];
 	polycubes.forEach((polycube, idx) => {
@@ -24,11 +24,27 @@ function generateNext(polycubes, { verbose } = {}) {
 		const ns = locations
 			.map((location) => grow(polycube, location))
 			.filter((p) => !!p); // filter out failed grow attempts
-		Array.prototype.push.apply(nexts, ns);
+		if (DEDUP_ADDITIONS) {
+			ns.forEach((n) => {
+				const alreadyExists = nexts.some((next) => (
+					n.equals(next)
+				));
+				if (!alreadyExists) {
+					nexts.push(n);
+				}
+			});
+		}
+		else {
+			Array.prototype.push.apply(nexts, ns);
+		}
 		if (verbose > 1) console.info(`   ${idx + 1} of ${polycubes.length}: found ${nexts.length} options`);
 	});
-	// XXX dedup nexts
-	if (verbose) console.timeEnd(' … find');
+	// IDEA normalize shapes (i.e. rotate so polycube.size() is [lg, md, sm]])
+	// IDEA group by dimensions
+	//  - 1x1x3 will not match any 1x2x2
+	//  - 1x1x3 will match 1x3x1 and 3x1x1 etc
+	//  - then we don't need as many rotations for every group (squares do need all 24, some might only need 8)
+	if (verbose) console.timeEnd(' … additions');
 
 	if (verbose) console.time(' … rotate');
 	if (verbose > 1) console.info();
@@ -36,17 +52,18 @@ function generateNext(polycubes, { verbose } = {}) {
 		? nexts.map((next) => rotate(next))
 		: nexts.map((next) => next.rotations());
 
-	// XXX dedup rotations of nexts
-	// XXX dedup nexts using rotations
+	// IDEA dedup rotations of nexts (like, remove unnecessary rotations; if x and nX are the same, we don't need both)
+	// IDEA group by some of the values, e.g. [0][0][0] or [0][0].join('')
+	//  - needs an access for logical rotations
 	if (verbose > 1) console.info(`   ${nexts.length} into total rotations ${nextsRotated.reduce((ret, r) => ret + r.length, 0)}`);
 	if (verbose) console.timeEnd(' … rotate');
 
-	if (verbose) console.time(' … check');
+	if (verbose) console.time(' … unique');
 	if (verbose > 1) console.info();
 	const found = [];
 	aggregate(found, nextsRotated);
 	found.sort((a, b) => b.serialized.localeCompare(a.serialized));
-	if (verbose) console.timeEnd(' … check');
+	if (verbose) console.timeEnd(' … unique');
 
 	return found;
 }
@@ -138,6 +155,8 @@ function grow(polycube, [x, y, z]) {
 	@returns {Polycube[]} array of rotated items, the first is the same as the input
 */
 function rotate(polycube) {
+	// TODO split this into a separate file
+	// TODO reuse intermediates (x, y, z, nX, xx, xy, xz)
 	const rotations = [
 		// zero
 		polycube.shape,
@@ -152,24 +171,24 @@ function rotate(polycube) {
 
 		// twice
 		utils.shape.rotate.x(utils.shape.rotate.x(polycube.shape)),
-		utils.shape.rotate.x(utils.shape.rotate.y(polycube.shape)),
-		utils.shape.rotate.x(utils.shape.rotate.z(polycube.shape)),
-		utils.shape.rotate.x(utils.shape.rotate.nY(polycube.shape)),
-		utils.shape.rotate.x(utils.shape.rotate.nZ(polycube.shape)),
+		utils.shape.rotate.y(utils.shape.rotate.x(polycube.shape)),
+		utils.shape.rotate.z(utils.shape.rotate.x(polycube.shape)),
+		utils.shape.rotate.nY(utils.shape.rotate.x(polycube.shape)),
+		utils.shape.rotate.nZ(utils.shape.rotate.x(polycube.shape)),
 		utils.shape.rotate.y(utils.shape.rotate.y(polycube.shape)),
-		utils.shape.rotate.y(utils.shape.rotate.nX(polycube.shape)),
-		utils.shape.rotate.y(utils.shape.rotate.nZ(polycube.shape)),
+		utils.shape.rotate.z(utils.shape.rotate.y(polycube.shape)),
+		utils.shape.rotate.nX(utils.shape.rotate.y(polycube.shape)),
 		utils.shape.rotate.z(utils.shape.rotate.z(polycube.shape)),
-		utils.shape.rotate.z(utils.shape.rotate.nX(polycube.shape)),
-		utils.shape.rotate.nX(utils.shape.rotate.nZ(polycube.shape)),
+		utils.shape.rotate.nY(utils.shape.rotate.z(polycube.shape)),
+		utils.shape.rotate.nY(utils.shape.rotate.nX(polycube.shape)),
 
 		// thrice
-		utils.shape.rotate.x(utils.shape.rotate.x(utils.shape.rotate.y(polycube.shape))),
-		utils.shape.rotate.x(utils.shape.rotate.x(utils.shape.rotate.z(polycube.shape))),
-		utils.shape.rotate.x(utils.shape.rotate.x(utils.shape.rotate.nY(polycube.shape))),
-		utils.shape.rotate.x(utils.shape.rotate.x(utils.shape.rotate.nZ(polycube.shape))),
-		utils.shape.rotate.x(utils.shape.rotate.y(utils.shape.rotate.y(polycube.shape))),
-		utils.shape.rotate.x(utils.shape.rotate.z(utils.shape.rotate.z(polycube.shape))),
+		utils.shape.rotate.y(utils.shape.rotate.x(utils.shape.rotate.x(polycube.shape))),
+		utils.shape.rotate.z(utils.shape.rotate.x(utils.shape.rotate.x(polycube.shape))),
+		utils.shape.rotate.nY(utils.shape.rotate.x(utils.shape.rotate.x(polycube.shape))),
+		utils.shape.rotate.nZ(utils.shape.rotate.x(utils.shape.rotate.x(polycube.shape))),
+		utils.shape.rotate.y(utils.shape.rotate.y(utils.shape.rotate.x(polycube.shape))),
+		utils.shape.rotate.z(utils.shape.rotate.z(utils.shape.rotate.x(polycube.shape))),
 	];
 
 	// rotate should have a length of 24

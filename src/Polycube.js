@@ -3,7 +3,7 @@ const utils = require('./utils');
 class Polycube {
 	/**
 		@param {number[][][]} shape - rectangular matrix; 0s are empty, 1s are full
-		@param {string} rotation - which rotation order to use when comparing
+		@param {string} rotation - which logical rotation order to use when comparing
 	*/
 	constructor({ shape, rotation = undefined }) {
 		this.shape = shape;
@@ -17,6 +17,10 @@ class Polycube {
 					zs.join('_') // these provide visual clarity, could use 'z' for technical clarity
 				)).join(' ') // these provide visual clarity, could use 'y' for technical clarity
 			)).join('/'); // these provide visual clarity, could use 'x' for technical clarity
+
+			if (this.rotation) {
+				this.$serialized += `but ${this.rotation}`;
+			}
 		}
 		return this.$serialized;
 	}
@@ -52,9 +56,7 @@ class Polycube {
 		if (!polycube?.shape) throw new Error('polycube.equals must compare against polycubes');
 		if (this.rotation) console.warn('this polycube probably should not have a rotation when checking equality');
 		if (polycube.rotation) {
-			return utils.rotation.equals[polycube.rotation](this.shape, polycube.shape)
-				// XXX although… i'm not sure why straight rotations didn't have this problem
-				|| utils.rotation.equals[polycube.rotation](polycube.shape, this.shape);
+			return utils.rotation.equals[polycube.rotation](this.shape, polycube.shape);
 		}
 		return utils.shape.equals(this.shape, polycube.shape);
 	}

@@ -1,3 +1,4 @@
+const { MAX_N } = require('./options');
 const Polycube = require('./Polycube');
 const utils = require('./utils');
 
@@ -19,7 +20,6 @@ async function dynamic(generateNext, { n, verbose }) {
 	if (n === 1) {
 		return; // this one is checked in
 	}
-	const MAX_N = 6; // last checked: 6 is 5s, i didn't have the patience for 7
 	if (n > MAX_N) throw new Error(`n is too high (for now, max of ${MAX_N})`);
 
 	// check if we have generated the one below

@@ -225,6 +225,25 @@ const utilsRotation = {
 		},
 
 		/**
+			check that rotated --yz-> original
+
+			y: [z][y][rxl - x - 1] \
+			z: [y][rxl - x - 1][z]
+
+			@param {number[][][]} original
+			@param {number[][][]} rotated
+			@returns {boolean}
+		*/
+		yz: (original, rotated) => {
+			const [oxl, oyl, ozl] = utilsShape.size(original);
+			const [rxl, ryl, rzl] = utilsShape.size(rotated);
+			return oxl === ryl && oyl === rzl && ozl === rxl
+				&& utilsShape.every(rotated, (x, y, z, v) => (
+					v === original[y][rzl - z - 1][rxl - x - 1]
+				));
+		},
+
+		/**
 			check that rotated --ynX-> original
 
 			y: [z][y][rxl - x - 1] \
@@ -240,27 +259,6 @@ const utilsRotation = {
 			return oxl === rzl && oyl === rxl && ozl === ryl
 				&& utilsShape.every(rotated, (x, y, z, v) => (
 					v === original[z][x][y]
-				));
-		},
-
-		/**
-			check that rotated --ynZ-> original
-
-			y: [z][y][rxl - x - 1] \
-			nZ: [ryl - y - 1][x][z]
-
-			@see utils.shape.rotate.y
-			@see utils.shape.equals
-			@param {number[][][]} original
-			@param {number[][][]} rotated
-			@returns {boolean}
-		*/
-		ynZ: (original, rotated) => {
-			const [oxl, oyl, ozl] = utilsShape.size(original);
-			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === ryl && oyl === rzl && ozl === rxl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[ryl - y - 1][z][rxl - x - 1]
 				));
 		},
 
@@ -284,40 +282,40 @@ const utilsRotation = {
 		},
 
 		/**
-			check that rotated --znX-> original
+			check that rotated --znY-> original
 
 			z: [y][rxl - x - 1][z] \
-			nX: [x][rzl - z - 1][y]
+			nY: [rzl - z - 1][y][x]
 
 			@param {number[][][]} original
 			@param {number[][][]} rotated
 			@returns {boolean}
 		*/
-		znX: (original, rotated) => {
-			const [oxl, oyl, ozl] = utilsShape.size(original);
-			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === ryl && oyl === rzl && ozl === rxl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[y][rzl - z - 1][rxl - x - 1]
-				));
-		},
-
-		/**
-			check that rotated --nXnZ-> original
-
-			nX: [x][rzl - z - 1][y] \
-			nZ: [ryl - y - 1][x][z]
-
-			@param {number[][][]} original
-			@param {number[][][]} rotated
-			@returns {boolean}
-		*/
-		nXnZ: (original, rotated) => {
+		znY: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
 			return oxl === rzl && oyl === rxl && ozl === ryl
 				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[z][x][y]
+					v === original[rzl - z - 1][rxl - x - 1][y]
+				));
+		},
+
+		/**
+			check that rotated --nXnY-> original
+
+			nX: [x][rzl - z - 1][y] \
+			nY: [rzl - z - 1][y][x]
+
+			@param {number[][][]} original
+			@param {number[][][]} rotated
+			@returns {boolean}
+		*/
+		nXnY: (original, rotated) => {
+			const [oxl, oyl, ozl] = utilsShape.size(original);
+			const [rxl, ryl, rzl] = utilsShape.size(rotated);
+			return oxl === ryl && oyl === rzl && ozl === rxl
+				&& utilsShape.every(rotated, (x, y, z, v) => (
+					v === original[ryl - y - 1][rzl - z - 1][x]
 				));
 		},
 
@@ -461,11 +459,11 @@ const utilsRotation = {
 		'xnY',
 		'xnZ',
 		'yy',
+		'yz',
 		'ynX',
-		'ynZ',
 		'zz',
-		'znX',
-		'nXnZ',
+		'znY',
+		'nXnY',
 
 		// thrice
 		'xxy',
@@ -495,11 +493,11 @@ const utilsRotation = {
 		xnY: Object.freeze(['y', 'nX']),
 		xnZ: Object.freeze(['z', 'nX']),
 		yy: Object.freeze(['nY', 'nY']),
+		yz: Object.freeze(['nZ', 'nY']),
 		ynX: Object.freeze(['x', 'nY']),
-		ynZ: Object.freeze(['z', 'nY']),
 		zz: Object.freeze(['nZ', 'nZ']),
-		znX: Object.freeze(['x', 'nZ']),
-		nXnZ: Object.freeze(['z', 'x']),
+		znY: Object.freeze(['y', 'nZ']),
+		nXnY: Object.freeze(['y', 'x']),
 
 		// thrice
 		xxy: Object.freeze(['nY', 'nX', 'nX']),
@@ -529,11 +527,11 @@ const utilsRotation = {
 		xnY: Object.freeze(['x', 'nY']),
 		xnZ: Object.freeze(['x', 'nZ']),
 		yy: Object.freeze(['y', 'y']),
+		yz: Object.freeze(['y', 'z']),
 		ynX: Object.freeze(['y', 'nX']),
-		ynZ: Object.freeze(['y', 'nZ']),
 		zz: Object.freeze(['z', 'z']),
-		znX: Object.freeze(['z', 'nX']),
-		nXnZ: Object.freeze(['nX', 'nZ']),
+		znY: Object.freeze(['z', 'nY']),
+		nXnY: Object.freeze(['nX', 'nY']),
 
 		// thrice
 		xxy: Object.freeze(['x', 'x', 'y']),

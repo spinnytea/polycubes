@@ -68,7 +68,7 @@ describe('Polycube', () => {
 			expect(() => polycube.equals(undefined)).toThrow();
 		});
 
-		test.skip('rotation: x', () => {
+		test('rotation: x', () => {
 			const originalShape = [[[1, 2], [4, 3]]];
 			const xShape = [[[4, 1], [3, 2]]];
 			const nXShape = [[[2, 3], [1, 4]]];
@@ -134,14 +134,6 @@ describe('Polycube', () => {
 				// expect(utils.rotation.equals.nYnX(actual.shape, invalid.shape)).toBe(true); // hmmm
 				expect(utils.rotation.equals.nYnX).toBe(undefined);
 
-				// this _is_ what I just said
-				// there isn't a rotation that matches them in this direction,
-				// but then why didn't we find it in our brute force?
-				utils.rotation.allNames.forEach((rn) => {
-					if (!rn) return;
-					expect(utils.rotation.equals[rn](actual.shape, invalid.shape)).toBe(false);
-				});
-
 				expect(utils.shape.findRotation(actual.shape, invalid.shape)).toEqual(['x', 'y']);
 				const skipXY = [
 					['x', 'y'],
@@ -155,21 +147,20 @@ describe('Polycube', () => {
 				expect(utils.shape.findRotation(actual.shape, invalid.shape, skipXY)).toEqual(['y', 'nZ']);
 
 				expect(utils.shape.findRotation(invalid.shape, actual.shape)).toEqual(['nX', 'z']);
-				/*
 				const skipnXz = [
 					['nX', 'z'],
 					['nY', 'nX'],
-					['z', 'nY'],
-					['x', 'x', 'x', 'z'],
-					['x', 'x', 'y', 'x'],
-					['x', 'x', 'z', 'y'],
-					['x', 'nX', 'nX', 'z'],
+					// ['z', 'nY'],
+					// ['x', 'x', 'x', 'z'],
+					// ['x', 'x', 'y', 'x'],
+					// ['x', 'x', 'z', 'y'],
+					// ['x', 'nX', 'nX', 'z'],
 				];
-				expect(utils.shape.findRotation(invalid.shape, actual.shape, skipnXz)).toEqual(null);
-				*/
+				expect(utils.shape.findRotation(invalid.shape, actual.shape, skipnXz)).toEqual(['z', 'nY']);
 				expect(utils.rotation.equals.nXz).toBe(undefined);
 				expect(utils.rotation.equals.nYnX).toBe(undefined);
-				expect(utils.rotation.equals.znY).toBe(undefined);
+				expect(utils.rotation.equals.znY).not.toBe(undefined);
+				expect(utils.rotation.equals.znY(actual.shape, invalid.shape)).toBe(true); // fixed this
 			});
 
 			test('[[[0,1],[1,1]],[[0,1],[0,1]]]', () => {
@@ -185,6 +176,10 @@ describe('Polycube', () => {
 				expect(utils.rotation.equals.xz(invalid.shape, actual.shape)).toBe(true);
 				// expect(utils.rotation.equals.nYnZ(actual.shape, invalid.shape)).toBe(true); // hmmm
 				expect(utils.rotation.equals.nYnZ).toBe(undefined);
+
+				expect(utils.shape.findRotation(invalid.shape, actual.shape)).toEqual(['nX', 'nY']);
+				expect(utils.rotation.equals.nXnY).not.toBe(undefined);
+				expect(utils.rotation.equals.nXnY(actual.shape, invalid.shape)).toBe(true); // fixed this
 			});
 
 			test('[[[0,1],[0,1]],[[1,1],[0,0]],[[0,1],[0,0]]]', () => {
@@ -200,6 +195,7 @@ describe('Polycube', () => {
 				expect(utils.rotation.equals.xy(invalid.shape, actual.shape)).toBe(true);
 				// expect(utils.rotation.equals.nYnX(actual.shape, invalid.shape)).toBe(true); // hmmm
 				expect(utils.rotation.equals.nYnX).toBe(undefined);
+				expect(utils.rotation.equals.znY(actual.shape, invalid.shape)).toBe(true); // fixed this
 			});
 
 			test('[[[0,1],[0,1],[1,1]],[[0,0],[0,1],[0,0]]]', () => {
@@ -215,6 +211,7 @@ describe('Polycube', () => {
 				expect(utils.rotation.equals.xz(invalid.shape, actual.shape)).toBe(true);
 				// expect(utils.rotation.equals.nYnZ(actual.shape, invalid.shape)).toBe(true); // hmmm
 				expect(utils.rotation.equals.nYnZ).toBe(undefined);
+				expect(utils.rotation.equals.nXnY(actual.shape, invalid.shape)).toBe(true); // fixed this
 			});
 
 			test('[[[0,0],[0,1]],[[0,1],[0,1]],[[1,1],[0,0]]]', () => {
@@ -230,6 +227,7 @@ describe('Polycube', () => {
 				expect(utils.rotation.equals.xy(invalid.shape, actual.shape)).toBe(true);
 				// expect(utils.rotation.equals.nYnX(actual.shape, invalid.shape)).toBe(true); // hmmm
 				expect(utils.rotation.equals.nYnX).toBe(undefined);
+				expect(utils.rotation.equals.znY(actual.shape, invalid.shape)).toBe(true); // fixed this
 			});
 		});
 	});

@@ -14,7 +14,7 @@
 	"rules": {
 		"brace-style": ["warn", "stroustrup", { "allowSingleLine": true }],
 		"class-methods-use-this": ["off"],
-		"indent": ["error", "tab"],
+		"indent": ["error", "tab", { "SwitchCase": 1 }],
 		"max-len": ["warn", { "code": 160 }],
 		"no-console": ["warn", { "allow": ["info", "warn", "error", "time", "timeEnd"] }],
 		"no-param-reassign": ["off"],
