@@ -201,7 +201,7 @@ describe('utils.rotation research', () => {
 		describe('utils.rotation.equals', () => {
 			const expected = {
 				// same (none)
-				undefined: Object.freeze([]),
+				undefined: ['x', 'y', 'z'],
 
 				// once
 				x: ['x', 'z', 'nY'],
@@ -254,7 +254,80 @@ describe('utils.rotation research', () => {
 				so simple iteration of all possible lists (one of [x, nX], each of [x, y, z], all orders) will have 2x as many
 				looks like i need the brute force thing again, but with rotateCoord instead of utils.shape.rotate
 			 */
-			test.todo('list all rotations');
+			test('list all rotations', () => {
+				const coords = ['x', 'y', 'z'];
+				const rotatedCoords = [coords];
+				const rotatedDirs = [[]];
+				function coordsEqual(a, b) { return a[0] === b[0] && a[1] === b[1] && a[2] === b[2]; }
+
+				// brute force
+				const dirs = ['x', 'y', 'z', 'nX', 'nY', 'nZ'];
+				dirs.forEach((dir1) => {
+					const newCoords1 = rotateCoord(coords, dir1);
+					const alreadyExists = rotatedCoords.some((c) => coordsEqual(c, newCoords1));
+					if (!alreadyExists) {
+						rotatedCoords.push(newCoords1);
+						rotatedDirs.push([dir1]);
+					}
+				});
+				dirs.forEach((dir1) => {
+					const newCoords1 = rotateCoord(coords, dir1);
+					dirs.forEach((dir2) => {
+						const newCoords2 = rotateCoord(newCoords1, dir2);
+						const alreadyExists = rotatedCoords.some((c) => coordsEqual(c, newCoords2));
+						if (!alreadyExists) {
+							rotatedCoords.push(newCoords2);
+							rotatedDirs.push([dir1, dir2]);
+						}
+					});
+				});
+				dirs.forEach((dir1) => {
+					const newCoords1 = rotateCoord(coords, dir1);
+					dirs.forEach((dir2) => {
+						const newCoords2 = rotateCoord(newCoords1, dir2);
+						dirs.forEach((dir3) => {
+							const newCoords3 = rotateCoord(newCoords2, dir3);
+							const alreadyExists = rotatedCoords.some((c) => coordsEqual(c, newCoords3));
+							if (!alreadyExists) {
+								rotatedCoords.push(newCoords3);
+								rotatedDirs.push([dir1, dir2, dir3]);
+							}
+						});
+					});
+				});
+				dirs.forEach((dir1) => {
+					const newCoords1 = rotateCoord(coords, dir1);
+					dirs.forEach((dir2) => {
+						const newCoords2 = rotateCoord(newCoords1, dir2);
+						dirs.forEach((dir3) => {
+							const newCoords3 = rotateCoord(newCoords2, dir3);
+							dirs.forEach((dir4) => {
+								const newCoords4 = rotateCoord(newCoords3, dir4);
+								const alreadyExists = rotatedCoords.some((c) => coordsEqual(c, newCoords4));
+								if (!alreadyExists) {
+									rotatedCoords.push(newCoords4);
+									rotatedDirs.push([dir1, dir2, dir3, dir4]);
+								}
+							});
+						});
+					});
+				});
+
+				// rotate should have a length of 24
+				expect(rotatedCoords.length).toBe(24);
+				expect(rotatedDirs.length).toBe(24);
+				expect(rotatedDirs.map((c) => (c.join('') || 'undefined'))).toEqual(Object.keys(expected));
+				const expectedDirs = Object.values(expected);
+				rotatedCoords.forEach((c) => {
+					const exists = expectedDirs.find((r) => r.join('') === c.join(''));
+					expect(c).toEqual(exists);
+				});
+
+				const rotationNames = rotatedDirs
+					.map((ds) => (ds.length ? ds.join('') : undefined));
+				expect(rotationNames.length).toBe(24);
+				expect(rotationNames).toEqual(utils.rotation.allNames);
+			});
 
 			describe('check a few redundant alternatives', () => {
 				test('xy', () => {
