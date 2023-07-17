@@ -102,4 +102,72 @@ describe('utils.rotation research', () => {
 		expect(rotationNames.length).toBe(24);
 		expect(rotationNames).toEqual(utils.rotation.allNames);
 	});
+
+	/**
+		I did all this by hand
+		but it's a lot of bean counting
+		maybe i made mistakes
+	*/
+	describe('compound dirs', () => {
+		function inverseSingle(d) {
+			switch (d) {
+				case 'x': return 'nX';
+				case 'y': return 'nY';
+				case 'z': return 'nZ';
+				case 'nX': return 'x';
+				case 'nY': return 'y';
+				case 'nZ': return 'z';
+				default: throw new Error('whoops');
+			}
+		}
+
+		function splitStrToRotations(d) {
+			const rotations = [];
+			if (d === undefined || d === 'undefined') {
+				return rotations;
+			}
+
+			const ds = d.split('');
+			for (let i = 0; i < ds.length; i += 1) {
+				if (ds[i] === 'n') {
+					// combine 'n', 'X' into 'nX'
+					rotations.push(ds[i] + ds[i + 1]);
+					i += 1;
+				}
+				else {
+					rotations.push(ds[i]);
+				}
+			}
+
+			return rotations;
+		}
+
+		test('inverseSingle', () => {
+			expect(inverseSingle('x')).toBe('nX');
+			expect(inverseSingle('y')).toBe('nY');
+			expect(inverseSingle('z')).toBe('nZ');
+			expect(inverseSingle('nX')).toBe('x');
+			expect(inverseSingle('nY')).toBe('y');
+			expect(inverseSingle('nZ')).toBe('z');
+		});
+
+		test('splitStrToRotations', () => {
+			expect(splitStrToRotations('x')).toEqual(['x']);
+			expect(splitStrToRotations('nX')).toEqual(['nX']);
+			expect(splitStrToRotations('xy')).toEqual(['x', 'y']);
+			expect(splitStrToRotations('xxnZ')).toEqual(['x', 'x', 'nZ']);
+		});
+
+		test('forwardRotations', () => {
+			Object.entries(utils.rotation.forwardRotations).forEach(([k, v]) => {
+				expect(splitStrToRotations(k)).toEqual(v);
+			});
+		});
+
+		test('inverseRotations', () => {
+			Object.entries(utils.rotation.inverseRotations).forEach(([k, v]) => {
+				expect(splitStrToRotations(k).map((d) => inverseSingle(d)).reverse()).toEqual(v);
+			});
+		});
+	});
 });

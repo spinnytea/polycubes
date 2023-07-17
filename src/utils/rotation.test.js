@@ -70,11 +70,4 @@ describe('utils.rotation', () => {
 			});
 		});
 	});
-
-	// i guess i'm paranoid
-	test('forwardRotations definition', () => {
-		Object.entries(utils.rotation.forwardRotations).forEach(([k, v]) => {
-			expect(v.join('')).toEqual(k === 'undefined' ? '' : k);
-		});
-	});
 });
