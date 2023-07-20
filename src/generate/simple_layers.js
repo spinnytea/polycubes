@@ -37,7 +37,7 @@ function generateNext(polycubes, { verbose } = {}) {
 		}
 		if (verbose > 1) console.info(`   ${idx + 1} of ${polycubes.length}: found ${nexts.length} options`);
 	});
-	// IDEA normalize shapes (i.e. rotate so polycube.size() is [lg, md, sm]])
+	// IDEA normalize shapes (i.e. rotate so polycube.size() is [lg, md, sm] or [sm, md, lg]])
 	// IDEA group by dimensions
 	//  - 1x1x3 will not match any 1x2x2
 	//  - 1x1x3 will match 1x3x1 and 3x1x1 etc
@@ -161,39 +161,48 @@ function grow(polycube, [x, y, z]) {
 */
 function rotate(polycube) {
 	// TODO split this into a separate file
-	// TODO reuse intermediates (x, y, z, nX, xx, xy, xz)
+
+	// reuse intermediate rotations (x, y, z, nX, xx, xy, xz)
+	const rotatedX = utils.shape.rotate.x(polycube.shape);
+	const rotatedY = utils.shape.rotate.y(polycube.shape);
+	const rotatedZ = utils.shape.rotate.z(polycube.shape);
+	const rotatedNX = utils.shape.rotate.nX(polycube.shape);
+	const rotatedXX = utils.shape.rotate.x(rotatedX);
+	const rotatedXY = utils.shape.rotate.y(rotatedX);
+	const rotatedXZ = utils.shape.rotate.z(rotatedX);
+
 	const rotations = [
 		// zero
 		polycube.shape,
 
 		// once
-		utils.shape.rotate.x(polycube.shape),
-		utils.shape.rotate.y(polycube.shape),
-		utils.shape.rotate.z(polycube.shape),
-		utils.shape.rotate.nX(polycube.shape),
+		rotatedX,
+		rotatedY,
+		rotatedZ,
+		rotatedNX,
 		utils.shape.rotate.nY(polycube.shape),
 		utils.shape.rotate.nZ(polycube.shape),
 
 		// twice
-		utils.shape.rotate.x(utils.shape.rotate.x(polycube.shape)),
-		utils.shape.rotate.y(utils.shape.rotate.x(polycube.shape)),
-		utils.shape.rotate.z(utils.shape.rotate.x(polycube.shape)),
-		utils.shape.rotate.nY(utils.shape.rotate.x(polycube.shape)),
-		utils.shape.rotate.nZ(utils.shape.rotate.x(polycube.shape)),
-		utils.shape.rotate.y(utils.shape.rotate.y(polycube.shape)),
-		utils.shape.rotate.z(utils.shape.rotate.y(polycube.shape)),
-		utils.shape.rotate.nX(utils.shape.rotate.y(polycube.shape)),
-		utils.shape.rotate.z(utils.shape.rotate.z(polycube.shape)),
-		utils.shape.rotate.nY(utils.shape.rotate.z(polycube.shape)),
-		utils.shape.rotate.nY(utils.shape.rotate.nX(polycube.shape)),
+		rotatedXX,
+		rotatedXY,
+		rotatedXZ,
+		utils.shape.rotate.nY(rotatedX),
+		utils.shape.rotate.nZ(rotatedX),
+		utils.shape.rotate.y(rotatedY),
+		utils.shape.rotate.z(rotatedY),
+		utils.shape.rotate.nX(rotatedY),
+		utils.shape.rotate.z(rotatedZ),
+		utils.shape.rotate.nY(rotatedZ),
+		utils.shape.rotate.nY(rotatedNX),
 
 		// thrice
-		utils.shape.rotate.y(utils.shape.rotate.x(utils.shape.rotate.x(polycube.shape))),
-		utils.shape.rotate.z(utils.shape.rotate.x(utils.shape.rotate.x(polycube.shape))),
-		utils.shape.rotate.nY(utils.shape.rotate.x(utils.shape.rotate.x(polycube.shape))),
-		utils.shape.rotate.nZ(utils.shape.rotate.x(utils.shape.rotate.x(polycube.shape))),
-		utils.shape.rotate.y(utils.shape.rotate.y(utils.shape.rotate.x(polycube.shape))),
-		utils.shape.rotate.z(utils.shape.rotate.z(utils.shape.rotate.x(polycube.shape))),
+		utils.shape.rotate.y(rotatedXX),
+		utils.shape.rotate.z(rotatedXX),
+		utils.shape.rotate.nY(rotatedXX),
+		utils.shape.rotate.nZ(rotatedXX),
+		utils.shape.rotate.y(rotatedXY),
+		utils.shape.rotate.z(rotatedXZ),
 	];
 
 	// rotate should have a length of 24
