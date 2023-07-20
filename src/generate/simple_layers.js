@@ -21,9 +21,7 @@ function generateNext(polycubes, { verbose } = {}) {
 	const nexts = [];
 	polycubes.forEach((polycube, idx) => {
 		const locations = listLocationsToGrow(polycube);
-		const ns = locations
-			.map((location) => grow(polycube, location))
-			.filter((p) => !!p); // filter out failed grow attempts
+		const ns = locations.map((location) => grow(polycube, location));
 		if (DEDUP_ADDITIONS) {
 			ns.forEach((n) => {
 				const alreadyExists = nexts.some((next) => (
@@ -76,19 +74,25 @@ function generateNext(polycubes, { verbose } = {}) {
 function listLocationsToGrow(polycube) {
 	const locations = [];
 
+	function checkNewLocation(x, y, z) {
+		if (polycube.shape[x]?.[y]?.[z] !== 1) {
+			locations.push([x, y, z]);
+		}
+	}
+
 	polycube.shape.forEach((ys, x) => {
 		ys.forEach((zs, y) => {
 			zs.forEach((v, z) => {
 				if (v === 1) {
 					// x,y,z is filled in
 					// we can do any of the adjacent squares
-					// (we could filter these locations, but they will very quickly get removed later)
-					locations.push([x + 1, y, z]);
-					locations.push([x - 1, y, z]);
-					locations.push([x, y + 1, z]);
-					locations.push([x, y - 1, z]);
-					locations.push([x, y, z + 1]);
-					locations.push([x, y, z - 1]);
+					// don't grow to a new location if it's already filled in
+					checkNewLocation(x + 1, y, z);
+					checkNewLocation(x - 1, y, z);
+					checkNewLocation(x, y + 1, z);
+					checkNewLocation(x, y - 1, z);
+					checkNewLocation(x, y, z + 1);
+					checkNewLocation(x, y, z - 1);
 				}
 			});
 		});
@@ -141,7 +145,8 @@ function grow(polycube, [x, y, z]) {
 		// z is now valid
 	}
 	else if (shape[x][y][z] === 1) {
-		return null;
+		// return null;
+		throw new Error(`[${x},${y},${z}] is already filled in, this should be prevented sooner`);
 	}
 
 	shape[x][y][z] = 1;
