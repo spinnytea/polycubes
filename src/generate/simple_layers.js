@@ -21,7 +21,10 @@ function generateNext(polycubes, { verbose } = {}) {
 	const nexts = [];
 	polycubes.forEach((polycube, idx) => {
 		const locations = listLocationsToGrow(polycube);
-		const ns = locations.map((location) => grow(polycube, location));
+		const ns = locations
+			.map((location) => grow(polycube, location))
+			.map((p) => normalizeOrientation(p));
+
 		if (DEDUP_ADDITIONS) {
 			ns.forEach((n) => {
 				const alreadyExists = nexts.some((next) => (
@@ -151,6 +154,42 @@ function grow(polycube, [x, y, z]) {
 
 	shape[x][y][z] = 1;
 	return new Polycube({ shape });
+}
+
+/**
+	rotate the polycube across all dimensions
+
+	@param {Polycube} polycube
+	@returns {Polycube} same shape, but rotated so the size is [sm, md, lg]
+*/
+function normalizeOrientation(polycube) {
+	const [xLength, yLength, zLength] = polycube.size();
+	// x sm 1
+	// x md 2
+	// x lg 4
+	// y sm 8
+	// y md 16
+	// y lg 32
+	// z sm 64
+	// z md 128
+	// z lg 256
+	const orientation = (
+		(xLength > yLength ? (xLength > zLength ? 4 : 2) : (xLength > zLength ? 2 : 1)) // eslint-disable-line no-nested-ternary
+		+ (yLength > xLength ? (yLength > zLength ? 32 : 16) : (yLength > zLength ? 16 : 8)) // eslint-disable-line no-nested-ternary
+		+ (zLength > xLength ? (zLength > yLength ? 256 : 128) : (zLength > yLength ? 128 : 64)) // eslint-disable-line no-nested-ternary
+	);
+
+	// FIXME we should save the final orientation in polycube so we can use it later to simplify rotations etc later
+	//  - sm md lg, sm md md, sm sm md, sm sm sm
+	//  - 4 final options isn't so bad, we could save them as constants
+	const ORIENTATION_SM_SM_SM = 1 + 8 + 64;
+	const ORIENTATION_SM_SM_MD = 1 + 8 + 128;
+	const ORIENTATION_SM_MD_MD = 1 + 16 + 128;
+	const ORIENTATION_SM_MD_LG = 1 + 16 + 256;
+	switch (orientation) {
+		default:
+			return polycube;
+	}
 }
 
 /**

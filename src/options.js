@@ -26,3 +26,14 @@ exports.DEDUP_ADDITIONS = DEDUP_ADDITIONS;
 */
 const MAX_N = 6;
 exports.MAX_N = MAX_N;
+
+/**
+	sometimes we can optimize operations by using bits/integers
+	but integers in javascript are awkwardly sized
+	so if we have operations that need to use more, we have to find alternatives
+	(maybe a Buffer or drop down to C)
+
+	MAX_SAFE_INTEGER_BITS = 53
+*/
+const MAX_SAFE_INTEGER_BITS = Number.MAX_SAFE_INTEGER.toString(2).length;
+exports.MAX_SAFE_INTEGER_BITS = MAX_SAFE_INTEGER_BITS;
