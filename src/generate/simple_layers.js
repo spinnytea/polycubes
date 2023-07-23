@@ -1,7 +1,7 @@
 const Polycube = require('../Polycube');
 const utils = require('../utils');
 const { ORIENTATION } = require('../constants');
-const { DEDUP_ADDITIONS, USE_ACTUAL_ROTATIONS, NORMALIZE_ROTATIONS, GROUP_BY_SIZE, DEDUP_ROTATIONS } = require('../options');
+const { DEDUP_ADDITIONS, NORMALIZE_ROTATIONS, GROUP_BY_SIZE, DEDUP_ROTATIONS } = require('../options');
 
 /*
 	This whole file is super un-optimized.
@@ -53,9 +53,7 @@ function generateNext(polycubes, { verbose } = {}) {
 
 	if (verbose) console.time(' … rotate');
 	if (verbose > 1) console.info();
-	const nextsRotated = USE_ACTUAL_ROTATIONS
-		? nexts.map((next) => rotate(next))
-		: nexts.map((next) => next.rotations());
+	const nextsRotated = nexts.map((next) => rotate(next));
 	if (verbose > 1) console.info(`   ${nexts.length} into total rotations ${nextsRotated.reduce((ret, r) => ret + r.length, 0)}`);
 	if (verbose) console.timeEnd(' … rotate');
 
@@ -118,9 +116,7 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 	Object.entries(sizeGroups).forEach(([xLength, ys]) => {
 		Object.entries(ys).forEach(([yLength, zs]) => {
 			Object.entries(zs).forEach(([zLength, list]) => {
-				const nextsRotated = USE_ACTUAL_ROTATIONS
-					? list.map((next) => rotate(next))
-					: list.map((next) => next.rotations());
+				const nextsRotated = list.map((next) => rotate(next));
 				sizeGroups[xLength][yLength][zLength] = nextsRotated;
 			}, 0);
 		}, 0);
