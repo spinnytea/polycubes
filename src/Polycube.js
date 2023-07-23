@@ -68,13 +68,14 @@ class Polycube {
 	/**
 		get all the rotations for this shape
 
-		TODO it's weird that `utils.rotation` is in Polycube, but `utils.shape` is in simple_layers
+		FIXME it's weird that `utils.rotation` is in Polycube, but `utils.shape` is in simple_layers
 		 - I think I was banking on this being definitively better
 
 		@returns {Polycube[]} rotations
 	*/
 	rotations() {
 		const { shape, rotation } = this;
+		// FIXME use orientation
 		return utils.rotation.allNames.map((rn) => {
 			if (rotation === rn) return this;
 			return new Polycube({ shape, rotation: rn });

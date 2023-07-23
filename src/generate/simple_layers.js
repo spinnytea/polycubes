@@ -14,7 +14,8 @@ const { DEDUP_ADDITIONS, USE_ACTUAL_ROTATIONS, NORMALIZE_ROTATIONS } = require('
 */
 
 /**
-	@param {Polycube[]} polycubes
+	@param {Polycube[]} polycubes all polycubes of size=n
+	@returns {Polycube[]} all polycubes of size=(n+1)
 */
 function generateNext(polycubes, { verbose } = {}) {
 	if (verbose) console.time(' … additions');
@@ -41,8 +42,7 @@ function generateNext(polycubes, { verbose } = {}) {
 		}
 		if (verbose > 1) console.info(`   ${idx + 1} of ${polycubes.length}: found ${nexts.length} options`);
 	});
-	// IDEA normalize shapes (i.e. rotate so polycube.size() is [lg, md, sm] or [sm, md, lg]])
-	// IDEA group by dimensions
+	// FIXME group by dimensions
 	//  - 1x1x3 will not match any 1x2x2
 	//  - 1x1x3 will match 1x3x1 and 3x1x1 etc
 	//  - then we don't need as many rotations for every group (squares do need all 24, some might only need 8)
@@ -54,9 +54,8 @@ function generateNext(polycubes, { verbose } = {}) {
 		? nexts.map((next) => rotate(next))
 		: nexts.map((next) => next.rotations());
 
-	// IDEA dedup rotations of nexts (like, remove unnecessary rotations; if x and nX are the same, we don't need both)
 	// IDEA group by some of the values, e.g. [0][0][0] or [0][0].join('')
-	//  - needs an access for logical rotations
+	//  - needs an accessor for logical rotations
 	if (verbose > 1) console.info(`   ${nexts.length} into total rotations ${nextsRotated.reduce((ret, r) => ret + r.length, 0)}`);
 	if (verbose) console.timeEnd(' … rotate');
 
