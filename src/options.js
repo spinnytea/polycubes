@@ -22,23 +22,6 @@ const NORMALIZE_ROTATIONS = true;
 exports.NORMALIZE_ROTATIONS = NORMALIZE_ROTATIONS;
 
 /**
-	shapes with different sizes will never be equal
-	i.e. [1,2,3] will never equal [2,2,3]
-
-	in which case, we can organize them into different lists
-	then when we aggregate (n^2 to de-dup)
-	when will have smaller lists
-	instead of every shape in one giant list, we'll have different lists for each size
-
-	this requires NORMALIZE_ROTATIONS to work
-	i mean, we _could_ do it without normalize, but it doesn't quite make sense to support that
-	 - i guess a naive way would be to group by x+y+z lengths, and have too many things in the lists; it'd be _better_
-	 - or we could, well, normalize the x,y,z without rotating them, and then generate all 24 rotations, but srsly, this is awful
-*/
-const GROUP_BY_SIZE = true;
-exports.GROUP_BY_SIZE = GROUP_BY_SIZE;
-
-/**
 	after adding cubes to the previous n,
 	before generating rotations,
 	do a first pass at deduping

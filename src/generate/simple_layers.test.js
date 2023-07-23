@@ -1,4 +1,4 @@
-const { NORMALIZE_ROTATIONS, GROUP_BY_SIZE, DEDUP_ADDITIONS } = require('../options');
+const { NORMALIZE_ROTATIONS } = require('../options');
 const Polycube = require('../Polycube');
 const utils = require('../utils');
 
@@ -6,6 +6,7 @@ const {
 	generateNext,
 	listLocationsToGrow,
 	rotate,
+	generateNextGroupBySize,
 } = require('./simple_layers');
 
 describe('generate simple', () => {
@@ -35,15 +36,34 @@ describe('generate simple', () => {
 			expect(gs.length).toBe(29);
 		});
 
-		if (GROUP_BY_SIZE && NORMALIZE_ROTATIONS && DEDUP_ADDITIONS) {
-			test('n=6 => 166', () => {
-				const gs = generateNext(generateNext(generateNext([n3a, n3b])));
-				expect(gs.length).toBe(166);
-			});
-		}
-		else {
-			test.todo('n=6 => 166');
-		}
+		test.todo('n=6 => 166');
+	});
+
+	describe('generateNextGroupBySize', () => {
+		test('n=2 => 1', () => {
+			const gs = generateNextGroupBySize([n1]);
+			expect(gs.length).toBe(1);
+		});
+
+		test('n=3 => 2', () => {
+			const gs = generateNextGroupBySize([n2]);
+			expect(gs.length).toBe(2);
+		});
+
+		test('n=4 => 8', () => {
+			const gs = generateNextGroupBySize([n3a, n3b]);
+			expect(gs.length).toBe(8);
+		});
+
+		test('n=5 => 29', () => {
+			const gs = generateNextGroupBySize(generateNextGroupBySize([n3a, n3b]));
+			expect(gs.length).toBe(29);
+		});
+
+		test('n=6 => 166', () => {
+			const gs = generateNextGroupBySize(generateNextGroupBySize(generateNextGroupBySize([n3a, n3b])));
+			expect(gs.length).toBe(166);
+		});
 
 		test.todo('n=7 => 1023');
 

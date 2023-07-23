@@ -19,7 +19,7 @@ Enumerating polycubes
 
 ## `major`
 - **6** could be computed immediately
-- **7** was possibly when we added `GROUP_BY_SIZE`
+- **7** was possibly when we added grouping by size
 
 ## `minor`
 

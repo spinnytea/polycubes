@@ -1,7 +1,7 @@
 const Polycube = require('../Polycube');
 const utils = require('../utils');
 const { ORIENTATION } = require('../constants');
-const { DEDUP_ADDITIONS, NORMALIZE_ROTATIONS, GROUP_BY_SIZE, DEDUP_ROTATIONS } = require('../options');
+const { DEDUP_ADDITIONS, NORMALIZE_ROTATIONS, DEDUP_ROTATIONS } = require('../options');
 
 /*
 	This whole file is super un-optimized.
@@ -18,13 +18,6 @@ const { DEDUP_ADDITIONS, NORMALIZE_ROTATIONS, GROUP_BY_SIZE, DEDUP_ROTATIONS } =
 	@returns {Polycube[]} all polycubes of size=(n+1)
 */
 function generateNext(polycubes, { verbose } = {}) {
-	if (GROUP_BY_SIZE) {
-		if (NORMALIZE_ROTATIONS && DEDUP_ADDITIONS) {
-			return generateNextGroupBySize(polycubes, { verbose });
-		}
-		console.warn('WARNING: GROUP_BY_SIZE cannot be used without both NORMALIZE_ROTATIONS and DEDUP_ADDITIONS');
-	}
-
 	if (verbose) console.time(' … additions');
 	if (verbose > 1) console.info();
 	const nexts = [];
@@ -36,9 +29,7 @@ function generateNext(polycubes, { verbose } = {}) {
 
 		if (DEDUP_ADDITIONS) {
 			ns.forEach((n) => {
-				const alreadyExists = nexts.some((next) => (
-					n.equals(next)
-				));
+				const alreadyExists = nexts.some((next) => n.equals(next));
 				if (!alreadyExists) {
 					nexts.push(n);
 				}
@@ -68,12 +59,25 @@ function generateNext(polycubes, { verbose } = {}) {
 }
 
 /**
-	not sure if this is grounds for creating a new file?
+	shapes with different sizes will never be equal
+	i.e. [1,2,3] will never equal [2,2,3]
+
+	in which case, we can organize them into different lists
+	then when we aggregate (n^2 to de-dup)
+	when will have smaller lists
+	instead of every shape in one giant list, we'll have different lists for each size
+
+	this requires NORMALIZE_ROTATIONS to work
+	i mean, we _could_ do it without normalize, but it doesn't quite make sense to support that
+	 - i guess a naive way would be to group by x+y+z lengths, and have too many things in the lists; it'd be _better_
+	 - or we could, well, normalize the x,y,z without rotating them, and then generate all 24 rotations, but srsly, this is awful
 
 	@param {Polycube[]} polycubes all polycubes of size=n
 	@returns {Polycube[]} all polycubes of size=(n+1)
 */
 function generateNextGroupBySize(polycubes, { verbose } = {}) {
+	if (verbose && !NORMALIZE_ROTATIONS) console.warn('generateNextGroupBySize must normalize rotations; NORMALIZE_ROTATIONS=false will be ignored');
+
 	if (verbose) console.time(' … additions');
 	if (verbose > 1) console.info();
 	const sizeGroups = new Map();
@@ -93,8 +97,13 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 
 		nexts.forEach((next) => {
 			const sizeGroup = getSizeGroup(next);
-			const alreadyExists = sizeGroup.some((p) => next.equals(p));
-			if (!alreadyExists) {
+			if (DEDUP_ADDITIONS) {
+				const alreadyExists = sizeGroup.some((p) => next.equals(p));
+				if (!alreadyExists) {
+					sizeGroup.push(next);
+				}
+			}
+			else {
 				sizeGroup.push(next);
 			}
 		});
@@ -137,7 +146,8 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 		if (verbose > 1) {
 			console.info(`   ${size}`
 				+ ` found ${foundHere.length.toString().padStart(maxRotatedPadding)}`
-				+ ` from ${nextsRotated.reduce((s, rotations) => s + rotations.length, 0).toString().padStart(maxRotatedSumPadding)}`);
+				+ ` from ${nextsRotated.length.toString().padStart(maxRotatedPadding)}`
+				+ ` (↻ ${nextsRotated.reduce((s, rotations) => s + rotations.length, 0).toString().padStart(maxRotatedSumPadding)})`);
 		}
 	});
 	found.sort((a, b) => b.serialized.localeCompare(a.serialized));
@@ -389,5 +399,6 @@ function aggregate(found, nextsRotated) {
 }
 
 exports.generateNext = generateNext;
+exports.generateNextGroupBySize = generateNextGroupBySize;
 exports.listLocationsToGrow = listLocationsToGrow;
 exports.rotate = rotate;
