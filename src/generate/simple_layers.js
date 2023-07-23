@@ -1,7 +1,7 @@
 const Polycube = require('../Polycube');
 const utils = require('../utils');
 const { ORIENTATION } = require('../constants');
-const { DEDUP_ADDITIONS, USE_ACTUAL_ROTATIONS, NORMALIZE_ROTATIONS } = require('../options');
+const { DEDUP_ADDITIONS, USE_ACTUAL_ROTATIONS, NORMALIZE_ROTATIONS, GROUP_BY_SIZE } = require('../options');
 
 /*
 	This whole file is super un-optimized.
@@ -18,6 +18,13 @@ const { DEDUP_ADDITIONS, USE_ACTUAL_ROTATIONS, NORMALIZE_ROTATIONS } = require('
 	@returns {Polycube[]} all polycubes of size=(n+1)
 */
 function generateNext(polycubes, { verbose } = {}) {
+	if (GROUP_BY_SIZE) {
+		if (NORMALIZE_ROTATIONS && DEDUP_ADDITIONS) {
+			return generateNextGroupBySize(polycubes, { verbose });
+		}
+		console.warn('WARNING: GROUP_BY_SIZE cannot be used without both NORMALIZE_ROTATIONS and DEDUP_ADDITIONS');
+	}
+
 	if (verbose) console.time(' … additions');
 	if (verbose > 1) console.info();
 	const nexts = [];
@@ -42,10 +49,6 @@ function generateNext(polycubes, { verbose } = {}) {
 		}
 		if (verbose > 1) console.info(`   ${idx + 1} of ${polycubes.length}: found ${nexts.length} options`);
 	});
-	// FIXME group by dimensions
-	//  - 1x1x3 will not match any 1x2x2
-	//  - 1x1x3 will match 1x3x1 and 3x1x1 etc
-	//  - then we don't need as many rotations for every group (squares do need all 24, some might only need 8)
 	if (verbose) console.timeEnd(' … additions');
 
 	if (verbose) console.time(' … rotate');
@@ -63,6 +66,95 @@ function generateNext(polycubes, { verbose } = {}) {
 	if (verbose > 1) console.info();
 	const found = [];
 	aggregate(found, nextsRotated);
+	found.sort((a, b) => b.serialized.localeCompare(a.serialized));
+	if (verbose) console.timeEnd(' … unique');
+
+	return found;
+}
+
+/**
+	not sure if this is grounds for creating a new file?
+
+	@param {Polycube[]} polycubes all polycubes of size=n
+	@returns {Polycube[]} all polycubes of size=(n+1)
+*/
+function generateNextGroupBySize(polycubes, { verbose } = {}) {
+	if (verbose) console.time(' … additions');
+	if (verbose > 1) console.info();
+	const sizeGroups = {};
+	function getSizeGroup(polycube) {
+		const [xLength, yLength, zLength] = utils.shape.size(polycube.shape);
+		if (!sizeGroups[xLength]) sizeGroups[xLength] = {};
+		if (!sizeGroups[xLength][yLength]) sizeGroups[xLength][yLength] = {};
+		if (!sizeGroups[xLength][yLength][zLength]) sizeGroups[xLength][yLength][zLength] = [];
+		return sizeGroups[xLength][yLength][zLength];
+	}
+
+	polycubes.forEach((polycube, idx) => {
+		const locations = listLocationsToGrow(polycube);
+		const nexts = locations
+			.map((location) => grow(polycube, location))
+			.map((next) => normalizeOrientation(next));
+
+		nexts.forEach((next) => {
+			const sizeGroup = getSizeGroup(next);
+			const alreadyExists = sizeGroup.some((p) => next.equals(p));
+			if (!alreadyExists) {
+				sizeGroup.push(next);
+			}
+		});
+		if (verbose > 1) {
+			const nestsCount = Object.values(sizeGroups).reduce((sx, ys) => (
+				sx + Object.values(ys).reduce((sy, zs) => (
+					sy + Object.values(zs).reduce((sz, list) => (
+						sz + list.length
+					), 0)
+				), 0)
+			), 0);
+			console.info(`   ${idx + 1} of ${polycubes.length}: found ${nestsCount} options`);
+		}
+	});
+	if (verbose) console.timeEnd(' … additions');
+
+	if (verbose) console.time(' … rotate');
+	if (verbose > 1) console.info();
+	Object.entries(sizeGroups).forEach(([xLength, ys]) => {
+		Object.entries(ys).forEach(([yLength, zs]) => {
+			Object.entries(zs).forEach(([zLength, list]) => {
+				const nextsRotated = USE_ACTUAL_ROTATIONS
+					? list.map((next) => rotate(next))
+					: list.map((next) => next.rotations());
+				sizeGroups[xLength][yLength][zLength] = nextsRotated;
+			}, 0);
+		}, 0);
+	}, 0);
+
+	// IDEA group by some of the values, e.g. [0][0][0] or [0][0].join('')
+	//  - needs an accessor for logical rotations
+	if (verbose > 1) {
+		const nextsRotatedCount = Object.values(sizeGroups).reduce((sx, ys) => (
+			sx + Object.values(ys).reduce((sy, zs) => (
+				sy + Object.values(zs).reduce((sz, nextsRotated) => (
+					sz + nextsRotated.reduce((s, rotations) => s + rotations.length, 0)
+				), 0)
+			), 0)
+		), 0);
+		console.info(`   rotations ${nextsRotatedCount}`);
+	}
+	if (verbose) console.timeEnd(' … rotate');
+
+	if (verbose) console.time(' … unique');
+	if (verbose > 1) console.info();
+	const found = [];
+	Object.values(sizeGroups).forEach((ys) => {
+		Object.values(ys).forEach((zs) => {
+			Object.values(zs).forEach((nextsRotated) => {
+				const foundHere = [];
+				aggregate(foundHere, nextsRotated);
+				Array.prototype.push.apply(found, foundHere);
+			}, 0);
+		}, 0);
+	}, 0);
 	found.sort((a, b) => b.serialized.localeCompare(a.serialized));
 	if (verbose) console.timeEnd(' … unique');
 
