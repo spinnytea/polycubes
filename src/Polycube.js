@@ -3,11 +3,13 @@ const utils = require('./utils');
 class Polycube {
 	/**
 		@param {number[][][]} shape - rectangular matrix; 0s are empty, 1s are full
-		@param {string} rotation - which logical rotation order to use when comparing
+		@param {number} orientation - how is this shape physically oriented; how do x,y,z lengths relate to each other
+
+		@see `constants.ORIENTATION` for more detail on `orientation`
 	*/
-	constructor({ shape, rotation = undefined }) {
+	constructor({ shape, orientation = undefined }) {
 		this.shape = shape;
-		if (rotation) this.rotation = rotation;
+		if (orientation) this.orientation = orientation;
 	}
 
 	get serialized() {
@@ -17,10 +19,6 @@ class Polycube {
 					zs.join('_') // these provide visual clarity, could use 'z' for technical clarity
 				)).join(' ') // these provide visual clarity, could use 'y' for technical clarity
 			)).join('/'); // these provide visual clarity, could use 'x' for technical clarity
-
-			if (this.rotation) {
-				this.$serialized += `but ${this.rotation}`;
-			}
 		}
 		return this.$serialized;
 	}
@@ -54,27 +52,7 @@ class Polycube {
 	*/
 	equals(polycube) {
 		if (!polycube?.shape) throw new Error('polycube.equals must compare against polycubes');
-		if (this.rotation) console.warn('this polycube probably should not have a rotation when checking equality');
-		if (polycube.rotation) {
-			return utils.rotation.equals[polycube.rotation](this.shape, polycube.shape);
-		}
 		return utils.shape.equals(this.shape, polycube.shape);
-	}
-
-	/**
-		get all the rotations for this shape
-
-		TODO it's weird that `utils.rotation` is in Polycube, but `utils.shape` is in simple_layers
-		 - I think I was banking on this being definitively better
-
-		@returns {Polycube[]} rotations
-	*/
-	rotations() {
-		const { shape, rotation } = this;
-		return utils.rotation.allNames.map((rn) => {
-			if (rotation === rn) return this;
-			return new Polycube({ shape, rotation: rn });
-		});
 	}
 }
 

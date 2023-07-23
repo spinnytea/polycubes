@@ -1,3 +1,4 @@
+const { ORIENTATION } = require('../constants');
 const utils = require('.');
 
 describe('utils.shape', () => {
@@ -253,6 +254,73 @@ describe('utils.shape', () => {
 			//             1 6
 			expect(utils.shape.rotate.nZ([[[1], [2], [3]], [[6], [5], [4]]]))
 				.toEqual([[[3], [4]], [[2], [5]], [[1], [6]]]);
+		});
+	});
+
+	describe('normalize', () => {
+		function prettyPrintOrientation(o) {
+			o = o.toString(2).padStart(9, '0');
+			return prettyPrintSML(o.substring(6, 9)) + prettyPrintSML(o.substring(3, 6)) + prettyPrintSML(o.substring(0, 3));
+		}
+		function prettyPrintSML(n) {
+			if (n === '001') return 's';
+			if (n === '010') return 'm';
+			if (n === '100') return 'l';
+			return '';
+		}
+
+		test.each`
+			x    | y    | z    | s            | o
+			${2} | ${2} | ${2} | ${[2, 2, 2]} | ${ORIENTATION.SM_SM_SM}
+			${2} | ${2} | ${3} | ${[2, 2, 3]} | ${ORIENTATION.SM_SM_MD}
+			${2} | ${2} | ${4} | ${[2, 2, 4]} | ${ORIENTATION.SM_SM_MD}
+			${2} | ${3} | ${2} | ${[2, 2, 3]} | ${ORIENTATION.SM_SM_MD}
+			${2} | ${3} | ${3} | ${[2, 3, 3]} | ${ORIENTATION.SM_MD_MD}
+			${2} | ${3} | ${4} | ${[2, 3, 4]} | ${ORIENTATION.SM_MD_LG}
+			${2} | ${4} | ${2} | ${[2, 2, 4]} | ${ORIENTATION.SM_SM_MD}
+			${2} | ${4} | ${3} | ${[2, 3, 4]} | ${ORIENTATION.SM_MD_LG}
+			${2} | ${4} | ${4} | ${[2, 4, 4]} | ${ORIENTATION.SM_MD_MD}
+
+			${3} | ${2} | ${2} | ${[2, 2, 3]} | ${ORIENTATION.SM_SM_MD}
+			${3} | ${2} | ${3} | ${[2, 3, 3]} | ${ORIENTATION.SM_MD_MD}
+			${3} | ${2} | ${4} | ${[2, 3, 4]} | ${ORIENTATION.SM_MD_LG}
+			${3} | ${3} | ${2} | ${[2, 3, 3]} | ${ORIENTATION.SM_MD_MD}
+			${3} | ${3} | ${3} | ${[3, 3, 3]} | ${ORIENTATION.SM_SM_SM}
+			${3} | ${3} | ${4} | ${[3, 3, 4]} | ${ORIENTATION.SM_SM_MD}
+			${3} | ${4} | ${2} | ${[2, 3, 4]} | ${ORIENTATION.SM_MD_LG}
+			${3} | ${4} | ${3} | ${[3, 3, 4]} | ${ORIENTATION.SM_SM_MD}
+			${3} | ${4} | ${4} | ${[3, 4, 4]} | ${ORIENTATION.SM_MD_MD}
+
+			${4} | ${2} | ${2} | ${[2, 2, 4]} | ${ORIENTATION.SM_SM_MD}
+			${4} | ${2} | ${3} | ${[2, 3, 4]} | ${ORIENTATION.SM_MD_LG}
+			${4} | ${2} | ${4} | ${[2, 4, 4]} | ${ORIENTATION.SM_MD_MD}
+			${4} | ${3} | ${2} | ${[2, 3, 4]} | ${ORIENTATION.SM_MD_LG}
+			${4} | ${3} | ${3} | ${[3, 3, 4]} | ${ORIENTATION.SM_SM_MD}
+			${4} | ${3} | ${4} | ${[3, 4, 4]} | ${ORIENTATION.SM_MD_MD}
+			${4} | ${4} | ${2} | ${[2, 4, 4]} | ${ORIENTATION.SM_MD_MD}
+			${4} | ${4} | ${3} | ${[3, 4, 4]} | ${ORIENTATION.SM_MD_MD}
+			${4} | ${4} | ${4} | ${[4, 4, 4]} | ${ORIENTATION.SM_SM_SM}
+		`('normalize orientation of [$x, $y, $z]', ({ x, y, z, s, o }) => {
+			const before = utils.shape.create(x, y, z);
+			for (let i = 0; i < x; i += 1) before[i][0][0] = 1;
+			for (let i = 0; i < y; i += 1) before[0][i][0] = 1;
+			for (let i = 0; i < z; i += 1) before[0][0][i] = 1;
+
+			const { shape: after, orientation } = utils.shape.normalize(before);
+
+			expect([
+				orientation,
+				prettyPrintOrientation(orientation),
+				'original:',
+				prettyPrintOrientation(utils.shape.orientation(x, y, z)),
+			]).toEqual([
+				o,
+				prettyPrintOrientation(o),
+				'original:',
+				prettyPrintOrientation(utils.shape.orientation(x, y, z)),
+			]);
+
+			expect(utils.shape.size(after)).toEqual(s);
 		});
 	});
 });

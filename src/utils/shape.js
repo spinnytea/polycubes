@@ -1,3 +1,5 @@
+const { ORIENTATION } = require('../constants');
+
 const utilsShape = {
 
 	clone: (shape) => (
@@ -298,6 +300,122 @@ const utilsShape = {
 		return null;
 	},
 
+	orientation: (xLength, yLength, zLength) => (
+		(xLength > yLength ? (xLength > zLength ? 4 : 2) : (xLength > zLength ? 2 : 1)) // eslint-disable-line no-nested-ternary
+		+ (yLength > xLength ? (yLength > zLength ? 32 : 16) : (yLength > zLength ? 16 : 8)) // eslint-disable-line no-nested-ternary
+		+ (zLength > xLength ? (zLength > yLength ? 256 : 128) : (zLength > yLength ? 128 : 64)) // eslint-disable-line no-nested-ternary
+	),
+
+	normalize: (shape) => {
+		const smX = 1;
+		const mdX = 2;
+		const lgX = 4;
+		const smY = 8;
+		const mdY = 16;
+		const lgY = 32;
+		const smZ = 64;
+		const mdZ = 128;
+		const lgZ = 256;
+		const [xLength, yLength, zLength] = utilsShape.size(shape);
+		const orientation = utilsShape.orientation(xLength, yLength, zLength);
+
+		switch (orientation) {
+			case smX + smY + smZ:
+			// case mdX + mdY + mdZ:
+			// case lgX + lgY + lgZ:
+				return {
+					shape,
+					orientation: ORIENTATION.SM_SM_SM,
+				};
+
+			// case smX + smY + mdZ:
+			case smX + smY + lgZ:
+			// case mdX + mdY + lgZ:
+				return {
+					shape,
+					orientation: ORIENTATION.SM_SM_MD,
+				};
+
+			// case smX + mdY + smZ:
+			case smX + lgY + smZ:
+			// case mdX + lgY + mdZ:
+				return {
+					shape: utilsShape.rotate.x(shape),
+					orientation: ORIENTATION.SM_SM_MD,
+				};
+
+			// case mdX + smY + smZ:
+			case lgX + smY + smZ:
+			// case lgX + mdY + mdZ:
+				return {
+					shape: utilsShape.rotate.y(shape),
+					orientation: ORIENTATION.SM_SM_MD,
+				};
+
+			case smX + mdY + mdZ:
+			// case smX + lgY + lgZ:
+			// case mdX + lgY + lgZ:
+				return {
+					shape,
+					orientation: ORIENTATION.SM_MD_MD,
+				};
+
+			case mdX + smY + mdZ:
+			// case lgX + smY + lgZ:
+			// case lgX + mdY + lgZ:
+				return {
+					shape: utilsShape.rotate.z(shape),
+					orientation: ORIENTATION.SM_MD_MD,
+				};
+
+			case mdX + mdY + smZ:
+			// case lgX + lgY + smZ:
+			// case lgX + lgY + mdZ:
+				return {
+					shape: utilsShape.rotate.y(shape),
+					orientation: ORIENTATION.SM_MD_MD,
+				};
+
+			case smX + mdY + lgZ:
+				return {
+					shape,
+					orientation: ORIENTATION.SM_MD_LG,
+				};
+
+			case smX + lgY + mdZ:
+				return {
+					shape: utilsShape.rotate.x(shape),
+					orientation: ORIENTATION.SM_MD_LG,
+				};
+
+			case mdX + smY + lgZ:
+				return {
+					shape: utilsShape.rotate.z(shape),
+					orientation: ORIENTATION.SM_MD_LG,
+				};
+
+			case lgX + mdY + smZ:
+				return {
+					shape: utilsShape.rotate.y(shape),
+					orientation: ORIENTATION.SM_MD_LG,
+				};
+
+			case lgX + smY + mdZ:
+				return {
+					shape: utilsShape.rotate.z(utilsShape.rotate.y(shape)),
+					orientation: ORIENTATION.SM_MD_LG,
+				};
+
+			case mdX + lgY + smZ:
+				return {
+					shape: utilsShape.rotate.x(utilsShape.rotate.y(shape)),
+					orientation: ORIENTATION.SM_MD_LG,
+				};
+
+			default:
+				throw new Error(`orientation ${orientation} is not accounted for`);
+		}
+	},
 };
 
 module.exports = utilsShape;
