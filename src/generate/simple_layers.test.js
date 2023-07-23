@@ -1,3 +1,4 @@
+const { NORMALIZE_ROTATIONS, GROUP_BY_SIZE, DEDUP_ADDITIONS } = require('../options');
 const Polycube = require('../Polycube');
 const utils = require('../utils');
 
@@ -34,7 +35,15 @@ describe('generate simple', () => {
 			expect(gs.length).toBe(29);
 		});
 
-		test.todo('n=6 => 166');
+		if (GROUP_BY_SIZE && NORMALIZE_ROTATIONS && DEDUP_ADDITIONS) {
+			test('n=6 => 166', () => {
+				const gs = generateNext(generateNext(generateNext([n3a, n3b])));
+				expect(gs.length).toBe(166);
+			});
+		}
+		else {
+			test.todo('n=6 => 166');
+		}
 
 		test.todo('n=7 => 1023');
 

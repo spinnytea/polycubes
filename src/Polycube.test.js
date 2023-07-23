@@ -8,7 +8,6 @@ describe('Polycube', () => {
 			'constructor',
 			'equals',
 			'n',
-			'rotations',
 			'serialized',
 			'size',
 		]);
@@ -68,7 +67,8 @@ describe('Polycube', () => {
 			expect(() => polycube.equals(undefined)).toThrow();
 		});
 
-		test('rotation: x', () => {
+		// `polycube.rotation` has been removed since it was not fully supported
+		test.skip('rotation: x', () => {
 			const originalShape = [[[1, 2], [4, 3]]];
 			const xShape = [[[4, 1], [3, 2]]];
 			const nXShape = [[[2, 3], [1, 4]]];
@@ -92,8 +92,9 @@ describe('Polycube', () => {
 		});
 	});
 
+	// `polycube.rotation` has been removed since it was not fully supported
 	describe('rotations', () => {
-		test('no rotation', () => {
+		test.skip('no rotation', () => {
 			const polycube = new Polycube({ shape: [[[1]]] });
 			const rotations = polycube.rotations();
 			expect(rotations.length).toBe(24);
@@ -104,7 +105,7 @@ describe('Polycube', () => {
 			});
 		});
 
-		test('starting rotation', () => {
+		test.skip('starting rotation', () => {
 			const polycube = new Polycube({ shape: [[[1]]], rotation: 'x' });
 			const rotations = polycube.rotations();
 			expect(rotations.length).toBe(24);
@@ -119,8 +120,9 @@ describe('Polycube', () => {
 	});
 
 	describe('bugfixes', () => {
+		// `polycube.rotation` has been removed since it was not fully supported
 		describe('rotations', () => {
-			test('[[[0,1],[1,1]],[[1,1],[0,0]]]', () => {
+			test.skip('[[[0,1],[1,1]],[[1,1],[0,0]]]', () => {
 				const invalid = new Polycube({ shape: JSON.parse('[[[0,1],[1,1]],[[1,1],[0,0]]]') });
 				const actual = new Polycube({ shape: JSON.parse('[[[1,0],[1,1]],[[1,0],[0,1]]]') });
 
@@ -163,7 +165,7 @@ describe('Polycube', () => {
 				expect(utils.rotation.equals.znY(actual.shape, invalid.shape)).toBe(true); // fixed this
 			});
 
-			test('[[[0,1],[1,1]],[[0,1],[0,1]]]', () => {
+			test.skip('[[[0,1],[1,1]],[[0,1],[0,1]]]', () => {
 				const invalid = new Polycube({ shape: JSON.parse('[[[0,1],[1,1]],[[0,1],[0,1]]]') });
 				const actual = new Polycube({ shape: JSON.parse('[[[1,1],[1,0]],[[1,1],[0,0]]]') });
 
@@ -182,7 +184,7 @@ describe('Polycube', () => {
 				expect(utils.rotation.equals.nXnY(actual.shape, invalid.shape)).toBe(true); // fixed this
 			});
 
-			test('[[[0,1],[0,1]],[[1,1],[0,0]],[[0,1],[0,0]]]', () => {
+			test.skip('[[[0,1],[0,1]],[[1,1],[0,0]],[[0,1],[0,0]]]', () => {
 				const invalid = new Polycube({ shape: JSON.parse('[[[0,1],[0,1]],[[1,1],[0,0]],[[0,1],[0,0]]]') });
 				const actual = new Polycube({ shape: JSON.parse('[[[1,0],[1,0],[1,1]],[[0,0],[1,0],[0,0]]]') });
 
@@ -198,7 +200,7 @@ describe('Polycube', () => {
 				expect(utils.rotation.equals.znY(actual.shape, invalid.shape)).toBe(true); // fixed this
 			});
 
-			test('[[[0,1],[0,1],[1,1]],[[0,0],[0,1],[0,0]]]', () => {
+			test.skip('[[[0,1],[0,1],[1,1]],[[0,0],[0,1],[0,0]]]', () => {
 				const invalid = new Polycube({ shape: JSON.parse('[[[0,1],[0,1],[1,1]],[[0,0],[0,1],[0,0]]]') });
 				const actual = new Polycube({ shape: JSON.parse('[[[1,0],[1,0]],[[1,1],[0,0]],[[1,0],[0,0]]]') });
 
@@ -214,7 +216,7 @@ describe('Polycube', () => {
 				expect(utils.rotation.equals.nXnY(actual.shape, invalid.shape)).toBe(true); // fixed this
 			});
 
-			test('[[[0,0],[0,1]],[[0,1],[0,1]],[[1,1],[0,0]]]', () => {
+			test.skip('[[[0,0],[0,1]],[[0,1],[0,1]],[[1,1],[0,0]]]', () => {
 				const invalid = new Polycube({ shape: JSON.parse('[[[0,0],[0,1]],[[0,1],[0,1]],[[1,1],[0,0]]]') });
 				const actual = new Polycube({ shape: JSON.parse('[[[1,0],[1,1],[0,1]],[[1,0],[0,0],[0,0]]]') });
 
