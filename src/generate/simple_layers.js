@@ -272,13 +272,15 @@ function normalizeOrientation(polycube) {
 */
 function rotate(polycube) {
 	// TODO split this into a separate file
+	const rotations = [];
 
-	if (polycube.orientation === ORIENTATION.SM_MD_LG || polycube.orientation === ORIENTATION.SM_SM_MD) {
-		const rotations = [];
+	const { orientation } = polycube;
+
+	if (orientation === ORIENTATION.SM_MD_LG || orientation === ORIENTATION.SM_SM_MD) {
 		// seed it
 		let { shape } = polycube;
 		rotations.push(shape);
-		// spin it x3
+		// spin it 3 times
 		shape = utils.shape.rotate.z(shape);
 		rotations.push(shape);
 		shape = utils.shape.rotate.z(shape);
@@ -288,22 +290,21 @@ function rotate(polycube) {
 		// flip it
 		shape = utils.shape.rotate.y(shape);
 		shape = utils.shape.rotate.y(shape);
-		// spin it x3
+		rotations.push(shape);
+		// spin it 3 times
 		shape = utils.shape.rotate.z(shape);
 		rotations.push(shape);
 		shape = utils.shape.rotate.z(shape);
 		rotations.push(shape);
 		shape = utils.shape.rotate.z(shape);
 		rotations.push(shape);
-		// finish it
-		return rotations;
 	}
-	if (polycube.orientation === ORIENTATION.SM_MD_MD) {
-		const rotations = [];
+
+	else if (orientation === ORIENTATION.SM_MD_MD) {
 		// seed it
 		let { shape } = polycube;
 		rotations.push(shape);
-		// spin it x3
+		// spin it 3 times
 		shape = utils.shape.rotate.x(shape);
 		rotations.push(shape);
 		shape = utils.shape.rotate.x(shape);
@@ -313,64 +314,65 @@ function rotate(polycube) {
 		// flip it
 		shape = utils.shape.rotate.y(shape);
 		shape = utils.shape.rotate.y(shape);
-		// spin it x3
+		rotations.push(shape);
+		// spin it 3 times
 		shape = utils.shape.rotate.x(shape);
 		rotations.push(shape);
 		shape = utils.shape.rotate.x(shape);
 		rotations.push(shape);
 		shape = utils.shape.rotate.x(shape);
 		rotations.push(shape);
-		// finish it
-		return rotations;
 	}
 
-	// ORIENTATION.SM_SM_SM - does not have a unique axis
+	else {
+		// does not have a unique axis, so we need to check all 24
+		// orientation === ORIENTATION.SM_SM_SM
+		// orientation === undefined
 
-	// reuse intermediate rotations (x, y, z, nX, xx, xy, xz)
-	const rotatedX = utils.shape.rotate.x(polycube.shape);
-	const rotatedY = utils.shape.rotate.y(polycube.shape);
-	const rotatedZ = utils.shape.rotate.z(polycube.shape);
-	const rotatedNX = utils.shape.rotate.nX(polycube.shape);
-	const rotatedXX = utils.shape.rotate.x(rotatedX);
-	const rotatedXY = utils.shape.rotate.y(rotatedX);
-	const rotatedXZ = utils.shape.rotate.z(rotatedX);
+		// reuse intermediate rotations (x, y, z, nX, xx, xy, xz)
+		const rotatedX = utils.shape.rotate.x(polycube.shape);
+		const rotatedY = utils.shape.rotate.y(polycube.shape);
+		const rotatedZ = utils.shape.rotate.z(polycube.shape);
+		const rotatedNX = utils.shape.rotate.nX(polycube.shape);
+		const rotatedXX = utils.shape.rotate.x(rotatedX);
+		const rotatedXY = utils.shape.rotate.y(rotatedX);
+		const rotatedXZ = utils.shape.rotate.z(rotatedX);
 
-	const rotations = [
 		// zero
-		polycube.shape,
+		rotations.push(polycube.shape);
 
 		// once
-		rotatedX,
-		rotatedY,
-		rotatedZ,
-		rotatedNX,
-		utils.shape.rotate.nY(polycube.shape),
-		utils.shape.rotate.nZ(polycube.shape),
+		rotations.push(rotatedX);
+		rotations.push(rotatedY);
+		rotations.push(rotatedZ);
+		rotations.push(rotatedNX);
+		rotations.push(utils.shape.rotate.nY(polycube.shape));
+		rotations.push(utils.shape.rotate.nZ(polycube.shape));
 
 		// twice
-		rotatedXX,
-		rotatedXY,
-		rotatedXZ,
-		utils.shape.rotate.nY(rotatedX),
-		utils.shape.rotate.nZ(rotatedX),
-		utils.shape.rotate.y(rotatedY),
-		utils.shape.rotate.z(rotatedY),
-		utils.shape.rotate.nX(rotatedY),
-		utils.shape.rotate.z(rotatedZ),
-		utils.shape.rotate.nY(rotatedZ),
-		utils.shape.rotate.nY(rotatedNX),
+		rotations.push(rotatedXX);
+		rotations.push(rotatedXY);
+		rotations.push(rotatedXZ);
+		rotations.push(utils.shape.rotate.nY(rotatedX));
+		rotations.push(utils.shape.rotate.nZ(rotatedX));
+		rotations.push(utils.shape.rotate.y(rotatedY));
+		rotations.push(utils.shape.rotate.z(rotatedY));
+		rotations.push(utils.shape.rotate.nX(rotatedY));
+		rotations.push(utils.shape.rotate.z(rotatedZ));
+		rotations.push(utils.shape.rotate.nY(rotatedZ));
+		rotations.push(utils.shape.rotate.nY(rotatedNX));
 
 		// thrice
-		utils.shape.rotate.y(rotatedXX),
-		utils.shape.rotate.z(rotatedXX),
-		utils.shape.rotate.nY(rotatedXX),
-		utils.shape.rotate.nZ(rotatedXX),
-		utils.shape.rotate.y(rotatedXY),
-		utils.shape.rotate.z(rotatedXZ),
-	];
+		rotations.push(utils.shape.rotate.y(rotatedXX));
+		rotations.push(utils.shape.rotate.z(rotatedXX));
+		rotations.push(utils.shape.rotate.nY(rotatedXX));
+		rotations.push(utils.shape.rotate.nZ(rotatedXX));
+		rotations.push(utils.shape.rotate.y(rotatedXY));
+		rotations.push(utils.shape.rotate.z(rotatedXZ));
+	}
 
 	// rotate should have a length of 24
-	return rotations.map((shape) => new Polycube({ shape }));
+	return rotations.map((shape) => new Polycube({ shape, orientation }));
 }
 
 function aggregate(found, nextsRotated) {

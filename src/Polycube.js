@@ -9,8 +9,9 @@ class Polycube {
 		@see `constants.ORIENTATION` for more detail on `orientation`
 		@see `options.USE_ACTUAL_ROTATIONS` for for detail on `rotation`
 	*/
-	constructor({ shape, rotation = undefined }) {
+	constructor({ shape, orientation = undefined, rotation = undefined }) {
 		this.shape = shape;
+		if (orientation) this.orientation = orientation;
 		if (rotation) this.rotation = rotation;
 	}
 
