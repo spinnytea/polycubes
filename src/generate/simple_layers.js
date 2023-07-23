@@ -56,9 +56,6 @@ function generateNext(polycubes, { verbose } = {}) {
 	const nextsRotated = USE_ACTUAL_ROTATIONS
 		? nexts.map((next) => rotate(next))
 		: nexts.map((next) => next.rotations());
-
-	// IDEA group by some of the values, e.g. [0][0][0] or [0][0].join('')
-	//  - needs an accessor for logical rotations
 	if (verbose > 1) console.info(`   ${nexts.length} into total rotations ${nextsRotated.reduce((ret, r) => ret + r.length, 0)}`);
 	if (verbose) console.timeEnd(' … rotate');
 
@@ -129,16 +126,20 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 		}, 0);
 	}, 0);
 
-	// IDEA group by some of the values, e.g. [0][0][0] or [0][0].join('')
-	//  - needs an accessor for logical rotations
+	let maxRotatedPadding = 2;
+	let maxRotatedSumPadding = 2;
 	if (verbose > 1) {
-		const nextsRotatedCount = Object.values(sizeGroups).reduce((sx, ys) => (
-			sx + Object.values(ys).reduce((sy, zs) => (
-				sy + Object.values(zs).reduce((sz, nextsRotated) => (
-					sz + nextsRotated.reduce((s, rotations) => s + rotations.length, 0)
-				), 0)
-			), 0)
-		), 0);
+		let nextsRotatedCount = 0;
+		Object.values(sizeGroups).forEach((ys) => {
+			Object.values(ys).forEach((zs) => {
+				Object.values(zs).forEach((nextsRotated) => {
+					const maxRotatedSum = nextsRotated.reduce((s, rotations) => s + rotations.length, 0);
+					nextsRotatedCount += maxRotatedSum;
+					maxRotatedPadding = Math.max(maxRotatedPadding, nextsRotated.length.toString().length);
+					maxRotatedSumPadding = Math.max(maxRotatedSumPadding, maxRotatedSum.toString().length);
+				}, 0);
+			}, 0);
+		}, 0);
 		console.info(`   rotations ${nextsRotatedCount}`);
 	}
 	if (verbose) console.timeEnd(' … rotate');
@@ -152,6 +153,11 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 				const foundHere = [];
 				aggregate(foundHere, nextsRotated);
 				Array.prototype.push.apply(found, foundHere);
+				if (verbose > 1) {
+					console.info(`   ${JSON.stringify(utils.shape.size(foundHere[0].shape))}`
+						+ ` found ${foundHere.length.toString().padStart(maxRotatedPadding)}`
+						+ ` from ${nextsRotated.reduce((s, rotations) => s + rotations.length, 0).toString().padStart(maxRotatedSumPadding)}`);
+				}
 			}, 0);
 		}, 0);
 	}, 0);

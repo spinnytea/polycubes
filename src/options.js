@@ -60,7 +60,12 @@ const DEDUP_ADDITIONS = true;
 exports.DEDUP_ADDITIONS = DEDUP_ADDITIONS;
 
 /**
-	last checked: 6 is 5s, i didn't have the patience for 7
+	last checked: 2 is -
+	last checked: 3 is -
+	last checked: 4 is 5 ms
+	last checked: 5 is 35 ms (60ms alone)
+	last checked: 6 is 350 ms (400ms alone)
+	last checked: 7 is 50s
 	"actual rotations" (USE_ACTUAL_ROTATIONS = true) takes a long time to rotate
 	"logical rotations" (USE_ACTUAL_ROTATIONS = false) takes a long time to aggregate
 */
