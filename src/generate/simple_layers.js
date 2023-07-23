@@ -17,7 +17,7 @@ const { DEDUP_ADDITIONS, NORMALIZE_ROTATIONS, DEDUP_ROTATIONS } = require('../op
 	@param {Polycube[]} polycubes all polycubes of size=n
 	@returns {Polycube[]} all polycubes of size=(n+1)
 */
-function generateNext(polycubes, { verbose } = {}) {
+function generateNextSimple(polycubes, { verbose } = {}) {
 	if (verbose) console.time(' … additions');
 	if (verbose > 1) console.info();
 	const nexts = [];
@@ -398,7 +398,7 @@ function aggregate(found, nextsRotated) {
 	});
 }
 
-exports.generateNext = generateNext;
+exports.generateNextSimple = generateNextSimple;
 exports.generateNextGroupBySize = generateNextGroupBySize;
 exports.listLocationsToGrow = listLocationsToGrow;
 exports.rotate = rotate;

@@ -47,12 +47,20 @@ const DEDUP_ROTATIONS = false;
 exports.DEDUP_ROTATIONS = DEDUP_ROTATIONS;
 
 /**
+	strings are simpler to work with, so polycube has a serialize function
+	instead of using `utils.shape.equals`, which iterates all of the 3d arrays,
+	serialize the polycube into a string once, and then use that for equality comparisons
+*/
+const USE_POLYCUBE_SERIALIZE_FOR_EQUALS = true;
+exports.USE_POLYCUBE_SERIALIZE_FOR_EQUALS = USE_POLYCUBE_SERIALIZE_FOR_EQUALS;
+
+/**
 	last checked: 2 is -
 	last checked: 3 is -
-	last checked: 4 is 5 ms
-	last checked: 5 is 30 ms (60ms alone)
-	last checked: 6 is 300 ms (350ms alone)
-	last checked: 7 is 50s - 75s
+	last checked: 4 is 5 ms (35 ms alone)
+	last checked: 5 is 25 ms (55 ms alone)
+	last checked: 6 is 150 ms (200 ms alone)
+	last checked: 7 is 16 s
 */
 const MAX_N = 7;
 exports.MAX_N = MAX_N;

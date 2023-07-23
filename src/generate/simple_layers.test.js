@@ -1,9 +1,8 @@
-const { NORMALIZE_ROTATIONS } = require('../options');
 const Polycube = require('../Polycube');
 const utils = require('../utils');
 
 const {
-	generateNext,
+	generateNextSimple,
 	listLocationsToGrow,
 	rotate,
 	generateNextGroupBySize,
@@ -15,28 +14,30 @@ describe('generate simple', () => {
 	const n3a = new Polycube({ shape: [[[1, 1, 1]]] });
 	const n3b = new Polycube({ shape: [[[1, 1], [1, 0]]] });
 
-	describe('generateNext', () => {
+	describe('generateNextSimple', () => {
 		test('n=2 => 1', () => {
-			const gs = generateNext([n1]);
+			const gs = generateNextSimple([n1]);
 			expect(gs.length).toBe(1);
 		});
 
 		test('n=3 => 2', () => {
-			const gs = generateNext([n2]);
+			const gs = generateNextSimple([n2]);
 			expect(gs.length).toBe(2);
 		});
 
 		test('n=4 => 8', () => {
-			const gs = generateNext([n3a, n3b]);
+			const gs = generateNextSimple([n3a, n3b]);
 			expect(gs.length).toBe(8);
 		});
 
 		test('n=5 => 29', () => {
-			const gs = generateNext(generateNext([n3a, n3b]));
+			const gs = generateNextSimple(generateNextSimple([n3a, n3b]));
 			expect(gs.length).toBe(29);
 		});
 
-		test.todo('n=6 => 166');
+		test.todo('n=6 => 166'); // almost
+
+		test.todo('n=7 => 1023');
 	});
 
 	describe('generateNextGroupBySize', () => {

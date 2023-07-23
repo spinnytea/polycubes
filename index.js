@@ -2,7 +2,7 @@
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 
-const { generateNextGroupBySize } = require('./src/generate/simple_layers');
+const { generateNextGroupBySize: generateNext } = require('./src/generate/simple_layers');
 const dynamic = require('./src/dynamic');
 const Polycube = require('./src/Polycube');
 const utils = require('./src/utils');
@@ -41,7 +41,7 @@ yargs(hideBin(process.argv))
 // TODO speed it all up
 function enumerate(argv) {
 	const { n, verbose } = argv;
-	return dynamic(generateNextGroupBySize, { n, verbose });
+	return dynamic(generateNext, { n, verbose });
 }
 
 async function dummy() {
@@ -50,7 +50,7 @@ async function dummy() {
 	const polycube = new Polycube({ shape: shapes[0] });
 	console.info(polycube, polycube.size());
 	await utils.file.saveArrayJson('./precomputed/1.json', shapes);
-	console.info(JSON.stringify(generateNextGroupBySize([polycube])));
+	console.info(JSON.stringify(generateNext([polycube])));
 }
 
 function clean() {
