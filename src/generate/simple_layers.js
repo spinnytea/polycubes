@@ -1,6 +1,7 @@
 const Polycube = require('../Polycube');
 const utils = require('../utils');
-const { DEDUP_ADDITIONS, USE_ACTUAL_ROTATIONS } = require('../options');
+const { ORIENTATION } = require('../constants');
+const { DEDUP_ADDITIONS, USE_ACTUAL_ROTATIONS, NORMALIZE_ROTATIONS } = require('../options');
 
 /*
 	This whole file is super un-optimized.
@@ -23,7 +24,7 @@ function generateNext(polycubes, { verbose } = {}) {
 		const locations = listLocationsToGrow(polycube);
 		const ns = locations
 			.map((location) => grow(polycube, location))
-			.map((p) => normalizeOrientation(p));
+			.map((p) => (NORMALIZE_ROTATIONS ? normalizeOrientation(p) : p));
 
 		if (DEDUP_ADDITIONS) {
 			ns.forEach((n) => {
@@ -174,6 +175,59 @@ function normalizeOrientation(polycube) {
 */
 function rotate(polycube) {
 	// TODO split this into a separate file
+
+	if (polycube.orientation === ORIENTATION.SM_MD_LG || polycube.orientation === ORIENTATION.SM_SM_MD) {
+		const rotations = [];
+		// seed it
+		let { shape } = polycube;
+		rotations.push(shape);
+		// spin it x3
+		shape = utils.shape.rotate.z(shape);
+		rotations.push(shape);
+		shape = utils.shape.rotate.z(shape);
+		rotations.push(shape);
+		shape = utils.shape.rotate.z(shape);
+		rotations.push(shape);
+		// flip it
+		shape = utils.shape.rotate.y(shape);
+		shape = utils.shape.rotate.y(shape);
+		// spin it x3
+		shape = utils.shape.rotate.z(shape);
+		rotations.push(shape);
+		shape = utils.shape.rotate.z(shape);
+		rotations.push(shape);
+		shape = utils.shape.rotate.z(shape);
+		rotations.push(shape);
+		// finish it
+		return rotations;
+	}
+	if (polycube.orientation === ORIENTATION.SM_MD_MD) {
+		const rotations = [];
+		// seed it
+		let { shape } = polycube;
+		rotations.push(shape);
+		// spin it x3
+		shape = utils.shape.rotate.x(shape);
+		rotations.push(shape);
+		shape = utils.shape.rotate.x(shape);
+		rotations.push(shape);
+		shape = utils.shape.rotate.x(shape);
+		rotations.push(shape);
+		// flip it
+		shape = utils.shape.rotate.y(shape);
+		shape = utils.shape.rotate.y(shape);
+		// spin it x3
+		shape = utils.shape.rotate.x(shape);
+		rotations.push(shape);
+		shape = utils.shape.rotate.x(shape);
+		rotations.push(shape);
+		shape = utils.shape.rotate.x(shape);
+		rotations.push(shape);
+		// finish it
+		return rotations;
+	}
+
+	// ORIENTATION.SM_SM_SM - does not have a unique axis
 
 	// reuse intermediate rotations (x, y, z, nX, xx, xy, xz)
 	const rotatedX = utils.shape.rotate.x(polycube.shape);
