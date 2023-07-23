@@ -3,7 +3,11 @@ const utils = require('./utils');
 class Polycube {
 	/**
 		@param {number[][][]} shape - rectangular matrix; 0s are empty, 1s are full
+		@param {number} orientation - how is this shape physically oriented; how do x,y,z lengths relate to each other
 		@param {string} rotation - which logical rotation order to use when comparing
+
+		@see `constants.ORIENTATION` for more detail on `orientation`
+		@see `options.USE_ACTUAL_ROTATIONS` for for detail on `rotation`
 	*/
 	constructor({ shape, rotation = undefined }) {
 		this.shape = shape;

@@ -82,58 +82,6 @@ describe('generate simple', () => {
 		});
 	});
 
-	describe('normalizeOrientation', () => {
-		test.todo('[sm, md, lg]');
-
-		test.todo('[sm, lg, md]');
-
-		test.todo('[md, sm, lg]');
-
-		test.todo('[md, lg, sm]');
-
-		test.todo('[lg, sm, md]');
-
-		test.todo('[lg, md, sm]');
-
-		// doing them all is rather redundant
-		// e.g. 2,3,3 and 3,4,4 are the same
-		// but this ensure we don't miss any
-		test.skip.each`
-			x    | y    | z    | expected
-			${2} | ${2} | ${2} | ${null}
-			${2} | ${2} | ${3} | ${null}
-			${2} | ${2} | ${4} | ${null}
-			${2} | ${3} | ${2} | ${null}
-			${2} | ${3} | ${3} | ${null}
-			${2} | ${3} | ${4} | ${null}
-			${2} | ${4} | ${2} | ${null}
-			${2} | ${4} | ${3} | ${null}
-			${2} | ${4} | ${4} | ${null}
-
-			${3} | ${2} | ${2} | ${null}
-			${3} | ${2} | ${3} | ${null}
-			${3} | ${2} | ${4} | ${null}
-			${3} | ${3} | ${2} | ${null}
-			${3} | ${3} | ${3} | ${null}
-			${3} | ${3} | ${4} | ${null}
-			${3} | ${4} | ${2} | ${null}
-			${3} | ${4} | ${3} | ${null}
-			${3} | ${4} | ${4} | ${null}
-
-			${4} | ${2} | ${2} | ${null}
-			${4} | ${2} | ${3} | ${null}
-			${4} | ${2} | ${4} | ${null}
-			${4} | ${3} | ${2} | ${null}
-			${4} | ${3} | ${3} | ${null}
-			${4} | ${3} | ${4} | ${null}
-			${4} | ${4} | ${2} | ${null}
-			${4} | ${4} | ${3} | ${null}
-			${4} | ${4} | ${4} | ${null}
-		`('normalize orientation of [$x, $y, $z]', ({ x, y, z, expected }) => {
-			expect(expected).toBe(null);
-		});
-	});
-
 	describe('rotate', () => {
 		test('identity', () => {
 			const identityShape = utils.shape.create(2, 3, 4);
