@@ -76,13 +76,13 @@ function generateNext(polycubes, { verbose } = {}) {
 function generateNextGroupBySize(polycubes, { verbose } = {}) {
 	if (verbose) console.time(' … additions');
 	if (verbose > 1) console.info();
-	const sizeGroups = {};
+	const sizeGroups = new Map();
 	function getSizeGroup(polycube) {
-		const [xLength, yLength, zLength] = utils.shape.size(polycube.shape);
-		if (!sizeGroups[xLength]) sizeGroups[xLength] = {};
-		if (!sizeGroups[xLength][yLength]) sizeGroups[xLength][yLength] = {};
-		if (!sizeGroups[xLength][yLength][zLength]) sizeGroups[xLength][yLength][zLength] = [];
-		return sizeGroups[xLength][yLength][zLength];
+		const size = utils.shape.size(polycube.shape).join('/');
+		if (!sizeGroups.has(size)) {
+			sizeGroups.set(size, []);
+		}
+		return sizeGroups.get(size);
 	}
 
 	polycubes.forEach((polycube, idx) => {
@@ -99,13 +99,8 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 			}
 		});
 		if (verbose > 1) {
-			const nestsCount = Object.values(sizeGroups).reduce((sx, ys) => (
-				sx + Object.values(ys).reduce((sy, zs) => (
-					sy + Object.values(zs).reduce((sz, list) => (
-						sz + list.length
-					), 0)
-				), 0)
-			), 0);
+			let nestsCount = 0;
+			sizeGroups.forEach((list) => { nestsCount += list.length; });
 			console.info(`   ${idx + 1} of ${polycubes.length}: found ${nestsCount} options`);
 		}
 	});
@@ -113,29 +108,21 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 
 	if (verbose) console.time(' … rotate');
 	if (verbose > 1) console.info();
-	Object.entries(sizeGroups).forEach(([xLength, ys]) => {
-		Object.entries(ys).forEach(([yLength, zs]) => {
-			Object.entries(zs).forEach(([zLength, list]) => {
-				const nextsRotated = list.map((next) => rotate(next));
-				sizeGroups[xLength][yLength][zLength] = nextsRotated;
-			}, 0);
-		}, 0);
-	}, 0);
+	sizeGroups.forEach((list, size) => {
+		const nextsRotated = list.map((next) => rotate(next));
+		sizeGroups.set(size, nextsRotated);
+	});
 
 	let maxRotatedPadding = 2;
 	let maxRotatedSumPadding = 2;
 	if (verbose > 1) {
 		let nextsRotatedCount = 0;
-		Object.values(sizeGroups).forEach((ys) => {
-			Object.values(ys).forEach((zs) => {
-				Object.values(zs).forEach((nextsRotated) => {
-					const maxRotatedSum = nextsRotated.reduce((s, rotations) => s + rotations.length, 0);
-					nextsRotatedCount += maxRotatedSum;
-					maxRotatedPadding = Math.max(maxRotatedPadding, nextsRotated.length.toString().length);
-					maxRotatedSumPadding = Math.max(maxRotatedSumPadding, maxRotatedSum.toString().length);
-				}, 0);
-			}, 0);
-		}, 0);
+		sizeGroups.forEach((nextsRotated) => {
+			const maxRotatedSum = nextsRotated.reduce((s, rotations) => s + rotations.length, 0);
+			nextsRotatedCount += maxRotatedSum;
+			maxRotatedPadding = Math.max(maxRotatedPadding, nextsRotated.length.toString().length);
+			maxRotatedSumPadding = Math.max(maxRotatedSumPadding, maxRotatedSum.toString().length);
+		});
 		console.info(`   rotations ${nextsRotatedCount}`);
 	}
 	if (verbose) console.timeEnd(' … rotate');
@@ -143,20 +130,16 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 	if (verbose) console.time(' … unique');
 	if (verbose > 1) console.info();
 	const found = [];
-	Object.values(sizeGroups).forEach((ys) => {
-		Object.values(ys).forEach((zs) => {
-			Object.values(zs).forEach((nextsRotated) => {
-				const foundHere = [];
-				aggregate(foundHere, nextsRotated);
-				Array.prototype.push.apply(found, foundHere);
-				if (verbose > 1) {
-					console.info(`   ${JSON.stringify(utils.shape.size(foundHere[0].shape))}`
-						+ ` found ${foundHere.length.toString().padStart(maxRotatedPadding)}`
-						+ ` from ${nextsRotated.reduce((s, rotations) => s + rotations.length, 0).toString().padStart(maxRotatedSumPadding)}`);
-				}
-			}, 0);
-		}, 0);
-	}, 0);
+	sizeGroups.forEach((nextsRotated, size) => {
+		const foundHere = [];
+		aggregate(foundHere, nextsRotated);
+		Array.prototype.push.apply(found, foundHere);
+		if (verbose > 1) {
+			console.info(`   ${size}`
+				+ ` found ${foundHere.length.toString().padStart(maxRotatedPadding)}`
+				+ ` from ${nextsRotated.reduce((s, rotations) => s + rotations.length, 0).toString().padStart(maxRotatedSumPadding)}`);
+		}
+	});
 	found.sort((a, b) => b.serialized.localeCompare(a.serialized));
 	if (verbose) console.timeEnd(' … unique');
 
