@@ -76,7 +76,6 @@ class Polycube {
 	*/
 	rotations() {
 		const { shape, rotation } = this;
-		// FIXME use orientation
 		return utils.rotation.allNames.map((rn) => {
 			if (rotation === rn) return this;
 			return new Polycube({ shape, rotation: rn });

@@ -1,7 +1,7 @@
 const Polycube = require('../Polycube');
 const utils = require('../utils');
 const { ORIENTATION } = require('../constants');
-const { DEDUP_ADDITIONS, USE_ACTUAL_ROTATIONS, NORMALIZE_ROTATIONS, GROUP_BY_SIZE } = require('../options');
+const { DEDUP_ADDITIONS, USE_ACTUAL_ROTATIONS, NORMALIZE_ROTATIONS, GROUP_BY_SIZE, DEDUP_ROTATIONS } = require('../options');
 
 /*
 	This whole file is super un-optimized.
@@ -369,6 +369,16 @@ function rotate(polycube) {
 		rotations.push(utils.shape.rotate.nZ(rotatedXX));
 		rotations.push(utils.shape.rotate.y(rotatedXY));
 		rotations.push(utils.shape.rotate.z(rotatedXZ));
+	}
+
+	if (DEDUP_ROTATIONS) {
+		const orig = rotations.splice(0);
+		orig.forEach((o) => {
+			const alreadyExists = rotations.some((r) => utils.shape.equals(o, r));
+			if (!alreadyExists) {
+				rotations.push(o);
+			}
+		});
 	}
 
 	// rotate should have a length of 24

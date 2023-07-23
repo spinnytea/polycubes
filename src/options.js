@@ -5,6 +5,8 @@
 	false: don't change the shape, just compare with a different looping order (utils.rotation.equals)
 	 - rotations are basically free to "have"
 	 - takes MUCH longer to compare them ?? the whole whole point was that this should be _faster_
+
+	TODO this isn't fully supported, so we should just remove it
 */
 const USE_ACTUAL_ROTATIONS = true;
 exports.USE_ACTUAL_ROTATIONS = USE_ACTUAL_ROTATIONS;
@@ -58,6 +60,21 @@ exports.GROUP_BY_SIZE = GROUP_BY_SIZE;
 */
 const DEDUP_ADDITIONS = true;
 exports.DEDUP_ADDITIONS = DEDUP_ADDITIONS;
+
+/**
+	when we generate rotations
+	(8 or 24 of them)
+	should we dedup that list
+
+	this sounds good on the surface, redue the 8184 things we need while it's just 24
+	but this will be n^2 to dedup
+	and we don't constantly cross check rotations
+	once we find something, we only use the representative rotation, and drop the rest
+
+	so this may actually slow things down
+*/
+const DEDUP_ROTATIONS = false;
+exports.DEDUP_ROTATIONS = DEDUP_ROTATIONS;
 
 /**
 	last checked: 2 is -
