@@ -1,7 +1,7 @@
 const Polycube = require('../Polycube');
 const utils = require('../utils');
 const { ORIENTATION } = require('../constants');
-const { DEDUP_ADDITIONS, NORMALIZE_ROTATIONS, DEDUP_ROTATIONS } = require('../options');
+const { DEDUP_ADDITIONS, NORMALIZE_ROTATIONS, DEDUP_ROTATIONS, COUNT_CORNERS_TO_GROUP } = require('../options');
 
 /*
 	This whole file is super un-optimized.
@@ -82,7 +82,22 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 	if (verbose > 1) console.info();
 	const sizeGroups = new Map();
 	function getSizeGroup(polycube) {
-		const size = utils.shape.size(polycube.shape).join('/');
+		const [xLength, yLength, zLength] = utils.shape.size(polycube.shape);
+		let size = [xLength, yLength, zLength].join('/');
+		if (COUNT_CORNERS_TO_GROUP) {
+			const xMax = xLength - 1;
+			const yMax = yLength - 1;
+			const zMax = zLength - 1;
+			const corners = polycube.shape[0][0][0]
+				+ polycube.shape[xMax][0][0]
+				+ polycube.shape[0][yMax][0]
+				+ polycube.shape[xMax][yMax][0]
+				+ polycube.shape[0][0][zMax]
+				+ polycube.shape[xMax][0][zMax]
+				+ polycube.shape[0][yMax][zMax]
+				+ polycube.shape[xMax][yMax][zMax];
+			size += `+${corners}`;
+		}
 		if (!sizeGroups.has(size)) {
 			sizeGroups.set(size, []);
 		}
@@ -139,12 +154,14 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 	if (verbose) console.time(' … unique');
 	if (verbose > 1) console.info();
 	const found = [];
+	let groupNum = 0;
 	sizeGroups.forEach((nextsRotated, size) => {
+		groupNum += 1;
 		const foundHere = [];
 		aggregate(foundHere, nextsRotated);
 		Array.prototype.push.apply(found, foundHere);
 		if (verbose > 1) {
-			console.info(`   ${size}`
+			console.info(`   ${size} (${groupNum} of ${sizeGroups.size})`
 				+ ` found ${foundHere.length.toString().padStart(maxRotatedPadding)}`
 				+ ` from ${nextsRotated.length.toString().padStart(maxRotatedPadding)}`
 				+ ` (↻ ${nextsRotated.reduce((s, rotations) => s + rotations.length, 0).toString().padStart(maxRotatedSumPadding)})`);

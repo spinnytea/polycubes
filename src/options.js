@@ -55,12 +55,22 @@ const USE_POLYCUBE_SERIALIZE_FOR_EQUALS = true;
 exports.USE_POLYCUBE_SERIALIZE_FOR_EQUALS = USE_POLYCUBE_SERIALIZE_FOR_EQUALS;
 
 /**
+	this can divide `generateNextGroupBySize` further into 9 groups
+	we know that _every_ cube will have 8 corners, so we can count the number of 1s
+	the same shape will have the same count regardles of rotation, and it's trivial to do
+
+	+0, +1, +2, +3, +4, +5, +6, +7, +8
+*/
+const COUNT_CORNERS_TO_GROUP = true;
+exports.COUNT_CORNERS_TO_GROUP = COUNT_CORNERS_TO_GROUP;
+
+/**
 	last checked: 2 is -
 	last checked: 3 is -
 	last checked: 4 is 5 ms (35 ms alone)
-	last checked: 5 is 25 ms (55 ms alone)
-	last checked: 6 is 150 ms (200 ms alone)
-	last checked: 7 is 16 s
+	last checked: 5 is 20 ms (50 ms alone)
+	last checked: 6 is 50 ms (85 ms alone)
+	last checked: 7 is 1.8 s
 */
-const MAX_N = 7;
+const MAX_N = 8;
 exports.MAX_N = MAX_N;
