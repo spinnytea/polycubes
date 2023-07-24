@@ -35,6 +35,38 @@ class Polycube {
 	}
 
 	/**
+		shapes with different sizes will never be equal
+		i.e. [1,2,3] will never equal [2,2,3]
+
+		in which case, we can organize them into different lists
+		then we will have smaller lists when we aggregate (dedupping is expensive)
+		instead of every shape in one giant list, this lets us break the problem down
+
+		counting corners can divide groups further into 9 groups
+		we know that _every_ cube will have 8 corners, so we can count the number of 1s
+		the same shape will have the same count regardles of rotation, and it's trivial to do
+
+		+0, +1, +2, +3, +4, +5, +6, +7, +8
+
+		@returns {string}
+	*/
+	sizeGroup() {
+		const [xLength, yLength, zLength] = this.size();
+		const xMax = xLength - 1;
+		const yMax = yLength - 1;
+		const zMax = zLength - 1;
+		const corners = this.shape[0][0][0]
+			+ this.shape[xMax][0][0]
+			+ this.shape[0][yMax][0]
+			+ this.shape[xMax][yMax][0]
+			+ this.shape[0][0][zMax]
+			+ this.shape[xMax][0][zMax]
+			+ this.shape[0][yMax][zMax]
+			+ this.shape[xMax][yMax][zMax];
+		return `${xLength}/${yLength}/${zLength}+${corners}`;
+	}
+
+	/**
 		returns the number of cubes in the polycube
 		we shouldn't ever actually need this, it should just be implicit
 		this is mostly just to start getting a handled on the data
