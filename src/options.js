@@ -68,9 +68,11 @@ exports.COUNT_CORNERS_TO_GROUP = COUNT_CORNERS_TO_GROUP;
 	last checked: 2 is -
 	last checked: 3 is -
 	last checked: 4 is 5 ms (35 ms alone)
-	last checked: 5 is 20 ms (50 ms alone)
-	last checked: 6 is 50 ms (85 ms alone)
-	last checked: 7 is 1.8 s
+	last checked: 5 is 15 ms (45 ms alone)
+	last checked: 6 is 35 ms (70 ms alone)
+	last checked: 7 is 230 ms (260 alone)
+	last checked: 8 is 3.2 s (3.4 alone)
+	last checked: 9 JavaScript heap out of memory
 */
 const MAX_N = 8;
 exports.MAX_N = MAX_N;

@@ -63,14 +63,17 @@ function generateNextSimple(polycubes, { verbose } = {}) {
 	i.e. [1,2,3] will never equal [2,2,3]
 
 	in which case, we can organize them into different lists
-	then when we aggregate (n^2 to de-dup)
-	when will have smaller lists
+	then we will have smaller lists when we aggregate (dedupping is expensive)
 	instead of every shape in one giant list, we'll have different lists for each size
 
 	this requires NORMALIZE_ROTATIONS to work
 	i mean, we _could_ do it without normalize, but it doesn't quite make sense to support that
 	 - i guess a naive way would be to group by x+y+z lengths, and have too many things in the lists; it'd be _better_
 	 - or we could, well, normalize the x,y,z without rotating them, and then generate all 24 rotations, but srsly, this is awful
+
+	TODO stop using lists to hold intermediates
+	 - i/o should be a list
+	 - sizedGroups, nexts, anytime there's a dedup
 
 	@param {Polycube[]} polycubes all polycubes of size=n
 	@returns {Polycube[]} all polycubes of size=(n+1)
@@ -392,9 +395,11 @@ function rotate(polycube) {
 }
 
 function aggregate(found, nextsRotated) {
+	const foundSerialized = new Set();
 	nextsRotated.forEach(() => {
 		if (found.length === 0) {
 			found.push(nextsRotated[0][0]);
+			foundSerialized.add(nextsRotated[0][0].serialized);
 		}
 		else {
 			// each nexts is an option
@@ -403,12 +408,11 @@ function aggregate(found, nextsRotated) {
 				// all the rest are other rotations, basically duplicates
 				// if any of the rotations are a match, then we don't add our vanguard
 				const alreadyExists = rotations.some((polycube) => (
-					found.some((f) => (
-						f.equals(polycube)
-					))
+					foundSerialized.has(polycube.serialized)
 				));
 				if (!alreadyExists) {
 					found.push(rotations[0]);
+					foundSerialized.add(rotations[0].serialized);
 				}
 			});
 		}
