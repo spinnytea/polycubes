@@ -20,7 +20,7 @@ Enumerating polycubes
 ## `major`
 - **6** could be computed immediately
 - **7** was possibly when we added grouping by size
-- **8** use a `Set` to dedup the final list + rotations, and a VERY big oversight
+- **8** use a `Map` to dedup the final list + rotations, and a VERY big oversight
 
 ## `minor`
 
