@@ -35,7 +35,10 @@ describe('generate simple', () => {
 			expect(gs.length).toBe(29);
 		});
 
-		test.todo('n=6 => 166'); // almost
+		test('n=6 => 166', () => {
+			const gs = generateNextSimple(generateNextSimple(generateNextSimple([n3a, n3b])));
+			expect(gs.length).toBe(166);
+		});
 
 		test.todo('n=7 => 1023');
 	});
@@ -66,7 +69,10 @@ describe('generate simple', () => {
 			expect(gs.length).toBe(166);
 		});
 
-		test.todo('n=7 => 1023');
+		test('n=7 => 1023', () => {
+			const gs = generateNextGroupBySize(generateNextGroupBySize(generateNextGroupBySize(generateNextGroupBySize([n3a, n3b]))));
+			expect(gs.length).toBe(1023);
+		});
 
 		test.todo('n=8 => 6922');
 	});
