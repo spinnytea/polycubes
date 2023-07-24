@@ -396,25 +396,22 @@ function rotate(polycube) {
 
 function aggregate(found, nextsRotated) {
 	const foundSerialized = new Set();
-	nextsRotated.forEach(() => {
+	nextsRotated.forEach((rotations) => {
 		if (found.length === 0) {
-			found.push(nextsRotated[0][0]);
-			foundSerialized.add(nextsRotated[0][0].serialized);
+			found.push(rotations[0]);
+			foundSerialized.add(rotations[0].serialized);
 		}
 		else {
-			// each nexts is an option
-			nextsRotated.forEach((rotations) => {
-				// the first of the rotations is our vanguard, the one we want to add
-				// all the rest are other rotations, basically duplicates
-				// if any of the rotations are a match, then we don't add our vanguard
-				const alreadyExists = rotations.some((polycube) => (
-					foundSerialized.has(polycube.serialized)
-				));
-				if (!alreadyExists) {
-					found.push(rotations[0]);
-					foundSerialized.add(rotations[0].serialized);
-				}
-			});
+			// the first of the rotations is our vanguard, the one we want to add
+			// all the rest are other rotations, basically duplicates
+			// if any of the rotations are a match, then we don't add our vanguard
+			const alreadyExists = rotations.some((polycube) => (
+				foundSerialized.has(polycube.serialized)
+			));
+			if (!alreadyExists) {
+				found.push(rotations[0]);
+				foundSerialized.add(rotations[0].serialized);
+			}
 		}
 	});
 }
