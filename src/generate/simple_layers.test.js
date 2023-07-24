@@ -1,11 +1,11 @@
-const { NORMALIZE_ROTATIONS, GROUP_BY_SIZE, DEDUP_ADDITIONS } = require('../options');
 const Polycube = require('../Polycube');
 const utils = require('../utils');
 
 const {
-	generateNext,
+	generateNextSimple,
 	listLocationsToGrow,
 	rotate,
+	generateNextGroupBySize,
 } = require('./simple_layers');
 
 describe('generate simple', () => {
@@ -14,36 +14,57 @@ describe('generate simple', () => {
 	const n3a = new Polycube({ shape: [[[1, 1, 1]]] });
 	const n3b = new Polycube({ shape: [[[1, 1], [1, 0]]] });
 
-	describe('generateNext', () => {
+	describe('generateNextSimple', () => {
 		test('n=2 => 1', () => {
-			const gs = generateNext([n1]);
+			const gs = generateNextSimple([n1]);
 			expect(gs.length).toBe(1);
 		});
 
 		test('n=3 => 2', () => {
-			const gs = generateNext([n2]);
+			const gs = generateNextSimple([n2]);
 			expect(gs.length).toBe(2);
 		});
 
 		test('n=4 => 8', () => {
-			const gs = generateNext([n3a, n3b]);
+			const gs = generateNextSimple([n3a, n3b]);
 			expect(gs.length).toBe(8);
 		});
 
 		test('n=5 => 29', () => {
-			const gs = generateNext(generateNext([n3a, n3b]));
+			const gs = generateNextSimple(generateNextSimple([n3a, n3b]));
 			expect(gs.length).toBe(29);
 		});
 
-		if (GROUP_BY_SIZE && NORMALIZE_ROTATIONS && DEDUP_ADDITIONS) {
-			test('n=6 => 166', () => {
-				const gs = generateNext(generateNext(generateNext([n3a, n3b])));
-				expect(gs.length).toBe(166);
-			});
-		}
-		else {
-			test.todo('n=6 => 166');
-		}
+		test.todo('n=6 => 166'); // almost
+
+		test.todo('n=7 => 1023');
+	});
+
+	describe('generateNextGroupBySize', () => {
+		test('n=2 => 1', () => {
+			const gs = generateNextGroupBySize([n1]);
+			expect(gs.length).toBe(1);
+		});
+
+		test('n=3 => 2', () => {
+			const gs = generateNextGroupBySize([n2]);
+			expect(gs.length).toBe(2);
+		});
+
+		test('n=4 => 8', () => {
+			const gs = generateNextGroupBySize([n3a, n3b]);
+			expect(gs.length).toBe(8);
+		});
+
+		test('n=5 => 29', () => {
+			const gs = generateNextGroupBySize(generateNextGroupBySize([n3a, n3b]));
+			expect(gs.length).toBe(29);
+		});
+
+		test('n=6 => 166', () => {
+			const gs = generateNextGroupBySize(generateNextGroupBySize(generateNextGroupBySize([n3a, n3b])));
+			expect(gs.length).toBe(166);
+		});
 
 		test.todo('n=7 => 1023');
 

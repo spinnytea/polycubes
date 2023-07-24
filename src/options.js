@@ -22,23 +22,6 @@ const NORMALIZE_ROTATIONS = true;
 exports.NORMALIZE_ROTATIONS = NORMALIZE_ROTATIONS;
 
 /**
-	shapes with different sizes will never be equal
-	i.e. [1,2,3] will never equal [2,2,3]
-
-	in which case, we can organize them into different lists
-	then when we aggregate (n^2 to de-dup)
-	when will have smaller lists
-	instead of every shape in one giant list, we'll have different lists for each size
-
-	this requires NORMALIZE_ROTATIONS to work
-	i mean, we _could_ do it without normalize, but it doesn't quite make sense to support that
-	 - i guess a naive way would be to group by x+y+z lengths, and have too many things in the lists; it'd be _better_
-	 - or we could, well, normalize the x,y,z without rotating them, and then generate all 24 rotations, but srsly, this is awful
-*/
-const GROUP_BY_SIZE = true;
-exports.GROUP_BY_SIZE = GROUP_BY_SIZE;
-
-/**
 	after adding cubes to the previous n,
 	before generating rotations,
 	do a first pass at deduping
@@ -64,12 +47,32 @@ const DEDUP_ROTATIONS = false;
 exports.DEDUP_ROTATIONS = DEDUP_ROTATIONS;
 
 /**
+	strings are simpler to work with, so polycube has a serialize function
+	instead of using `utils.shape.equals`, which iterates all of the 3d arrays,
+	serialize the polycube into a string once, and then use that for equality comparisons
+*/
+const USE_POLYCUBE_SERIALIZE_FOR_EQUALS = true;
+exports.USE_POLYCUBE_SERIALIZE_FOR_EQUALS = USE_POLYCUBE_SERIALIZE_FOR_EQUALS;
+
+/**
+	this can divide `generateNextGroupBySize` further into 9 groups
+	we know that _every_ cube will have 8 corners, so we can count the number of 1s
+	the same shape will have the same count regardles of rotation, and it's trivial to do
+
+	+0, +1, +2, +3, +4, +5, +6, +7, +8
+*/
+const COUNT_CORNERS_TO_GROUP = true;
+exports.COUNT_CORNERS_TO_GROUP = COUNT_CORNERS_TO_GROUP;
+
+/**
 	last checked: 2 is -
 	last checked: 3 is -
-	last checked: 4 is 5 ms
-	last checked: 5 is 30 ms (60ms alone)
-	last checked: 6 is 300 ms (350ms alone)
-	last checked: 7 is 50s - 75s
+	last checked: 4 is 5 ms (35 ms alone)
+	last checked: 5 is 15 ms (45 ms alone)
+	last checked: 6 is 35 ms (70 ms alone)
+	last checked: 7 is 230 ms (260 alone)
+	last checked: 8 is 3.2 s (3.4 alone)
+	last checked: 9 JavaScript heap out of memory
 */
-const MAX_N = 7;
+const MAX_N = 8;
 exports.MAX_N = MAX_N;

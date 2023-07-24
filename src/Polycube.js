@@ -1,3 +1,4 @@
+const { USE_POLYCUBE_SERIALIZE_FOR_EQUALS } = require('./options');
 const utils = require('./utils');
 
 class Polycube {
@@ -52,6 +53,9 @@ class Polycube {
 	*/
 	equals(polycube) {
 		if (!polycube?.shape) throw new Error('polycube.equals must compare against polycubes');
+		if (USE_POLYCUBE_SERIALIZE_FOR_EQUALS) {
+			return this.serialized === polycube.serialized;
+		}
 		return utils.shape.equals(this.shape, polycube.shape);
 	}
 }

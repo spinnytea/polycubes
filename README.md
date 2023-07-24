@@ -19,17 +19,17 @@ Enumerating polycubes
 
 ## `major`
 - **6** could be computed immediately
-- **7** was possibly when we added `GROUP_BY_SIZE`
+- **7** was possibly when we added grouping by size
 
 ## `minor`
 
-### **#1:** `simple_layers.generateNext`
+### **#1:** `simple_layers.generateNextSimple`
 
 Original implementation, possibly the "example" implementation. This is was meant to be so simple you could prove it by inspection.
 
 ### **#2:** `simple_layers.generateNextGroupBySize`
 
-I'm not 100% sure this counts as a different way of solving, but it is a completely different impl. Instead of putting everything in one giant list, normalize the arrays and group them by size. No there's a bunch of small lists, but otherwise its the same thing. as `generateNext`.
+I'm not 100% sure this counts as a different way of solving, but it is a completely different impl. Instead of putting everything in one giant list, normalize the arrays and group them by size. No there's a bunch of small lists, but otherwise its the same thing. as `generateNextSimple`.
 
 # References
 - [Polycube - Wikipedia](https://en.wikipedia.org/wiki/Polycube)
