@@ -1,7 +1,7 @@
+const { ORIENTATION } = require('../constants');
+const { DEDUP_ADDITIONS, NORMALIZE_ROTATIONS, DEDUP_ROTATIONS } = require('../options');
 const Polycube = require('../Polycube');
 const utils = require('../utils');
-const { ORIENTATION } = require('../constants');
-const { DEDUP_ADDITIONS, NORMALIZE_ROTATIONS, DEDUP_ROTATIONS, COUNT_CORNERS_TO_GROUP } = require('../options');
 
 /*
 	This whole file is super un-optimized.
@@ -80,22 +80,7 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 	if (verbose > 1) console.info();
 	const sizeGroups = new Map();
 	function getSizeGroup(polycube) {
-		const [xLength, yLength, zLength] = utils.shape.size(polycube.shape);
-		let size = [xLength, yLength, zLength].join('/');
-		if (COUNT_CORNERS_TO_GROUP) {
-			const xMax = xLength - 1;
-			const yMax = yLength - 1;
-			const zMax = zLength - 1;
-			const corners = polycube.shape[0][0][0]
-				+ polycube.shape[xMax][0][0]
-				+ polycube.shape[0][yMax][0]
-				+ polycube.shape[xMax][yMax][0]
-				+ polycube.shape[0][0][zMax]
-				+ polycube.shape[xMax][0][zMax]
-				+ polycube.shape[0][yMax][zMax]
-				+ polycube.shape[xMax][yMax][zMax];
-			size += `+${corners}`;
-		}
+		const size = polycube.sizeGroup();
 		if (!sizeGroups.has(size)) {
 			sizeGroups.set(size, (DEDUP_ADDITIONS ? new Map() : []));
 		}
@@ -119,7 +104,7 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 		});
 		if (verbose > 1) {
 			let nestsCount = 0;
-			sizeGroups.forEach((list) => { nestsCount += list.length; });
+			sizeGroups.forEach((list) => { nestsCount += (DEDUP_ADDITIONS ? list.size : list.length); });
 			console.info(`   ${idx + 1} of ${polycubes.length}: found ${nestsCount} options`);
 		}
 	});
@@ -413,4 +398,5 @@ function aggregate(nextsRotated) {
 exports.generateNextSimple = generateNextSimple;
 exports.generateNextGroupBySize = generateNextGroupBySize;
 exports.listLocationsToGrow = listLocationsToGrow;
+exports.grow = grow;
 exports.rotate = rotate;

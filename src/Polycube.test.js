@@ -10,6 +10,7 @@ describe('Polycube', () => {
 			'n',
 			'serialized',
 			'size',
+			'sizeGroup',
 		]);
 	});
 
@@ -38,6 +39,8 @@ describe('Polycube', () => {
 		expect(new Polycube({ shape: [[[1]], [[1]]] }).size()).toEqual([2, 1, 1]);
 		expect(new Polycube({ shape: [[[1, 1], [1, 0]], [[1, 0], [1, 1]], [[1, 0], [0, 0]]] }).size()).toEqual([3, 2, 2]);
 	});
+
+	test.todo('sizeGroup');
 
 	test('n', () => {
 		expect(new Polycube({ shape: [[[1]]] }).n()).toEqual(1);

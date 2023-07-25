@@ -2,7 +2,7 @@
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 
-const { generateNextGroupBySize: generateNext } = require('./src/generate/simple_layers');
+const { generateNextFlat: generateNext } = require('./src/generate/simple_flat');
 const dynamic = require('./src/dynamic');
 const Polycube = require('./src/Polycube');
 const utils = require('./src/utils');
