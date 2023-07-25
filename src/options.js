@@ -27,6 +27,11 @@ exports.NORMALIZE_ROTATIONS = NORMALIZE_ROTATIONS;
 	do a first pass at deduping
 
 	we don't need to rotate the same thing twice
+
+	now that we have better ways of checking if something exists,
+	we can check later before we rotate
+	it means we have to push more items around, but we can reduce the places that need to dedup
+	(if it takes more space to dedup up front and it's not worth paying, deferring might be worthwhile)
 */
 const DEDUP_ADDITIONS = true;
 exports.DEDUP_ADDITIONS = DEDUP_ADDITIONS;

@@ -43,11 +43,16 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 
 		nexts.forEach((next) => {
 			const sizeGroup = getSizeGroup(next);
-			sizeGroup.set(next.serialized, next);
+			if (DEDUP_ADDITIONS) {
+				sizeGroup.set(next.serialized, next);
+			}
+			else {
+				sizeGroup.push(next);
+			}
 		});
 		if (verbose > 1) {
 			let nestsCount = 0;
-			sizeGroups.forEach((list) => { nestsCount += list.size; });
+			sizeGroups.forEach((list) => { nestsCount += (DEDUP_ADDITIONS ? list.size : list.length); });
 			console.info(`   ${idx + 1} of ${polycubes.length}: found ${nestsCount} options`);
 		}
 	});

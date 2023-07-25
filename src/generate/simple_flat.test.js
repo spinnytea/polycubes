@@ -1,5 +1,4 @@
 const Polycube = require('../Polycube');
-const utils = require('../utils');
 
 const { generateNextFlat } = require('./simple_flat');
 
