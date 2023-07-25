@@ -1,6 +1,6 @@
 {
   "name": "polycubes",
-  "version": "8.2.0",
+  "version": "9.3.0",
   "description": "Enumerating polycubes",
   "main": "index.js",
   "scripts": {

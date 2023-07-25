@@ -21,6 +21,7 @@ Enumerating polycubes
 - **6** could be computed immediately
 - **7** was possibly when we added grouping by size
 - **8** use a `Map` to dedup the final list + rotations, and a VERY big oversight
+- **9** dont store all the intermediates; rotate/aggregate in one go
 
 ## `minor`
 
@@ -31,6 +32,12 @@ Original implementation, possibly the "example" implementation. This is was mean
 ### **#2:** `simple_layers.generateNextGroupBySize`
 
 I'm not 100% sure this counts as a different way of solving, but it is a completely different impl. Instead of putting everything in one giant list, normalize the arrays and group them by size. No there's a bunch of small lists, but otherwise its the same thing. as `generateNextSimple`.
+
+### **#3:** `simple_flat.generateNextFlat`
+
+Doing things in layers was a nice tutorial, but now it's time to get started. Break the problem down, solve each independently, recombine as necessary at the end.
+
+(this name is awful "flat", but I picked it when I was looking forward; now it's out of date, and by the time I finish with it, it will be even more so - no wonder people give things codenames before finalizing)
 
 # References
 - [Polycube - Wikipedia](https://en.wikipedia.org/wiki/Polycube)
