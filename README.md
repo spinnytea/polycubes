@@ -42,3 +42,4 @@ Doing things in layers was a nice tutorial, but now it's time to get started. Br
 # References
 - [Polycube - Wikipedia](https://en.wikipedia.org/wiki/Polycube)
 - [This repository](https://github.com/mikepound/cubes/) nerd sniped me
+- [Enumeration up to 16](http://kevingong.com/Polyominoes/Enumeration.html)

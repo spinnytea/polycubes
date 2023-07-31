@@ -1,4 +1,3 @@
-const { USE_POLYCUBE_SERIALIZE_FOR_EQUALS } = require('./options');
 const utils = require('./utils');
 
 class Polycube {
@@ -17,6 +16,11 @@ class Polycube {
 		if (!this.$serialized) {
 			this.$serialized = this.shape.map((ys) => (
 				ys.map((zs) => (
+					// IDEA collapse consecutive numbers
+					//  - z is the largest dimension (e.g. sm_sm_md)
+					//  - 3x0_1_2x0_2x1
+					//  - 0_0_0_1_2_2_1_1
+					//  - we only get a benefit if there are 3 or more in a row
 					zs.join('_') // these provide visual clarity, could use 'z' for technical clarity
 				)).join(' ') // these provide visual clarity, could use 'y' for technical clarity
 			)).join('/'); // these provide visual clarity, could use 'x' for technical clarity
@@ -85,10 +89,13 @@ class Polycube {
 	*/
 	equals(polycube) {
 		if (!polycube?.shape) throw new Error('polycube.equals must compare against polycubes');
+		return this.serialized === polycube.serialized;
+		/*
 		if (USE_POLYCUBE_SERIALIZE_FOR_EQUALS) {
 			return this.serialized === polycube.serialized;
 		}
 		return utils.shape.equals(this.shape, polycube.shape);
+		*/
 	}
 }
 

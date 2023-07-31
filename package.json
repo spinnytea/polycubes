@@ -4,6 +4,7 @@
   "description": "Enumerating polycubes",
   "main": "index.js",
   "scripts": {
+    "enum": "node index.js enumerate",
     "coverage": "jest --coverage",
     "lint": "eslint . || exit 0",
     "prebuild": "npm run lint && npm run coverage",

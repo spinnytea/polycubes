@@ -44,12 +44,20 @@ describe('generate flat', () => {
 			expect(gs.length).toBe(6922);
 		});
 
-		test.todo('n=9');
+		test.todo('n=9 => 48311');
 
-		test.todo('n=10');
+		test.todo('n=10 => 346543');
 
-		test.todo('n=11');
+		test.todo('n=11 => 2522522');
 
-		test.todo('n=12');
+		test.todo('n=12 => 18598427');
+
+		test.todo('n=13 => 138462649');
+
+		test.todo('n=14 => 1039496297');
+
+		test.todo('n=15 => 7859514470');
+
+		test.todo('n=16 => 59795121480');
 	});
 });

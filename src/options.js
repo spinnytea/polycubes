@@ -55,14 +55,14 @@ exports.DEDUP_ROTATIONS = DEDUP_ROTATIONS;
 	strings are simpler to work with, so polycube has a serialize function
 	instead of using `utils.shape.equals`, which iterates all of the 3d arrays,
 	serialize the polycube into a string once, and then use that for equality comparisons
-*/
-const USE_POLYCUBE_SERIALIZE_FOR_EQUALS = true;
-exports.USE_POLYCUBE_SERIALIZE_FOR_EQUALS = USE_POLYCUBE_SERIALIZE_FOR_EQUALS;
 
-/**
+	it's probably hard to improve upon this in javascript
+	since objects are keyed by strings and all
+
+	it doesn't seem to be a huge speedup, but we need to serialize anyway for the maps
 */
-const COUNT_CORNERS_TO_GROUP = true;
-exports.COUNT_CORNERS_TO_GROUP = COUNT_CORNERS_TO_GROUP;
+// const USE_POLYCUBE_SERIALIZE_FOR_EQUALS = true;
+// exports.USE_POLYCUBE_SERIALIZE_FOR_EQUALS = USE_POLYCUBE_SERIALIZE_FOR_EQUALS;
 
 /**
 	last checked: 2 is -
