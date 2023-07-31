@@ -51,9 +51,9 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 			}
 		});
 		if (verbose > 1) {
-			let nestsCount = 0;
-			sizeGroups.forEach((list) => { nestsCount += (DEDUP_ADDITIONS ? list.size : list.length); });
-			console.info(`   ${idx + 1} of ${polycubes.length}: found ${nestsCount} options`);
+			let nextsCount = 0;
+			sizeGroups.forEach((list) => { nextsCount += (DEDUP_ADDITIONS ? list.size : list.length); });
+			console.info(`   ${idx + 1} of ${polycubes.length}: found ${nextsCount} options`);
 		}
 	});
 	if (verbose) console.timeEnd(' … extending / grouping');
@@ -61,9 +61,16 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 	if (verbose) console.time(' … rotating / uniqing');
 	if (verbose > 1) console.info();
 	const found = [];
-	sizeGroups.forEach((list) => {
+	let currGroupIdx = 1;
+	sizeGroups.forEach((list, key) => {
 		const foundHere = aggregate(list);
 		Array.prototype.push.apply(found, foundHere);
+		if (verbose > 1) {
+			const [xLength, , zLength] = list.values().next().value.size();
+			const squareness = (xLength / zLength).toFixed(1);
+			console.info(`   ${currGroupIdx} of ${sizeGroups.size}: ${key} (${squareness}) found ${foundHere.length} shapes`);
+			currGroupIdx += 1;
+		}
 	});
 	found.sort((a, b) => b.serialized.localeCompare(a.serialized));
 	if (verbose) console.timeEnd(' … rotating / uniqing');
