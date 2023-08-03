@@ -8,6 +8,7 @@ describe('Polycube', () => {
 			'constructor',
 			'equals',
 			'n',
+			'rotations',
 			'serialized',
 			'size',
 			'sizeGroup',
@@ -97,27 +98,47 @@ describe('Polycube', () => {
 
 	// `polycube.rotation` has been removed since it was not fully supported
 	describe('rotations', () => {
-		test.skip('no rotation', () => {
-			const polycube = new Polycube({ shape: [[[1]]] });
-			const rotations = polycube.rotations();
-			expect(rotations.length).toBe(24);
-			expect(rotations[0]).toBe(polycube);
-			expect(rotations[0].rotation).toBe(undefined);
-			rotations.forEach((rotation) => {
-				expect(rotation.shape).toBe(polycube.shape);
+		test('identity', () => {
+			const identityShape = utils.shape.create(2, 3, 4);
+			identityShape[0][0][0] = 1;
+			identityShape[1][0][0] = 1;
+			identityShape[0][1][0] = 1;
+			identityShape[0][2][0] = 1;
+			identityShape[0][0][1] = 1;
+			identityShape[0][0][2] = 1;
+			identityShape[0][0][3] = 1;
+			expect(identityShape).toEqual([[[1, 1, 1, 1], [1, 0, 0, 0], [1, 0, 0, 0]], [[1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]]);
+
+			const rotations = new Polycube({ shape: identityShape }).rotations(false);
+
+			// the first one is the one we passed in
+			expect(rotations[0].shape).toBe(identityShape);
+
+			// they are all unique
+			rotations.forEach((r1, idx1) => {
+				rotations.forEach((r2, idx2) => {
+					if (idx1 !== idx2) {
+						expect(utils.shape.equals(r1.shape, r2.shape)).toBe(false);
+					}
+				});
 			});
+
+			// there are 24 unique rotations for a 3d cube
+			expect(rotations.length).toBe(24);
 		});
 
-		test.skip('starting rotation', () => {
-			const polycube = new Polycube({ shape: [[[1]]], rotation: 'x' });
-			const rotations = polycube.rotations();
-			expect(rotations.length).toBe(24);
-			expect(rotations[0]).not.toBe(polycube); // this time it isn't the first one
-			expect(rotations[0].rotation).toBe(undefined); // the first one is still the unrotated version
-			// XXX index 1 isn't special, it's just the first rotation in `utils.rotation.allNames`
-			expect(rotations[1]).toBe(polycube); // it is in the list tho
-			rotations.forEach((rotation) => {
-				expect(rotation.shape).toBe(polycube.shape);
+		describe('dedup rotations', () => {
+			test('one', () => {
+				const shape = [[[1, 1], [1, 1]], [[1, 1], [1, 1]]];
+				let rotations = new Polycube({ shape }).rotations(false);
+				expect(rotations.length).toBe(24);
+				rotations = new Polycube({ shape }).rotations(true);
+				expect(rotations.length).toBe(1);
+			});
+			test('two', () => {
+				const shape = [[[0, 1], [1, 0]], [[1, 0], [0, 1]]];
+				const rotations = new Polycube({ shape }).rotations(true);
+				expect(rotations.length).toBe(2);
 			});
 		});
 	});

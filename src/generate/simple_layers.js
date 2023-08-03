@@ -1,5 +1,4 @@
-const { ORIENTATION } = require('../constants');
-const { DEDUP_ADDITIONS, NORMALIZE_ROTATIONS, DEDUP_ROTATIONS } = require('../options');
+const { DEDUP_ADDITIONS, NORMALIZE_ROTATIONS } = require('../options');
 const Polycube = require('../Polycube');
 const utils = require('../utils');
 
@@ -41,7 +40,7 @@ function generateNextSimple(polycubes, { verbose } = {}) {
 
 	if (verbose) console.time(' … rotate');
 	if (verbose > 1) console.info();
-	const nextsRotated = (DEDUP_ADDITIONS ? Array.from(nexts.values()) : nexts).map((next) => rotate(next));
+	const nextsRotated = (DEDUP_ADDITIONS ? Array.from(nexts.values()) : nexts).map((next) => next.rotations());
 	if (verbose > 1) {
 		console.info(`   ${(DEDUP_ADDITIONS ? nexts.size : nexts.length)}`
 			+ ` into total rotations ${nextsRotated.reduce((ret, r) => ret + r.length, 0)}`);
@@ -114,10 +113,10 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 	if (verbose > 1) console.info();
 	sizeGroups.forEach((v, size) => {
 		if (DEDUP_ADDITIONS) {
-			sizeGroups.set(size, Array.from(v.values()).map((next) => rotate(next)));
+			sizeGroups.set(size, Array.from(v.values()).map((next) => next.rotations()));
 		}
 		else {
-			sizeGroups.set(size, v.map((next) => rotate(next)));
+			sizeGroups.set(size, v.map((next) => next.rotations()));
 		}
 	});
 
@@ -253,127 +252,6 @@ function normalizeOrientation(polycube) {
 	return new Polycube(utils.shape.normalize(polycube.shape));
 }
 
-/**
-	rotate the polycube across all dimensions
-
-	@param {Polycube} polycube
-	@returns {Polycube[]} array of rotated items, the first is the same as the input
-*/
-function rotate(polycube) {
-	// TODO split this into a separate file
-	const rotations = [];
-
-	const { orientation } = polycube;
-
-	if (orientation === ORIENTATION.SM_MD_LG || orientation === ORIENTATION.SM_SM_MD) {
-		// seed it
-		let { shape } = polycube;
-		rotations.push(shape);
-		// spin it 3 times
-		shape = utils.shape.rotate.z(shape);
-		rotations.push(shape);
-		shape = utils.shape.rotate.z(shape);
-		rotations.push(shape);
-		shape = utils.shape.rotate.z(shape);
-		rotations.push(shape);
-		// flip it
-		shape = utils.shape.rotate.y(shape);
-		shape = utils.shape.rotate.y(shape);
-		rotations.push(shape);
-		// spin it 3 times
-		shape = utils.shape.rotate.z(shape);
-		rotations.push(shape);
-		shape = utils.shape.rotate.z(shape);
-		rotations.push(shape);
-		shape = utils.shape.rotate.z(shape);
-		rotations.push(shape);
-	}
-
-	else if (orientation === ORIENTATION.SM_MD_MD) {
-		// seed it
-		let { shape } = polycube;
-		rotations.push(shape);
-		// spin it 3 times
-		shape = utils.shape.rotate.x(shape);
-		rotations.push(shape);
-		shape = utils.shape.rotate.x(shape);
-		rotations.push(shape);
-		shape = utils.shape.rotate.x(shape);
-		rotations.push(shape);
-		// flip it
-		shape = utils.shape.rotate.y(shape);
-		shape = utils.shape.rotate.y(shape);
-		rotations.push(shape);
-		// spin it 3 times
-		shape = utils.shape.rotate.x(shape);
-		rotations.push(shape);
-		shape = utils.shape.rotate.x(shape);
-		rotations.push(shape);
-		shape = utils.shape.rotate.x(shape);
-		rotations.push(shape);
-	}
-
-	else {
-		// does not have a unique axis, so we need to check all 24
-		// orientation === ORIENTATION.SM_SM_SM
-		// orientation === undefined
-
-		// reuse intermediate rotations (x, y, z, nX, xx, xy, xz)
-		const rotatedX = utils.shape.rotate.x(polycube.shape);
-		const rotatedY = utils.shape.rotate.y(polycube.shape);
-		const rotatedZ = utils.shape.rotate.z(polycube.shape);
-		const rotatedNX = utils.shape.rotate.nX(polycube.shape);
-		const rotatedXX = utils.shape.rotate.x(rotatedX);
-		const rotatedXY = utils.shape.rotate.y(rotatedX);
-		const rotatedXZ = utils.shape.rotate.z(rotatedX);
-
-		// zero
-		rotations.push(polycube.shape);
-
-		// once
-		rotations.push(rotatedX);
-		rotations.push(rotatedY);
-		rotations.push(rotatedZ);
-		rotations.push(rotatedNX);
-		rotations.push(utils.shape.rotate.nY(polycube.shape));
-		rotations.push(utils.shape.rotate.nZ(polycube.shape));
-
-		// twice
-		rotations.push(rotatedXX);
-		rotations.push(rotatedXY);
-		rotations.push(rotatedXZ);
-		rotations.push(utils.shape.rotate.nY(rotatedX));
-		rotations.push(utils.shape.rotate.nZ(rotatedX));
-		rotations.push(utils.shape.rotate.y(rotatedY));
-		rotations.push(utils.shape.rotate.z(rotatedY));
-		rotations.push(utils.shape.rotate.nX(rotatedY));
-		rotations.push(utils.shape.rotate.z(rotatedZ));
-		rotations.push(utils.shape.rotate.nY(rotatedZ));
-		rotations.push(utils.shape.rotate.nY(rotatedNX));
-
-		// thrice
-		rotations.push(utils.shape.rotate.y(rotatedXX));
-		rotations.push(utils.shape.rotate.z(rotatedXX));
-		rotations.push(utils.shape.rotate.nY(rotatedXX));
-		rotations.push(utils.shape.rotate.nZ(rotatedXX));
-		rotations.push(utils.shape.rotate.y(rotatedXY));
-		rotations.push(utils.shape.rotate.z(rotatedXZ));
-	}
-
-	if (DEDUP_ROTATIONS) {
-		const orig = rotations.splice(0);
-		orig.forEach((o) => {
-			const alreadyExists = rotations.some((r) => utils.shape.equals(o, r));
-			if (!alreadyExists) {
-				rotations.push(o);
-			}
-		});
-	}
-
-	// rotate should have a length of 24
-	return rotations.map((shape) => new Polycube({ shape, orientation }));
-}
-
 function aggregate(nextsRotated) {
 	const foundMap = new Map();
 	nextsRotated.forEach((rotations) => {
@@ -399,4 +277,3 @@ exports.generateNextSimple = generateNextSimple;
 exports.generateNextGroupBySize = generateNextGroupBySize;
 exports.listLocationsToGrow = listLocationsToGrow;
 exports.grow = grow;
-exports.rotate = rotate;

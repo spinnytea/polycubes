@@ -257,6 +257,45 @@ describe('utils.shape', () => {
 		});
 	});
 
+	describe('makeRotations', () => {
+		test('identity', () => {
+			const identityShape = utils.shape.create(2, 3, 4);
+			identityShape[0][0][0] = 1;
+			identityShape[1][0][0] = 1;
+			identityShape[0][1][0] = 1;
+			identityShape[0][2][0] = 1;
+			identityShape[0][0][1] = 1;
+			identityShape[0][0][2] = 1;
+			identityShape[0][0][3] = 1;
+			expect(identityShape).toEqual([[[1, 1, 1, 1], [1, 0, 0, 0], [1, 0, 0, 0]], [[1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]]);
+
+			const rotations = utils.shape.makeRotations(identityShape);
+
+			// the first one is the one we passed in
+			expect(rotations[0]).toBe(identityShape);
+
+			// they are all unique
+			rotations.forEach((r1, idx1) => {
+				rotations.forEach((r2, idx2) => {
+					if (idx1 !== idx2) {
+						expect(utils.shape.equals(r1, r2)).toBe(false);
+					}
+				});
+			});
+
+			// there are 24 unique rotations for a 3d cube
+			expect(rotations.length).toBe(24);
+		});
+
+		test.todo('orientation a');
+
+		test.todo('orientation b');
+
+		test.todo('orientation c');
+
+		test.todo('dedup rotations');
+	});
+
 	describe('normalize', () => {
 		function prettyPrintOrientation(o) {
 			o = o.toString(2).padStart(9, '0');

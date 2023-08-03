@@ -1,3 +1,4 @@
+const { DEDUP_ROTATIONS } = require('./options');
 const utils = require('./utils');
 
 class Polycube {
@@ -14,6 +15,11 @@ class Polycube {
 
 	get serialized() {
 		if (!this.$serialized) {
+			// IDEA do a "convolution" over the matrix
+			//  - e.g. count 2x2x2 or 3x3x3 as a prefix before exact comparisons
+			//  - the goal is to collapse areas to find mismatches sooner
+			//  - this makes the keys longer (summary + absolute)
+			//  - with the hope of finding mismatches sooner
 			this.$serialized = this.shape.map((ys) => (
 				ys.map((zs) => (
 					// IDEA collapse consecutive numbers
@@ -39,6 +45,8 @@ class Polycube {
 	}
 
 	/**
+		## size
+
 		shapes with different sizes will never be equal
 		i.e. [1,2,3] will never equal [2,2,3]
 
@@ -46,13 +54,15 @@ class Polycube {
 		then we will have smaller lists when we aggregate (dedupping is expensive)
 		instead of every shape in one giant list, this lets us break the problem down
 
+		## corners
+
 		counting corners can divide groups further into 9 groups
 		we know that _every_ cube will have 8 corners, so we can count the number of 1s
 		the same shape will have the same count regardles of rotation, and it's trivial to do
 
 		+0, +1, +2, +3, +4, +5, +6, +7, +8
 
-		@returns {string}
+		@returns {string} "x/y/z+corners"
 	*/
 	sizeGroup() {
 		const [xLength, yLength, zLength] = this.size();
@@ -96,6 +106,19 @@ class Polycube {
 		}
 		return utils.shape.equals(this.shape, polycube.shape);
 		*/
+	}
+
+	/**
+		create all the rotations for this polycube
+		24 if there is no orientation (or if all the dimensions are the same)
+		8 if there is a unique dimension
+
+		@returns {Polycube[]} array of rotated items, the first is the same as the input
+	*/
+	rotations(dedupRotations = DEDUP_ROTATIONS) {
+		const { shape, orientation } = this;
+		return utils.shape.makeRotations(shape, orientation, dedupRotations)
+			.map((s) => (s === shape ? this : new Polycube({ shape: s, orientation })));
 	}
 }
 

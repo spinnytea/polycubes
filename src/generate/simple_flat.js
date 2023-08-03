@@ -3,7 +3,7 @@ const Polycube = require('../Polycube');
 const utils = require('../utils');
 
 // TODO remove dependency
-const { listLocationsToGrow, grow, rotate } = require('./simple_layers');
+const { listLocationsToGrow, grow } = require('./simple_layers');
 
 /**
 	n=(n-1) => size groups -> rotate and local dedup -> aggregate
@@ -88,7 +88,7 @@ function aggregate(list) {
 			// the first of the rotations is our vanguard, the one we want to add
 			// all the rest are other rotations, basically duplicates
 			// if any of the rotations are a match, then we don't add our vanguard
-			const rotations = rotate(next);
+			const rotations = next.rotations();
 			const alreadyExists = rotations.some((polycube) => (
 				foundMap.has(polycube.serialized)
 			));
