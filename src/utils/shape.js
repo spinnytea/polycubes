@@ -1,7 +1,6 @@
 const { ORIENTATION } = require('../constants');
 
 const utilsShape = {
-
 	clone: (shape) => (
 		shape.map((ys) => ys.map((zs) => zs.map((v) => v)))
 	),

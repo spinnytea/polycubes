@@ -37,8 +37,8 @@ yargs(hideBin(process.argv))
 	.alias('help', 'h')
 	.parse();
 
-// TODO metrics? (how many polycubes created, pruned, spaces tested, etc)
-// TODO speed it all up
+// TODO (benchmark) metrics? (how many polycubes created, pruned, spaces tested, etc)
+// TODO (modivation) speed it all up
 function enumerate(argv) {
 	const { n, verbose } = argv;
 	return dynamic(generateNext, { n, verbose });

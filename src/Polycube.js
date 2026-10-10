@@ -15,17 +15,17 @@ class Polycube {
 
 	get serialized() {
 		if (!this.$serialized) {
-			// IDEA do a "convolution" over the matrix
+			// IDEA (optimize) (serialized) do a "convolution" over the matrix
 			//  - e.g. count 2x2x2 or 3x3x3 as a prefix before exact comparisons
 			//  - the goal is to collapse areas to find mismatches sooner
 			//  - this makes the keys longer (summary + absolute)
 			//  - with the hope of finding mismatches sooner
 			this.$serialized = this.shape.map((ys) => (
 				ys.map((zs) => (
-					// IDEA collapse consecutive numbers
+					// IDEA (optimize) collapse consecutive numbers
 					//  - z is the largest dimension (e.g. sm_sm_md)
 					//  - 3x0_1_2x0_2x1
-					//  - 0_0_0_1_2_2_1_1
+					//  - 0_0_0_1_0_0_1_1
 					//  - we only get a benefit if there are 3 or more in a row
 					zs.join('_') // these provide visual clarity, could use 'z' for technical clarity
 				)).join(' ') // these provide visual clarity, could use 'y' for technical clarity

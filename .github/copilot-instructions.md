@@ -8,6 +8,14 @@
 - Run coverage with `npm run coverage`.
 - Run lint with `npx eslint .`. The `npm run lint` script invokes ESLint but ends with `|| exit 0`, so its exit status does not reliably report lint failures.
 - To enumerate a size, run `node index.js enumerate <n>` from the repository root. `n` is limited to 1–9; generated levels are saved under `precomputed/`.
+- Regenerate the task-label summary with `npm run gen:task-labels`; this writes `README-todo-labels.md`.
+- `npm run check:all` chains lint and coverage, then calls `gen:task-labels` directly. Run `npm run gen:task-labels` separately if that final command is not found.
+
+## TODO tags
+
+The README TODO list uses tags such as `TODO (benchmark)` and `TODO (validation)`. The task-label generator also recognizes `FIXME`, `BUG`, `HACK`, `XXX`, `REVIEW`, and `IDEA` followed by one or more parenthesized labels. After adding or changing tagged tasks, run `npm run gen:task-labels` to update the generated `README-todo-labels.md`.
+
+The generator scans readable files under the repository root, excluding `.git`, `.next`, `.vscode`, `coverage`, `node_modules`, and `out`. Labels matching `<number>-priority` are sorted from highest to lowest; other labels are sorted alphabetically.
 
 ## Architecture
 

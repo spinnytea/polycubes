@@ -2,13 +2,13 @@ const { DEDUP_ADDITIONS } = require('../options');
 const Polycube = require('../Polycube');
 const utils = require('../utils');
 
-// TODO remove dependency
+// TODO (techdebt) remove dependency
 const { listLocationsToGrow, grow } = require('./simple_layers');
 
 /**
 	n=(n-1) => size groups -> rotate and local dedup -> aggregate
 
-	IDEA stream data from files
+	IDEA (optimize) stream data from files
 	 - when we do additions, each size group can be written to a different file
 	 - each file can be rotated/deduped independently
 	 - a final process that recombines all the files
@@ -16,7 +16,7 @@ const { listLocationsToGrow, grow } = require('./simple_layers');
 	 - (i mean, it will still take up _space_, but it can take up disk space instead of memory)
 	 - i guess an analogy would be map-reduce: n=(n-1) => (map) size groups -> (work) rotate and local dedup -> (reduce) aggregate
 
-	IDEA once a single size group gets too large, that can also be split
+	IDEA (optimize) once a single size group gets too large, that can also be split
 	 - we can do it in batches, write multiple files; since we can sort the items, they can all be sorted
 	 - then we can stream the files and do a sorted unique as we go
 
