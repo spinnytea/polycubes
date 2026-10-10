@@ -8,6 +8,7 @@ describe('Polycube', () => {
 			'constructor',
 			'equals',
 			'n',
+			'normalize',
 			'rotations',
 			'serialized',
 			'size',
@@ -254,6 +255,19 @@ describe('Polycube', () => {
 				// expect(utils.rotation.equals.nYnX(actual.shape, invalid.shape)).toBe(true); // hmmm
 				expect(utils.rotation.equals.nYnX).toBe(undefined);
 				expect(utils.rotation.equals.znY(actual.shape, invalid.shape)).toBe(true); // fixed this
+			});
+		});
+
+		describe('normalize', () => {
+			test('normalizes equivalent rotations and preserves orientation', () => {
+				const polycube = new Polycube({ shape: [[[0, 1], [1, 1]]], orientation: 7 });
+				const normalized = new Polycube({ shape: [[[1, 1], [1, 0]]], orientation: 7 }).normalize();
+
+				expect(normalized).toBeInstanceOf(Polycube);
+				expect(normalized.shape).toEqual([[[1, 1], [1, 0]]]);
+				expect(normalized.orientation).toBe(7);
+				expect(polycube.equals(normalized)).toBe(false);
+				expect(polycube.normalize().equals(normalized)).toBe(true);
 			});
 		});
 	});

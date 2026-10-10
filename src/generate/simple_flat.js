@@ -80,11 +80,7 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 function aggregate(list) {
 	const foundMap = new Map();
 	list.forEach((next) => {
-		// `Polycube.rotations` will return all `utils.shape.makeRotations`
-		// const rotations = next.rotations();
-		// `utils.shape.normalizeInnerOrientationRotation` will pick the best `utils.shape.makeRotations` for this orientation
-		const shape = utils.shape.normalizeInnerOrientationRotation(next.shape);
-		const normalized = new Polycube({ shape, orientation: next.orientation });
+		const normalized = next.normalize();
 		foundMap.set(normalized.serialized, normalized);
 	});
 	return Array.from(foundMap.values());

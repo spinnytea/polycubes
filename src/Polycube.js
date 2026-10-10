@@ -120,6 +120,17 @@ class Polycube {
 		return utils.shape.makeRotations(shape, orientation, dedupRotations)
 			.map((s) => (s === shape ? this : new Polycube({ shape: s, orientation })));
 	}
+
+	/**
+		compare all the rotations for this polycube (with it's fixed orientation)
+		picks a representative rotation (e.g. sort by axes)
+
+		@returns {Polycube} the shape in the same overall orientation, but normalized for comparison
+	*/
+	normalize() {
+		const shape = utils.shape.normalizeInnerOrientationRotation(this.shape);
+		return new Polycube({ shape, orientation: this.orientation });
+	}
 }
 
 module.exports = Polycube;
