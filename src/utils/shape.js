@@ -420,7 +420,7 @@ const utilsShape = {
 		+ (zLength > xLength ? (zLength > yLength ? 256 : 128) : (zLength > yLength ? 128 : 64)) // eslint-disable-line no-nested-ternary
 	),
 
-	normalize: (shape) => {
+	normalizeOrientation: (shape) => {
 		const smX = 1;
 		const mdX = 2;
 		const lgX = 4;
@@ -529,6 +529,20 @@ const utilsShape = {
 			default:
 				throw new Error(`orientation ${orientation} is not accounted for`);
 		}
+	},
+
+	normalizeInnerOrientationRotation: (shape) => {
+		const size = utilsShape.size(shape);
+		const orientation = utilsShape.orientation(...size);
+		const serialize = (candidate) => candidate
+			.map((ys) => ys.map((zs) => zs.join('_')).join(' '))
+			.join('/');
+
+		return utilsShape.makeRotations(shape, orientation)
+			.filter((rotation) => utilsShape.size(rotation).every((length, idx) => length === size[idx]))
+			.reduce((best, candidate) => (
+				serialize(candidate) > serialize(best) ? candidate : best
+			));
 	},
 };
 

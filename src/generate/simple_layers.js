@@ -249,7 +249,7 @@ function grow(polycube, [x, y, z]) {
 	@returns {Polycube} same shape, but rotated so the size is [sm, md, lg]
 */
 function normalizeOrientation(polycube) {
-	return new Polycube(utils.shape.normalize(polycube.shape));
+	return new Polycube(utils.shape.normalizeOrientation(polycube.shape));
 }
 
 function aggregate(nextsRotated) {

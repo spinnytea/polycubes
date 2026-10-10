@@ -65,14 +65,15 @@ exports.DEDUP_ROTATIONS = DEDUP_ROTATIONS;
 // exports.USE_POLYCUBE_SERIALIZE_FOR_EQUALS = USE_POLYCUBE_SERIALIZE_FOR_EQUALS;
 
 /**
-	last checked: 2 is -
-	last checked: 3 is -
-	last checked: 4 is 5 ms (35 ms alone)
-	last checked: 5 is 12 ms (45 ms alone)
-	last checked: 6 is 25 ms (60 ms alone)
-	last checked: 7 is 100 ms (165 alone)
-	last checked: 8 is 420 ms (700 alone)
-	last checked: 9 is 4.5 s
+	last checked:  2 is -
+	last checked:  3 is -
+	last checked:  4 is 1 ms (12 ms alone)
+	last checked:  5 is 3 ms (15 ms alone)
+	last checked:  6 is 10 ms (22 ms alone)
+	last checked:  7 is 65 ms (80 alone)
+	last checked:  8 is 440 ms (550 alone)
+	last checked:  9 is 2.9 s
+	last checked: 10 is 40s
 */
 const MAX_N = 9;
 exports.MAX_N = MAX_N;

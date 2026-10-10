@@ -296,7 +296,7 @@ describe('utils.shape', () => {
 		test.todo('dedup rotations');
 	});
 
-	describe('normalize', () => {
+	describe('normalizeOrientation', () => {
 		function prettyPrintOrientation(o) {
 			o = o.toString(2).padStart(9, '0');
 			return prettyPrintSML(o.substring(6, 9)) + prettyPrintSML(o.substring(3, 6)) + prettyPrintSML(o.substring(0, 3));
@@ -339,13 +339,13 @@ describe('utils.shape', () => {
 			${4} | ${4} | ${2} | ${[2, 4, 4]} | ${ORIENTATION.SM_MD_MD}
 			${4} | ${4} | ${3} | ${[3, 4, 4]} | ${ORIENTATION.SM_MD_MD}
 			${4} | ${4} | ${4} | ${[4, 4, 4]} | ${ORIENTATION.SM_SM_SM}
-		`('normalize orientation of [$x, $y, $z]', ({ x, y, z, s, o }) => {
+		`('[$x, $y, $z]', ({ x, y, z, s, o }) => {
 			const before = utils.shape.create(x, y, z);
 			for (let i = 0; i < x; i += 1) before[i][0][0] = 1;
 			for (let i = 0; i < y; i += 1) before[0][i][0] = 1;
 			for (let i = 0; i < z; i += 1) before[0][0][i] = 1;
 
-			const { shape: after, orientation } = utils.shape.normalize(before);
+			const { shape: after, orientation } = utils.shape.normalizeOrientation(before);
 
 			expect([
 				orientation,
@@ -360,6 +360,55 @@ describe('utils.shape', () => {
 			]);
 
 			expect(utils.shape.size(after)).toEqual(s);
+		});
+	});
+
+	describe('normalizeInnerOrientationRotation', () => {
+		const namedCases = (cases) => cases.map((c) => ({ ...c, name: JSON.stringify(c.shape) }));
+
+		describe('SM_MD_MD: 1, 2, 2', () => {
+			test.each(namedCases([
+				{ shape: [[[1, 1], [1, 0]]], normalized: [[[1, 1], [1, 0]]] },
+				{ shape: [[[1, 1], [0, 1]]], normalized: [[[1, 1], [1, 0]]] },
+				{ shape: [[[1, 0], [1, 1]]], normalized: [[[1, 1], [1, 0]]] },
+				{ shape: [[[0, 1], [1, 1]]], normalized: [[[1, 1], [1, 0]]] },
+			]))('$name', ({ shape, normalized }) => {
+				expect(utils.shape.size(shape)).toEqual([1, 2, 2]);
+				expect(utils.shape.size(normalized)).toEqual([1, 2, 2]);
+				expect(utils.shape.normalizeInnerOrientationRotation(shape)).toEqual(normalized);
+			});
+		});
+
+		describe('rotation invariance by bounding-box orientation', () => {
+			test.each(namedCases([
+				{
+					name: 'SM_SM_SM: 2, 2, 2',
+					shape: [[[1, 0], [0, 0]], [[1, 0], [1, 0]]],
+					normalized: [[[1, 1], [1, 0]], [[0, 0], [0, 0]]],
+					size: [2, 2, 2],
+				},
+				{
+					name: 'SM_SM_MD: 2, 2, 3',
+					shape: [[[1, 0, 0], [0, 0, 0]], [[1, 0, 0], [1, 1, 1]]],
+					normalized: [[[1, 1, 1], [1, 0, 0]], [[0, 0, 0], [1, 0, 0]]],
+					size: [2, 2, 3],
+				},
+				{
+					name: 'SM_MD_MD: 1, 3, 3',
+					shape: [[[1, 1, 1], [0, 0, 1], [0, 0, 1]]],
+					normalized: [[[1, 1, 1], [1, 0, 0], [1, 0, 0]]],
+					size: [1, 3, 3],
+				},
+				{
+					name: 'SM_MD_LG: 2, 3, 4',
+					shape: [[[1, 1, 1, 1], [0, 0, 0, 1], [1, 1, 1, 1]], [[0, 0, 0, 0], [0, 0, 0, 0], [1, 0, 0, 0]]],
+					normalized: [[[1, 1, 1, 1], [1, 0, 0, 0], [1, 1, 1, 1]], [[0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]]],
+					size: [2, 3, 4],
+				},
+			]))('$name', ({ shape, normalized, size }) => {
+				expect(utils.shape.size(shape)).toEqual(size);
+				expect(utils.shape.normalizeInnerOrientationRotation(shape)).toEqual(normalized);
+			});
 		});
 	});
 });

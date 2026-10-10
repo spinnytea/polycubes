@@ -12,11 +12,15 @@ describe('generate flat', () => {
 		test('n=2 => 1', () => {
 			const gs = generateNextFlat([n1]);
 			expect(gs.length).toBe(1);
+			expect(gs[0].serialized).toBe(n2.serialized);
 		});
 
 		test('n=3 => 2', () => {
 			const gs = generateNextFlat([n2]);
 			expect(gs.length).toBe(2);
+			const serialized = gs.map((g) => g.serialized).sort();
+			expect(serialized[0]).toBe(n3b.serialized);
+			expect(serialized[1]).toBe(n3a.serialized);
 		});
 
 		test('n=4 => 8', () => {

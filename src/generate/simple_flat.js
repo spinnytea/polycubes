@@ -39,7 +39,7 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 		const locations = listLocationsToGrow(polycube);
 		const nexts = locations
 			.map((location) => grow(polycube, location))
-			.map((next) => (new Polycube(utils.shape.normalize(next.shape))));
+			.map((next) => (new Polycube(utils.shape.normalizeOrientation(next.shape))));
 
 		nexts.forEach((next) => {
 			const sizeGroup = getSizeGroup(next);
@@ -81,21 +81,12 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 function aggregate(list) {
 	const foundMap = new Map();
 	list.forEach((next) => {
-		if (foundMap.size === 0) {
-			foundMap.set(next.serialized, next);
-		}
-		else {
-			// the first of the rotations is our vanguard, the one we want to add
-			// all the rest are other rotations, basically duplicates
-			// if any of the rotations are a match, then we don't add our vanguard
-			const rotations = next.rotations();
-			const alreadyExists = rotations.some((polycube) => (
-				foundMap.has(polycube.serialized)
-			));
-			if (!alreadyExists) {
-				foundMap.set(rotations[0].serialized, rotations[0]);
-			}
-		}
+		// `Polycube.rotations` will return all `utils.shape.makeRotations`
+		// const rotations = next.rotations();
+		// `utils.shape.normalizeInnerOrientationRotation` will pick the best `utils.shape.makeRotations` for this orientation
+		const shape = utils.shape.normalizeInnerOrientationRotation(next.shape);
+		const normalized = new Polycube({ shape, orientation: next.orientation });
+		foundMap.set(normalized.serialized, normalized);
 	});
 	return Array.from(foundMap.values());
 }
