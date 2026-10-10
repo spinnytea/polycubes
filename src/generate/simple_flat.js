@@ -1,4 +1,3 @@
-const { DEDUP_ADDITIONS } = require('../options');
 const Polycube = require('../Polycube');
 const utils = require('../utils');
 
@@ -24,13 +23,13 @@ const { listLocationsToGrow, grow } = require('./simple_layers');
 	@returns {Polycube[]} all polycubes of size=(n+1)
 */
 function generateNextFlat(polycubes, { verbose } = {}) {
+	if (verbose > 1) console.info(`   starting with ${polycubes.length} options`);
 	if (verbose) console.time(' … extending / grouping');
-	if (verbose > 1) console.info();
 	const sizeGroups = new Map();
 	function getSizeGroup(polycube) {
 		const size = polycube.sizeGroup();
 		if (!sizeGroups.has(size)) {
-			sizeGroups.set(size, (DEDUP_ADDITIONS ? new Map() : []));
+			sizeGroups.set(size, new Map());
 		}
 		return sizeGroups.get(size);
 	}
@@ -43,29 +42,28 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 
 		nexts.forEach((next) => {
 			const sizeGroup = getSizeGroup(next);
-			if (DEDUP_ADDITIONS) {
-				sizeGroup.set(next.serialized, next);
-			}
-			else {
-				sizeGroup.push(next);
-			}
+			sizeGroup.set(next.serialized, next);
 		});
-		if (verbose > 1) {
+		if (verbose > 2) {
 			let nextsCount = 0;
-			sizeGroups.forEach((list) => { nextsCount += (DEDUP_ADDITIONS ? list.size : list.length); });
-			console.info(`   ${idx + 1} of ${polycubes.length}: found ${nextsCount} options`);
+			sizeGroups.forEach((list) => { nextsCount += list.size; });
+			console.info(`   ${idx + 1} of ${polycubes.length}: found ${nextsCount} total options`);
 		}
 	});
 	if (verbose) console.timeEnd(' … extending / grouping');
+	if (verbose > 1) {
+		let nextsCount = 0;
+		sizeGroups.forEach((list) => { nextsCount += list.size; });
+		console.info(`   found ${nextsCount} options, across ${sizeGroups.size} groups`);
+	}
 
 	if (verbose) console.time(' … rotating / uniqing');
-	if (verbose > 1) console.info();
 	const found = [];
 	let currGroupIdx = 1;
 	sizeGroups.forEach((list, key) => {
 		const foundHere = aggregate(list);
 		Array.prototype.push.apply(found, foundHere);
-		if (verbose > 1) {
+		if (verbose > 2) {
 			const [xLength, , zLength] = list.values().next().value.size();
 			const squareness = (xLength / zLength).toFixed(1);
 			console.info(`   ${currGroupIdx} of ${sizeGroups.size}: ${key} (${squareness}) found ${foundHere.length} shapes`);
@@ -74,6 +72,7 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 	});
 	found.sort((a, b) => b.serialized.localeCompare(a.serialized));
 	if (verbose) console.timeEnd(' … rotating / uniqing');
+	if (verbose > 1) console.info(`   ending with ${found.length} options`);
 
 	return found;
 }

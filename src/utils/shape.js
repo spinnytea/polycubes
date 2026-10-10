@@ -419,6 +419,15 @@ const utilsShape = {
 		+ (zLength > xLength ? (zLength > yLength ? 256 : 128) : (zLength > yLength ? 128 : 64)) // eslint-disable-line no-nested-ternary
 	),
 
+	/*
+	normalize: (shape) => {
+		let orientation;
+		({ shape, orientation } = utilsShape.normalizeOrientation(shape));
+		shape = utilsShape.normalizeInnerOrientationRotation(shape);
+		return { shape, orientation };
+	},
+	*/
+
 	normalizeOrientation: (shape) => {
 		const smX = 1;
 		const mdX = 2;
