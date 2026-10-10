@@ -294,6 +294,28 @@ describe('utils.shape', () => {
 		test.todo('orientation c');
 
 		test.todo('dedup rotations');
+
+		test.each([
+			[1, 2, 2],
+			[2, 2, 3],
+			[2, 3, 4],
+			[2, 2, 2],
+			[2, 1, 2],
+			[2, 2, 1],
+			[3, 1, 2],
+		])('preserves dimensions for %i x %i x %i shapes', (x, y, z) => {
+			const shape = utils.shape.create(x, y, z);
+			shape[0][0][0] = 1;
+			const size = utils.shape.size(shape);
+			const orientation = utils.shape.orientation(...size);
+			const expected = utils.shape.makeRotations(shape, orientation)
+				.filter((rotation) => utils.shape.size(rotation).every((length, idx) => length === size[idx]));
+			const actual = utils.shape.makeRotations(shape, orientation, false, true);
+
+			expect(actual[0]).toBe(shape);
+			expect(actual.map((rotation) => JSON.stringify(rotation)).sort())
+				.toEqual(expected.map((rotation) => JSON.stringify(rotation)).sort());
+		});
 	});
 
 	describe('normalizeOrientation', () => {

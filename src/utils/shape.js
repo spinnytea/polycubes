@@ -269,10 +269,48 @@ const utilsShape = {
 	/**
 		rotate the polycube across all dimensions
 	*/
-	makeRotations: (shape, orientation = undefined, dedupRotations = false) => {
+	makeRotations: (shape, orientation = undefined, dedupRotations = false, preserveDimensions = false) => {
 		const rotations = [];
 
-		if (orientation === ORIENTATION.SM_MD_LG || orientation === ORIENTATION.SM_SM_MD) {
+		const [xLength, yLength, zLength] = utilsShape.size(shape);
+		if (preserveDimensions && !(xLength === yLength && yLength === zLength)) {
+			const dimensions = [xLength, yLength, zLength];
+			const axes = ['x', 'y', 'z'];
+			const allDimensionsDistinct = xLength !== yLength && yLength !== zLength && xLength !== zLength;
+
+			if (allDimensionsDistinct) {
+				rotations.push(shape);
+				axes.forEach((axis) => {
+					rotations.push(utilsShape.rotate[axis](utilsShape.rotate[axis](shape)));
+				});
+				// console.assert(rotations.length === 4, 'expected 4 distinct rotations');
+			}
+			else {
+				const uniqueAxisIndex = dimensions.findIndex((length) => dimensions.filter((value) => value === length).length === 1);
+				const spinAxis = axes[uniqueAxisIndex];
+				let rotation = shape;
+
+				rotations.push(rotation);
+				for (let i = 0; i < 3; i += 1) {
+					rotation = utilsShape.rotate[spinAxis](rotation);
+					rotations.push(rotation);
+				}
+
+				// to flip, we just need to rotate twice along our non-unique axis
+				const flipAxis = axes[uniqueAxisIndex === 0 ? 1 : 0];
+				rotation = utilsShape.rotate[flipAxis](utilsShape.rotate[flipAxis](shape));
+
+				rotations.push(rotation);
+				for (let i = 0; i < 3; i += 1) {
+					rotation = utilsShape.rotate[spinAxis](rotation);
+					rotations.push(rotation);
+				}
+
+				// console.assert(rotations.length === 8, 'expected 8 distinct rotations');
+			}
+		}
+
+		else if (orientation === ORIENTATION.SM_MD_LG || orientation === ORIENTATION.SM_SM_MD) {
 			// seed it
 			rotations.push(shape);
 			// spin it 3 times
@@ -546,8 +584,7 @@ const utilsShape = {
 			.map((ys) => ys.map((zs) => zs.join('_')).join(' '))
 			.join('/');
 
-		return utilsShape.makeRotations(shape, orientation)
-			.filter((rotation) => utilsShape.size(rotation).every((length, idx) => length === size[idx]))
+		return utilsShape.makeRotations(shape, orientation, false, true)
 			.reduce((best, candidate) => (
 				serialize(candidate) > serialize(best) ? candidate : best
 			));

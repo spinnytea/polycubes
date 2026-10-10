@@ -69,11 +69,11 @@ exports.DEDUP_ROTATIONS = DEDUP_ROTATIONS;
 	last checked:  3 is -
 	last checked:  4 is 1 ms (12 ms alone)
 	last checked:  5 is 3 ms (15 ms alone)
-	last checked:  6 is 10 ms (22 ms alone)
-	last checked:  7 is 65 ms (80 alone)
-	last checked:  8 is 440 ms (550 alone)
-	last checked:  9 is 2.9 s
-	last checked: 10 is 40s
+	last checked:  6 is 8 ms (22 ms alone)
+	last checked:  7 is 60 ms (80 alone)
+	last checked:  8 is 410 ms (550 alone)
+	last checked:  9 is 2.6 s
+	last checked: 10 is 35s
 */
 const MAX_N = 9;
 exports.MAX_N = MAX_N;
