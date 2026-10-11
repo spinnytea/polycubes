@@ -51,26 +51,31 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 		}
 	});
 	if (verbose) console.timeEnd(' … extending / grouping');
+	let nextsCount = 0;
 	if (verbose > 1) {
-		let nextsCount = 0;
 		sizeGroups.forEach((list) => { nextsCount += list.size; });
 		console.info(`   found ${nextsCount} options, across ${sizeGroups.size} groups`);
 	}
 
 	if (verbose) console.time(' … rotating / uniqing');
 	const found = [];
+	let pointVsArrayTotal = 0;
 	let currGroupIdx = 1;
 	sizeGroups.forEach((list, key) => {
 		const foundHere = aggregate(list);
 		Array.prototype.push.apply(found, foundHere);
 		if (verbose > 2) {
-			const [xLength, , zLength] = list.values().next().value.size();
+			const polycube = list.values().next().value;
+			const [xLength, yLength, zLength] = polycube.size();
 			const squareness = (xLength / zLength).toFixed(1);
-			console.info(`   ${currGroupIdx} of ${sizeGroups.size}: ${key} (${squareness}) found ${foundHere.length} shapes`);
+			const pointVsArray = ((3 * polycube.n()) / (xLength * yLength * zLength));
+			pointVsArrayTotal += pointVsArray * list.size;
+			console.info(`   ${currGroupIdx} of ${sizeGroups.size}: ${key} (${squareness}, ${pointVsArray.toFixed(1)}) found ${foundHere.length} shapes`);
 			currGroupIdx += 1;
 		}
 	});
 	found.sort((a, b) => b.serialized.localeCompare(a.serialized));
+	if (verbose > 2) console.info(`   ratio 'point : array' projected memory ${(pointVsArrayTotal / nextsCount).toFixed(1)}`);
 	if (verbose) console.timeEnd(' … rotating / uniqing');
 	if (verbose > 1) console.info(`   ending with ${found.length} options`);
 

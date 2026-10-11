@@ -1,2 +1,3 @@
+*.cpuprofile
 coverage
 node_modules/

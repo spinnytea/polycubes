@@ -397,7 +397,8 @@ describe('utils.shape', () => {
 			]))('$name', ({ shape, normalized }) => {
 				expect(utils.shape.size(shape)).toEqual([1, 2, 2]);
 				expect(utils.shape.size(normalized)).toEqual([1, 2, 2]);
-				expect(utils.shape.normalizeInnerOrientationRotation(shape)).toEqual(normalized);
+				const orientation = utils.shape.orientation(1, 2, 2);
+				expect(utils.shape.normalizeInnerOrientationRotation({ shape, orientation })).toEqual(normalized);
 			});
 		});
 
@@ -429,7 +430,8 @@ describe('utils.shape', () => {
 				},
 			]))('$name', ({ shape, normalized, size }) => {
 				expect(utils.shape.size(shape)).toEqual(size);
-				expect(utils.shape.normalizeInnerOrientationRotation(shape)).toEqual(normalized);
+				const orientation = utils.shape.orientation(...size);
+				expect(utils.shape.normalizeInnerOrientationRotation({ shape, orientation })).toEqual(normalized);
 			});
 		});
 	});

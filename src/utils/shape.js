@@ -270,6 +270,7 @@ const utilsShape = {
 		rotate the polycube across all dimensions
 	*/
 	makeRotations: (shape, orientation = undefined, dedupRotations = false, preserveDimensions = false) => {
+		// TODO (benchmark) (optimize) avoid allocating full shape arrays for every candidate rotation
 		const rotations = [];
 
 		const [xLength, yLength, zLength] = utilsShape.size(shape);
@@ -461,7 +462,7 @@ const utilsShape = {
 	normalize: (shape) => {
 		let orientation;
 		({ shape, orientation } = utilsShape.normalizeOrientation(shape));
-		shape = utilsShape.normalizeInnerOrientationRotation(shape);
+		shape = utilsShape.normalizeInnerOrientationRotation({ shape, orientation });
 		return { shape, orientation };
 	},
 	*/
@@ -577,9 +578,8 @@ const utilsShape = {
 		}
 	},
 
-	normalizeInnerOrientationRotation: (shape) => {
-		const size = utilsShape.size(shape);
-		const orientation = utilsShape.orientation(...size);
+	normalizeInnerOrientationRotation: ({ shape, orientation }) => {
+		// TODO (benchmark) (optimize) serialize each candidate once instead of rebuilding these strings during comparisons
 		const serialize = (candidate) => candidate
 			.map((ys) => ys.map((zs) => zs.join('_')).join(' '))
 			.join('/');

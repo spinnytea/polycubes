@@ -128,7 +128,7 @@ class Polycube {
 		@returns {Polycube} the shape in the same overall orientation, but normalized for comparison
 	*/
 	normalize() {
-		const shape = utils.shape.normalizeInnerOrientationRotation(this.shape);
+		const shape = utils.shape.normalizeInnerOrientationRotation(this);
 		return new Polycube({ shape, orientation: this.orientation });
 	}
 }

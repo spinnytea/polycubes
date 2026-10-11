@@ -4,7 +4,7 @@
   "description": "Enumerating polycubes",
   "main": "index.js",
   "scripts": {
-    "enum": "node index.js enumerate",
+    "prof": "node --cpu-prof index.js -vvv enumerate",
     "coverage": "jest --coverage",
     "lint": "eslint . || exit 0",
     "gen:task-labels": "node scripts/find-task-labels.mjs",

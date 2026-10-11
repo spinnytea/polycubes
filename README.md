@@ -66,6 +66,7 @@ Doing things in layers was a nice tutorial, but now it's time to get started. Br
 - TODO (optimize) Define a canonical shape key from the smallest encoding among valid rotations and reuse it for deduplication.
 - TODO (optimize) Process oversized size groups in sorted chunks and merge their deduplicated outputs to reduce peak memory use.
 - TODO (optimize) Parallelize independent size groups, measuring worker coordination and serialization overhead against the speedup.
+- TODO (optimize) utils.shape → utils.shape.array + utils.shape.points
 
 # References
 - [Polycube - Wikipedia](https://en.wikipedia.org/wiki/Polycube)
