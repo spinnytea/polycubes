@@ -144,6 +144,67 @@ describe('Polycube', () => {
 		});
 	});
 
+	describe('normalize', () => {
+		test('normalizes equivalent rotations and preserves orientation', () => {
+			const polycube = new Polycube({ shape: [[[0, 1], [1, 1]]], orientation: 7 });
+			const normalized = new Polycube({ shape: [[[1, 1], [1, 0]]], orientation: 7 }).normalize();
+
+			expect(normalized).toBeInstanceOf(Polycube);
+			expect(normalized.shape).toEqual([[[1, 1], [1, 0]]]);
+			expect(normalized.orientation).toBe(7);
+			expect(polycube.equals(normalized)).toBe(false);
+			expect(polycube.normalize().equals(normalized)).toBe(true);
+		});
+
+		describe('SM_MD_MD: 1, 2, 2', () => {
+			const namedCases = (cases) => cases.map((c) => ({ ...c, name: JSON.stringify(c.shape) }));
+			test.each(namedCases([
+				{ shape: [[[1, 1], [1, 0]]], normalized: [[[1, 1], [1, 0]]] },
+				{ shape: [[[1, 1], [0, 1]]], normalized: [[[1, 1], [1, 0]]] },
+				{ shape: [[[1, 0], [1, 1]]], normalized: [[[1, 1], [1, 0]]] },
+				{ shape: [[[0, 1], [1, 1]]], normalized: [[[1, 1], [1, 0]]] },
+			]))('$name', ({ shape, normalized }) => {
+				expect(utils.shape.size(shape)).toEqual([1, 2, 2]);
+				expect(utils.shape.size(normalized)).toEqual([1, 2, 2]);
+				const orientation = utils.shape.orientation(1, 2, 2);
+				expect(new Polycube({ shape, orientation }).normalize().shape).toEqual(normalized);
+			});
+		});
+
+		describe('rotation invariance by bounding-box orientation', () => {
+			test.each([
+				{
+					name: 'SM_SM_SM: 2, 2, 2',
+					shape: [[[1, 0], [0, 0]], [[1, 0], [1, 0]]],
+					normalized: [[[1, 1], [1, 0]], [[0, 0], [0, 0]]],
+					size: [2, 2, 2],
+				},
+				{
+					name: 'SM_SM_MD: 2, 2, 3',
+					shape: [[[1, 0, 0], [0, 0, 0]], [[1, 0, 0], [1, 1, 1]]],
+					normalized: [[[1, 1, 1], [1, 0, 0]], [[0, 0, 0], [1, 0, 0]]],
+					size: [2, 2, 3],
+				},
+				{
+					name: 'SM_MD_MD: 1, 3, 3',
+					shape: [[[1, 1, 1], [0, 0, 1], [0, 0, 1]]],
+					normalized: [[[1, 1, 1], [1, 0, 0], [1, 0, 0]]],
+					size: [1, 3, 3],
+				},
+				{
+					name: 'SM_MD_LG: 2, 3, 4',
+					shape: [[[1, 1, 1, 1], [0, 0, 0, 1], [1, 1, 1, 1]], [[0, 0, 0, 0], [0, 0, 0, 0], [1, 0, 0, 0]]],
+					normalized: [[[1, 1, 1, 1], [1, 0, 0, 0], [1, 1, 1, 1]], [[0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]]],
+					size: [2, 3, 4],
+				},
+			])('$name', ({ shape, normalized, size }) => {
+				expect(utils.shape.size(shape)).toEqual(size);
+				const orientation = utils.shape.orientation(...size);
+				expect(new Polycube({ shape, orientation }).normalize().shape).toEqual(normalized);
+			});
+		});
+	});
+
 	describe('bugfixes', () => {
 		// `polycube.rotation` has been removed since it was not fully supported
 		describe('rotations', () => {
@@ -255,19 +316,6 @@ describe('Polycube', () => {
 				// expect(utils.rotation.equals.nYnX(actual.shape, invalid.shape)).toBe(true); // hmmm
 				expect(utils.rotation.equals.nYnX).toBe(undefined);
 				expect(utils.rotation.equals.znY(actual.shape, invalid.shape)).toBe(true); // fixed this
-			});
-		});
-
-		describe('normalize', () => {
-			test('normalizes equivalent rotations and preserves orientation', () => {
-				const polycube = new Polycube({ shape: [[[0, 1], [1, 1]]], orientation: 7 });
-				const normalized = new Polycube({ shape: [[[1, 1], [1, 0]]], orientation: 7 }).normalize();
-
-				expect(normalized).toBeInstanceOf(Polycube);
-				expect(normalized.shape).toEqual([[[1, 1], [1, 0]]]);
-				expect(normalized.orientation).toBe(7);
-				expect(polycube.equals(normalized)).toBe(false);
-				expect(polycube.normalize().equals(normalized)).toBe(true);
 			});
 		});
 	});

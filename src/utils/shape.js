@@ -458,15 +458,6 @@ const utilsShape = {
 		+ (zLength > xLength ? (zLength > yLength ? 256 : 128) : (zLength > yLength ? 128 : 64)) // eslint-disable-line no-nested-ternary
 	),
 
-	/*
-	normalize: (shape) => {
-		let orientation;
-		({ shape, orientation } = utilsShape.normalizeOrientation(shape));
-		shape = utilsShape.normalizeInnerOrientationRotation({ shape, orientation });
-		return { shape, orientation };
-	},
-	*/
-
 	normalizeOrientation: (shape) => {
 		const smX = 1;
 		const mdX = 2;
@@ -578,17 +569,6 @@ const utilsShape = {
 		}
 	},
 
-	normalizeInnerOrientationRotation: ({ shape, orientation }) => {
-		// TODO (benchmark) (optimize) serialize each candidate once instead of rebuilding these strings during comparisons
-		const serialize = (candidate) => candidate
-			.map((ys) => ys.map((zs) => zs.join('_')).join(' '))
-			.join('/');
-
-		return utilsShape.makeRotations(shape, orientation, false, true)
-			.reduce((best, candidate) => (
-				serialize(candidate) > serialize(best) ? candidate : best
-			));
-	},
 };
 
 module.exports = utilsShape;
