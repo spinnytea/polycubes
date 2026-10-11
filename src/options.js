@@ -75,7 +75,7 @@ exports.DEDUP_ROTATIONS = DEDUP_ROTATIONS;
 	last checked:  7 is 45 ms (60 ms alone)
 	last checked:  8 is 300 ms (360 ms alone)
 	last checked:  9 is 1.8 s (1.9 s alone)
-	last checked: 10 is 22 s (25 s alone)
+	last checked: 10 is 22 s (25 s alone) … or "JavaScript heap out of memory"
 */
 const MAX_N = 9;
 exports.MAX_N = MAX_N;

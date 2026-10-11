@@ -28,10 +28,12 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 	const sizeGroups = new Map();
 	function getSizeGroup(polycube) {
 		const size = polycube.sizeGroup();
-		if (!sizeGroups.has(size)) {
-			sizeGroups.set(size, new Map());
+		let sizeGroup = sizeGroups.get(size);
+		if (!sizeGroup) {
+			sizeGroup = new Map();
+			sizeGroups.set(size, sizeGroup);
 		}
-		return sizeGroups.get(size);
+		return sizeGroup;
 	}
 
 	polycubes.forEach((polycube, idx) => {

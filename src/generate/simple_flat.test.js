@@ -19,8 +19,7 @@ describe('generate flat', () => {
 			const gs = generateNextFlat([n2]);
 			expect(gs.length).toBe(2);
 			const serialized = gs.map((g) => g.serialized).sort();
-			expect(serialized[0]).toBe(n3b.serialized);
-			expect(serialized[1]).toBe(n3a.serialized);
+			expect(serialized).toEqual([n3a.serialized, n3b.serialized].sort());
 		});
 
 		test('n=4 => 8', () => {

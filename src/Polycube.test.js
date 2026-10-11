@@ -28,6 +28,10 @@ describe('Polycube', () => {
 
 		expect(new Polycube({ shape: [[[1, 2, 3], [6, 5, 4]]] }).serialized)
 			.toEqual('1_2_3 6_5_4');
+		expect(new Polycube({ shape: [[[0, 0, 0, 1, 1, 0, 0, 0, 0]]] }).serialized)
+			.toEqual('3x0_1_1_4x0');
+		expect(new Polycube({ shape: [[[1, 1, 0, 0]]] }).serialized)
+			.toEqual('1_1_0_0');
 		expect(new Polycube({ shape: utils.shape.rotate.x([[[1, 2, 3], [6, 5, 4]]]) }).serialized)
 			.toEqual('6_1 5_2 4_3');
 		expect(new Polycube({ shape: utils.shape.rotate.y([[[1, 2, 3], [6, 5, 4]]]) }).serialized)
@@ -176,31 +180,37 @@ describe('Polycube', () => {
 				{
 					name: 'SM_SM_SM: 2, 2, 2',
 					shape: [[[1, 0], [0, 0]], [[1, 0], [1, 0]]],
-					normalized: [[[1, 1], [1, 0]], [[0, 0], [0, 0]]],
+					normalizedSerial: '1_1 1_0/0_0 0_0',
+					normalizedShape: [[[1, 1], [1, 0]], [[0, 0], [0, 0]]],
 					size: [2, 2, 2],
 				},
 				{
 					name: 'SM_SM_MD: 2, 2, 3',
 					shape: [[[1, 0, 0], [0, 0, 0]], [[1, 0, 0], [1, 1, 1]]],
-					normalized: [[[1, 1, 1], [1, 0, 0]], [[0, 0, 0], [1, 0, 0]]],
+					normalizedSerial: '3x1 3x0/0_0_1 0_0_1',
+					normalizedShape: [[[1, 1, 1], [0, 0, 0]], [[0, 0, 1], [0, 0, 1]]],
 					size: [2, 2, 3],
 				},
 				{
 					name: 'SM_MD_MD: 1, 3, 3',
 					shape: [[[1, 1, 1], [0, 0, 1], [0, 0, 1]]],
-					normalized: [[[1, 1, 1], [1, 0, 0], [1, 0, 0]]],
+					normalizedSerial: '3x1 1_0_0 1_0_0',
+					normalizedShape: [[[1, 1, 1], [1, 0, 0], [1, 0, 0]]],
 					size: [1, 3, 3],
 				},
 				{
 					name: 'SM_MD_LG: 2, 3, 4',
 					shape: [[[1, 1, 1, 1], [0, 0, 0, 1], [1, 1, 1, 1]], [[0, 0, 0, 0], [0, 0, 0, 0], [1, 0, 0, 0]]],
-					normalized: [[[1, 1, 1, 1], [1, 0, 0, 0], [1, 1, 1, 1]], [[0, 0, 0, 1], [0, 0, 0, 0], [0, 0, 0, 0]]],
+					normalizedSerial: '4x1 3x0_1 4x1/4x0 4x0 1_3x0',
+					normalizedShape: [[[1, 1, 1, 1], [0, 0, 0, 1], [1, 1, 1, 1]], [[0, 0, 0, 0], [0, 0, 0, 0], [1, 0, 0, 0]]],
 					size: [2, 3, 4],
 				},
-			])('$name', ({ shape, normalized, size }) => {
+			])('$name', ({ shape, normalizedSerial, normalizedShape, size }) => {
 				expect(utils.shape.size(shape)).toEqual(size);
 				const orientation = utils.shape.orientation(...size);
-				expect(new Polycube({ shape, orientation }).normalize().shape).toEqual(normalized);
+				const normalized = new Polycube({ shape, orientation }).normalize();
+				expect(normalized.serialized).toEqual(normalizedSerial);
+				expect(normalized.shape).toEqual(normalizedShape);
 			});
 		});
 	});
