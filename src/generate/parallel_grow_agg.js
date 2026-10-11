@@ -33,7 +33,10 @@ exports.generateNextPGA = generateNextPGA;
 //  - extending / grouping
 //  - rotating / uniqing
 async function workerFlow(workers, { n, verbose }) {
-	return workers.checkPreviousExists({ n, verbose }).then(function () {
+	if (verbose) console.time(` … [n=${n}] [main] checking previous run`);
+	return workers.checkPreviousRun({ n, verbose }).then(function () {
+		if (verbose) console.timeEnd(` … [n=${n}] [main] checking previous run`);
+
 		// FIXME okay to proceed
 		console.log('hello world');
 	});

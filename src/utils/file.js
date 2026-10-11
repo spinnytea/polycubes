@@ -4,6 +4,13 @@ const path = require('path');
 const utilsFile = {
 	existsSync: (filepath) => fs.existsSync(filepath),
 	unlinkSync: (filepath) => fs.unlinkSync(filepath),
+	mkdirSync: (filepath) => {
+		if (!fs.existsSync(filepath)) {
+			fs.mkdirSync(filepath);
+			return true;
+		}
+		return false;
+	},
 
 	loadJson: (filepath) => utilsFile.loadFile(filepath).then((data) => JSON.parse(data)),
 
