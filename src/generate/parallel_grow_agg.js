@@ -38,9 +38,11 @@ async function workerFlow(workers, { n, verbose }) {
 	//  - so each worker function has a start/end logging (other file)
 	//  - each stage in the worker flow has a start/end logging (this file)
 	// FIXME ^^ review notes when finished with impl
-	if (verbose) console.time(` … [n=${n}] [main] checking previous run`);
-	return workers
-		.checkPreviousRun({ n, verbose })
+	return Promise.resolve()
+		.then(() => {
+			if (verbose) console.time(` … [n=${n}] [main] checking previous run`);
+			return workers.checkPreviousRun({ n, verbose });
+		})
 		.then(() => {
 			if (verbose) console.timeEnd(` … [n=${n}] [main] checking previous run`);
 
@@ -55,5 +57,11 @@ async function workerFlow(workers, { n, verbose }) {
 		})
 		.then(() => {
 			if (verbose) console.timeEnd(` … [n=${n}] [main] rotate and unique size group`);
+
+			if (verbose) console.time(` … [n=${n}] [main] combine size group`);
+			return workers.combineSizeGroups({ n, verbose });
+		})
+		.then(() => {
+			if (verbose) console.timeEnd(` … [n=${n}] [main] combine size group`);
 		});
 }

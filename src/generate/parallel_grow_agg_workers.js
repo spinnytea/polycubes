@@ -13,7 +13,7 @@ const { listLocationsToGrow, grow } = require('./simple_layers'); // FIXME remov
 
 const TMP_DIR = './precomputed/tmp';
 
-workerpool.worker({ checkPreviousRun, growAndGroup, rotateAndUniqueSizeGroup });
+workerpool.worker({ checkPreviousRun, growAndGroup, rotateAndUniqueSizeGroup, combineSizeGroups });
 
 async function checkPreviousRun({ n, verbose }) {
 	if (verbose) console.time(` … [n=${n}] [worker ${threadId}] checking previous run`);
@@ -81,7 +81,7 @@ async function growAndGroup({ n, verbose }) {
 		const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.json`;
 		const shapes = [];
 		for (const polycube of list.values()) shapes.push(polycube.shape);
-		promises.push(utils.file.saveJson(sizeGroupCandidateFilepath, shapes));
+		promises.push(utils.file.saveArrayJson(sizeGroupCandidateFilepath, shapes));
 		if (verbose > 2) {
 			console.info(`   [n=${n}] [worker ${threadId}] saving group ${size} with ${shapes.length} candidate shapes`);
 		}
@@ -110,8 +110,26 @@ async function rotateAndUniqueSizeGroup({ n, size, verbose }) {
 		foundMap.set(normalized.serialized, normalized);
 	});
 	const found = Array.from(foundMap.values()).map((polycube) => polycube.shape);
-	await utils.file.saveJson(sizeGroupFoundFilepath, found);
+	await utils.file.saveArrayJson(sizeGroupFoundFilepath, found);
 	if (verbose > 1) console.info(`   [n=${n}] [worker ${threadId}] [${size}] found/saved ${found.length} shapes`);
 
 	if (verbose) console.timeEnd(` … [n=${n}] [worker ${threadId}] [${size}] rotate and unique size group`);
+}
+
+async function combineSizeGroups({ n, verbose }) {
+	if (verbose) console.time(` … [n=${n}] [worker ${threadId}] combine size group`);
+
+	const foundFilepaths = (await utils.file.listFiles(TMP_DIR)).filter((fp) => fp.endsWith('found.json'));
+	if (verbose > 2) console.info(`   [n=${n}] [worker ${threadId}] found ${foundFilepaths.length} size groups`);
+
+	const found = [];
+	for (const fp of foundFilepaths) {
+		const loaded = await utils.file.loadJson(fp);
+		Array.prototype.push.apply(found, loaded);
+	}
+
+	const nFilepath = `./precomputed/${n}.json`;
+	await utils.file.saveArrayJson(nFilepath, found);
+
+	if (verbose) console.timeEnd(` … [n=${n}] [worker ${threadId}] combine size group`);
 }

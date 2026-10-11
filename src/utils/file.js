@@ -37,17 +37,6 @@ const utilsFile = {
 			});
 		}),
 
-	saveJson: (filepath, json) =>
-		new Promise((resolve, reject) => {
-			fs.writeFile(filepath, JSON.stringify(json), (err) => {
-				if (err) {
-					reject(err);
-				} else {
-					resolve();
-				}
-			});
-		}),
-
 	listFiles: (folder) =>
 		new Promise((resolve, reject) => {
 			fs.readdir(folder, (err, filenames) => {

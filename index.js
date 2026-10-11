@@ -58,7 +58,7 @@ async function dummy() {
 function clean() {
 	utils.file.listFiles('./precomputed').then((filepaths) => {
 		filepaths.forEach((filepath) => {
-			if (filepath.endsWith('.gitignore')) return;
+			if (filepath.endsWith('tmp')) return;
 			if (filepath.endsWith('1.json')) return;
 
 			console.info(`deleting ${filepath}`);
