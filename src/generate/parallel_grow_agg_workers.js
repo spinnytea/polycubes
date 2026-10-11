@@ -47,8 +47,12 @@ async function growAndGroup({ n, verbose }) {
 
 	const filepath = `./precomputed/${n - 1}.json`;
 	const polycubes = (await utils.file.loadJson(filepath)).map((shape) => new Polycube({ shape }));
+	if (verbose > 2) {
+		console.info(`   [n=${n}] [worker ${threadId}] loaded ${polycubes.length} shapes from n-1=${n - 1}`);
+	}
 
 	const sizeGroups = new Map();
+	// FIXME convert to "addToSizeGroup"
 	function getSizeGroup(polycube) {
 		const size = polycube.sizeGroup();
 		let sizeGroup = sizeGroups.get(size);
@@ -153,4 +157,6 @@ async function combineSizeGroups({ n, verbose }) {
 	if (verbose > 2) console.info(`   [n=${n}] [worker ${threadId}] combined ${shapeCount} shapes`);
 
 	if (verbose > 1) console.timeEnd(` … [n=${n}] [worker ${threadId}] combine size group`);
+
+	return shapeCount;
 }

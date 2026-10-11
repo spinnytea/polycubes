@@ -1,4 +1,6 @@
 const workerpool = require('workerpool');
+const Polycube = require('../Polycube');
+const utils = require('../utils');
 
 /**
 	## Benchmarking
@@ -12,27 +14,32 @@ const workerpool = require('workerpool');
 	- `n=9` 1.5 s
 	- `n=10` 12 s
 */
-async function generateNextPGA(polycubes, { n, verbose } = {}) {
+async function generateNextPGA(polycubes, { n, verbose, returnPolycubes } = {}) {
 	if (polycubes) throw new Error('generateNextPGA does not require the list of polycubes');
 
 	// worker implementation lives in another file
 	const pool = workerpool.pool(__dirname + '/parallel_grow_agg_workers.js');
 
 	// pool lifecycle
-	await pool
+	const shapeCount = await pool
 		.proxy()
 		.then((workers) => workerFlow(workers, { n, verbose }))
-		.catch(function (error) {
+		.catch((error) => {
 			pool.terminate();
 			// propogate error / let the wrapper handle it (let the program crash)
 			throw error;
-		})
-		.then(function () {
-			// terminate all workers when done
-			pool.terminate();
 		});
+	pool.terminate();
 
 	if (verbose > 2) console.info(pool.stats());
+
+	if (returnPolycubes) {
+		return utils.file
+			.loadJson(`./precomputed/${n}.json`)
+			.then((shapes) => shapes.map((shape) => new Polycube({ shape })));
+	}
+
+	return shapeCount;
 }
 
 /** signal to `dynamic` that it does not need to load or save files */
@@ -65,7 +72,8 @@ async function workerFlow(workers, { n, verbose }) {
 			if (verbose) console.time(` … [n=${n}] [main] combine size group`);
 			return workers.combineSizeGroups({ n, verbose });
 		})
-		.then(() => {
+		.then((shapeCount) => {
 			if (verbose) console.timeEnd(` … [n=${n}] [main] combine size group`);
+			return shapeCount;
 		});
 }

@@ -34,7 +34,8 @@ async function dynamic(generateNext, { n, verbose }) {
 	if (verbose) console.info(`\ngenerating n=${n}…`);
 
 	if (generateNext.managesFiles) {
-		await generateNext(undefined, { n, verbose });
+		const foundShapeCount = await generateNext(undefined, { n, verbose });
+		console.info(`found ${foundShapeCount} shapes for n=${n}`);
 	} else {
 		// load
 		if (verbose) console.info(`loading polycubes for n=${n - 1}`);

@@ -1,4 +1,5 @@
 import { describe, test, expect } from 'vitest';
+import { generateNextPGA } from './parallel_grow_agg';
 const Polycube = require('../Polycube');
 
 describe('generate flat', () => {
@@ -22,21 +23,45 @@ describe('generate flat', () => {
 		expect(n3b.sizeGroup()).toBe('1x2x2+6');
 	});
 
-	// FIXME consider how to interact with the unit tests
+	// TODO each test should use a separate cache folder, and clean up afterwards
 	describe('generateNextPGA', () => {
-		test.todo('n=2 => 1');
+		test('n=2 => 1', async () => {
+			const gs = await generateNextPGA(undefined, { n: 2, returnPolycubes: true });
+			expect(gs.length).toBe(1);
+			expect(gs[0].serialized).toBe(n2.serialized);
+		});
 
-		test.todo('n=3 => 2');
+		test('n=3 => 2', async () => {
+			const gs = await generateNextPGA(undefined, { n: 3, returnPolycubes: true });
+			expect(gs.length).toBe(2);
+			const serialized = gs.map((g) => g.serialized).sort();
+			expect(serialized).toEqual([n3a.serialized, n3b.serialized].sort());
+		});
 
-		test.todo('n=4 => 8');
+		test('n=4 => 8', async () => {
+			const gs = await generateNextPGA(undefined, { n: 4 });
+			expect(gs).toBe(8);
+		});
 
-		test.todo('n=5 => 29');
+		test('n=5 => 29', async () => {
+			const gs = await generateNextPGA(undefined, { n: 5 });
+			expect(gs).toBe(29);
+		});
 
-		test.todo('n=6 => 166');
+		test('n=6 => 166', async () => {
+			const gs = await generateNextPGA(undefined, { n: 6 });
+			expect(gs).toBe(166);
+		});
 
-		test.todo('n=7 => 1023');
+		test('n=7 => 1023', async () => {
+			const gs = await generateNextPGA(undefined, { n: 7 });
+			expect(gs).toBe(1023);
+		});
 
-		test.todo('n=8 => 6922');
+		test('n=8 => 6922', async () => {
+			const gs = await generateNextPGA(undefined, { n: 8 });
+			expect(gs).toBe(6922);
+		});
 
 		test.todo('n=9 => 48311');
 
