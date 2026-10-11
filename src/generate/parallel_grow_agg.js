@@ -1,6 +1,17 @@
 const workerpool = require('workerpool');
 
-// FIXME review verbose levels 1,2,3
+/**
+	## Benchmarking
+	- `n=2` -
+	- `n=3` -
+	- `n=4` 50 ms
+	- `n=5` 61 ms
+	- `n=6` 75 ms
+	- `n=7` 120 ms
+	- `n=8` 370 ms
+	- `n=9` 1.5 s
+	- `n=10` 12 s
+*/
 async function generateNextPGA(polycubes, { n, verbose } = {}) {
 	if (polycubes) throw new Error('generateNextPGA does not require the list of polycubes');
 
@@ -29,15 +40,8 @@ generateNextPGA.managesFiles = true;
 
 exports.generateNextPGA = generateNextPGA;
 
-// FIXME the workflow lives in this file
-//  - extending / grouping
-//  - rotating / uniqing
+// utilizes verbose 0-4; e.g. -vvvv
 async function workerFlow(workers, { n, verbose }) {
-	// not trying to over-do the benchmarks, that can be done via --cpu-prof or `npm run prof 7`
-	// but for simple readout, we want to see "how long did each step take" and "how long did each worker take"
-	//  - so each worker function has a start/end logging (other file)
-	//  - each stage in the worker flow has a start/end logging (this file)
-	// FIXME ^^ review notes when finished with impl
 	return Promise.resolve()
 		.then(() => {
 			if (verbose) console.time(` … [n=${n}] [main] checking previous run`);

@@ -17,6 +17,18 @@ const { listLocationsToGrow, grow } = require('./simple_layers'); // TODO (techd
 	 - we can do it in batches, write multiple files; since we can sort the items, they can all be sorted
 	 - then we can stream the files and do a sorted unique as we go
 
+
+	## Benchmarking
+	- `n=2` -
+	- `n=3` -
+	- `n=4` 1 ms (12 ms alone)
+	- `n=5` 2 ms (15 ms alone)
+	- `n=6` 7 ms (20 ms alone)
+	- `n=7` 45 ms (60 ms alone)
+	- `n=8` 300 ms (360 ms alone)
+	- `n=9` 1.8 s (1.9 s alone)
+	- `n=10` 22 s (25 s alone) … or "JavaScript heap out of memory"
+
 	@param {Polycube[]} polycubes all polycubes of size=n
 	@returns {Polycube[]} all polycubes of size=(n+1)
 */
