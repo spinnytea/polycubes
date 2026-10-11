@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/spinnytea/polycubes#readme",
   "dependencies": {
+    "workerpool": "^10.0.3",
     "yargs": "^18.2.0"
   },
   "devDependencies": {

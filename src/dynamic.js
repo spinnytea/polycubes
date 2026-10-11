@@ -33,15 +33,22 @@ async function dynamic(generateNext, { n, verbose }) {
 	console.time(`time to generate polycubes for n=${n}`);
 	if (verbose) console.info(`\ngenerating n=${n}…`);
 
-	if (verbose) console.info(`loading polycubes for n=${n - 1}`);
-	const shapes = await utils.file.loadJson(`./precomputed/${n - 1}.json`);
-	const polycubes = shapes.map((shape) => new Polycube({ shape }));
+	if (generateNext.managesFiles) {
+		await generateNext(undefined, { n, verbose });
+	} else {
+		// load
+		if (verbose) console.info(`loading polycubes for n=${n - 1}`);
+		const shapes = await utils.file.loadJson(`./precomputed/${n - 1}.json`);
+		const polycubes = shapes.map((shape) => new Polycube({ shape }));
 
-	const foundPolycubes = generateNext(polycubes, { n, verbose });
+		// do
+		const foundPolycubes = generateNext(polycubes, { n, verbose });
 
-	console.info(`saving ${foundPolycubes.length} shapes for n=${n}`);
-	const foundShapes = foundPolycubes.map((polycube) => polycube.shape);
-	await utils.file.saveArrayJson(`./precomputed/${n}.json`, foundShapes);
+		// save
+		console.info(`saving ${foundPolycubes.length} shapes for n=${n}`);
+		const foundShapes = foundPolycubes.map((polycube) => polycube.shape);
+		await utils.file.saveArrayJson(`./precomputed/${n}.json`, foundShapes);
+	}
 
 	console.timeEnd(`time to generate polycubes for n=${n}`);
 }
