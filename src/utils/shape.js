@@ -1,7 +1,6 @@
 const { ORIENTATION } = require('../constants');
 
 const utilsShape = {
-
 	clone: (shape) => (
 		shape.map((ys) => ys.map((zs) => zs.map((v) => v)))
 	),
@@ -268,6 +267,159 @@ const utilsShape = {
 	},
 
 	/**
+		rotate the polycube across all dimensions
+	*/
+	makeRotations: (shape, orientation = undefined, dedupRotations = false, preserveDimensions = false) => {
+		// TODO (benchmark) (optimize) avoid allocating full shape arrays for every candidate rotation
+		const rotations = [];
+
+		const [xLength, yLength, zLength] = utilsShape.size(shape);
+		if (preserveDimensions && !(xLength === yLength && yLength === zLength)) {
+			const dimensions = [xLength, yLength, zLength];
+			const axes = ['x', 'y', 'z'];
+			const allDimensionsDistinct = xLength !== yLength && yLength !== zLength && xLength !== zLength;
+
+			if (allDimensionsDistinct) {
+				rotations.push(shape);
+				axes.forEach((axis) => {
+					rotations.push(utilsShape.rotate[axis](utilsShape.rotate[axis](shape)));
+				});
+				// console.assert(rotations.length === 4, 'expected 4 distinct rotations');
+			}
+			else {
+				const uniqueAxisIndex = dimensions.findIndex((length) => dimensions.filter((value) => value === length).length === 1);
+				const spinAxis = axes[uniqueAxisIndex];
+				let rotation = shape;
+
+				rotations.push(rotation);
+				for (let i = 0; i < 3; i += 1) {
+					rotation = utilsShape.rotate[spinAxis](rotation);
+					rotations.push(rotation);
+				}
+
+				// to flip, we just need to rotate twice along our non-unique axis
+				const flipAxis = axes[uniqueAxisIndex === 0 ? 1 : 0];
+				rotation = utilsShape.rotate[flipAxis](utilsShape.rotate[flipAxis](shape));
+
+				rotations.push(rotation);
+				for (let i = 0; i < 3; i += 1) {
+					rotation = utilsShape.rotate[spinAxis](rotation);
+					rotations.push(rotation);
+				}
+
+				// console.assert(rotations.length === 8, 'expected 8 distinct rotations');
+			}
+		}
+
+		else if (orientation === ORIENTATION.SM_MD_LG || orientation === ORIENTATION.SM_SM_MD) {
+			// seed it
+			rotations.push(shape);
+			// spin it 3 times
+			shape = utilsShape.rotate.z(shape);
+			rotations.push(shape);
+			shape = utilsShape.rotate.z(shape);
+			rotations.push(shape);
+			shape = utilsShape.rotate.z(shape);
+			rotations.push(shape);
+			// flip it
+			shape = utilsShape.rotate.y(shape);
+			shape = utilsShape.rotate.y(shape);
+			rotations.push(shape);
+			// spin it 3 times
+			shape = utilsShape.rotate.z(shape);
+			rotations.push(shape);
+			shape = utilsShape.rotate.z(shape);
+			rotations.push(shape);
+			shape = utilsShape.rotate.z(shape);
+			rotations.push(shape);
+		}
+
+		else if (orientation === ORIENTATION.SM_MD_MD) {
+			// seed it
+			rotations.push(shape);
+			// spin it 3 times
+			shape = utilsShape.rotate.x(shape);
+			rotations.push(shape);
+			shape = utilsShape.rotate.x(shape);
+			rotations.push(shape);
+			shape = utilsShape.rotate.x(shape);
+			rotations.push(shape);
+			// flip it
+			shape = utilsShape.rotate.y(shape);
+			shape = utilsShape.rotate.y(shape);
+			rotations.push(shape);
+			// spin it 3 times
+			shape = utilsShape.rotate.x(shape);
+			rotations.push(shape);
+			shape = utilsShape.rotate.x(shape);
+			rotations.push(shape);
+			shape = utilsShape.rotate.x(shape);
+			rotations.push(shape);
+		}
+
+		else {
+			// does not have a unique axis, so we need to check all 24
+			// orientation === ORIENTATION.SM_SM_SM
+			// orientation === undefined
+
+			// reuse intermediate rotations (x, y, z, nX, xx, xy, xz)
+			const rotatedX = utilsShape.rotate.x(shape);
+			const rotatedY = utilsShape.rotate.y(shape);
+			const rotatedZ = utilsShape.rotate.z(shape);
+			const rotatedNX = utilsShape.rotate.nX(shape);
+			const rotatedXX = utilsShape.rotate.x(rotatedX);
+			const rotatedXY = utilsShape.rotate.y(rotatedX);
+			const rotatedXZ = utilsShape.rotate.z(rotatedX);
+
+			// zero
+			rotations.push(shape);
+
+			// once
+			rotations.push(rotatedX);
+			rotations.push(rotatedY);
+			rotations.push(rotatedZ);
+			rotations.push(rotatedNX);
+			rotations.push(utilsShape.rotate.nY(shape));
+			rotations.push(utilsShape.rotate.nZ(shape));
+
+			// twice
+			rotations.push(rotatedXX);
+			rotations.push(rotatedXY);
+			rotations.push(rotatedXZ);
+			rotations.push(utilsShape.rotate.nY(rotatedX));
+			rotations.push(utilsShape.rotate.nZ(rotatedX));
+			rotations.push(utilsShape.rotate.y(rotatedY));
+			rotations.push(utilsShape.rotate.z(rotatedY));
+			rotations.push(utilsShape.rotate.nX(rotatedY));
+			rotations.push(utilsShape.rotate.z(rotatedZ));
+			rotations.push(utilsShape.rotate.nY(rotatedZ));
+			rotations.push(utilsShape.rotate.nY(rotatedNX));
+
+			// thrice
+			rotations.push(utilsShape.rotate.y(rotatedXX));
+			rotations.push(utilsShape.rotate.z(rotatedXX));
+			rotations.push(utilsShape.rotate.nY(rotatedXX));
+			rotations.push(utilsShape.rotate.nZ(rotatedXX));
+			rotations.push(utilsShape.rotate.y(rotatedXY));
+			rotations.push(utilsShape.rotate.z(rotatedXZ));
+		}
+
+		if (dedupRotations) {
+			const orig = rotations.splice(0);
+			orig.forEach((o) => {
+				const alreadyExists = rotations.some((r) => utilsShape.equals(o, r));
+				if (!alreadyExists) {
+					rotations.push(o);
+				}
+			});
+		}
+
+		// rotate should have a length of 24 (or 8)
+		// …unless it's been deduped
+		return rotations;
+	},
+
+	/**
 	 	breadth first search to find a rotation to get from a to b
 		(image doing depth first, that's funny)
 
@@ -306,7 +458,7 @@ const utilsShape = {
 		+ (zLength > xLength ? (zLength > yLength ? 256 : 128) : (zLength > yLength ? 128 : 64)) // eslint-disable-line no-nested-ternary
 	),
 
-	normalize: (shape) => {
+	normalizeOrientation: (shape) => {
 		const smX = 1;
 		const mdX = 2;
 		const lgX = 4;
@@ -416,6 +568,7 @@ const utilsShape = {
 				throw new Error(`orientation ${orientation} is not accounted for`);
 		}
 	},
+
 };
 
 module.exports = utilsShape;

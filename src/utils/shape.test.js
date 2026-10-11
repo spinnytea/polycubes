@@ -257,7 +257,68 @@ describe('utils.shape', () => {
 		});
 	});
 
-	describe('normalize', () => {
+	describe('makeRotations', () => {
+		test('identity', () => {
+			const identityShape = utils.shape.create(2, 3, 4);
+			identityShape[0][0][0] = 1;
+			identityShape[1][0][0] = 1;
+			identityShape[0][1][0] = 1;
+			identityShape[0][2][0] = 1;
+			identityShape[0][0][1] = 1;
+			identityShape[0][0][2] = 1;
+			identityShape[0][0][3] = 1;
+			expect(identityShape).toEqual([[[1, 1, 1, 1], [1, 0, 0, 0], [1, 0, 0, 0]], [[1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]]);
+
+			const rotations = utils.shape.makeRotations(identityShape);
+
+			// the first one is the one we passed in
+			expect(rotations[0]).toBe(identityShape);
+
+			// they are all unique
+			rotations.forEach((r1, idx1) => {
+				rotations.forEach((r2, idx2) => {
+					if (idx1 !== idx2) {
+						expect(utils.shape.equals(r1, r2)).toBe(false);
+					}
+				});
+			});
+
+			// there are 24 unique rotations for a 3d cube
+			expect(rotations.length).toBe(24);
+		});
+
+		test.todo('orientation a');
+
+		test.todo('orientation b');
+
+		test.todo('orientation c');
+
+		test.todo('dedup rotations');
+
+		test.each([
+			[1, 2, 2],
+			[2, 2, 3],
+			[2, 3, 4],
+			[2, 2, 2],
+			[2, 1, 2],
+			[2, 2, 1],
+			[3, 1, 2],
+		])('preserves dimensions for %i x %i x %i shapes', (x, y, z) => {
+			const shape = utils.shape.create(x, y, z);
+			shape[0][0][0] = 1;
+			const size = utils.shape.size(shape);
+			const orientation = utils.shape.orientation(...size);
+			const expected = utils.shape.makeRotations(shape, orientation)
+				.filter((rotation) => utils.shape.size(rotation).every((length, idx) => length === size[idx]));
+			const actual = utils.shape.makeRotations(shape, orientation, false, true);
+
+			expect(actual[0]).toBe(shape);
+			expect(actual.map((rotation) => JSON.stringify(rotation)).sort())
+				.toEqual(expected.map((rotation) => JSON.stringify(rotation)).sort());
+		});
+	});
+
+	describe('normalizeOrientation', () => {
 		function prettyPrintOrientation(o) {
 			o = o.toString(2).padStart(9, '0');
 			return prettyPrintSML(o.substring(6, 9)) + prettyPrintSML(o.substring(3, 6)) + prettyPrintSML(o.substring(0, 3));
@@ -300,13 +361,13 @@ describe('utils.shape', () => {
 			${4} | ${4} | ${2} | ${[2, 4, 4]} | ${ORIENTATION.SM_MD_MD}
 			${4} | ${4} | ${3} | ${[3, 4, 4]} | ${ORIENTATION.SM_MD_MD}
 			${4} | ${4} | ${4} | ${[4, 4, 4]} | ${ORIENTATION.SM_SM_SM}
-		`('normalize orientation of [$x, $y, $z]', ({ x, y, z, s, o }) => {
+		`('[$x, $y, $z]', ({ x, y, z, s, o }) => {
 			const before = utils.shape.create(x, y, z);
 			for (let i = 0; i < x; i += 1) before[i][0][0] = 1;
 			for (let i = 0; i < y; i += 1) before[0][i][0] = 1;
 			for (let i = 0; i < z; i += 1) before[0][0][i] = 1;
 
-			const { shape: after, orientation } = utils.shape.normalize(before);
+			const { shape: after, orientation } = utils.shape.normalizeOrientation(before);
 
 			expect([
 				orientation,

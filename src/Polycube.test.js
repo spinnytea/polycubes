@@ -8,6 +8,8 @@ describe('Polycube', () => {
 			'constructor',
 			'equals',
 			'n',
+			'normalize',
+			'rotations',
 			'serialized',
 			'size',
 			'sizeGroup',
@@ -26,6 +28,10 @@ describe('Polycube', () => {
 
 		expect(new Polycube({ shape: [[[1, 2, 3], [6, 5, 4]]] }).serialized)
 			.toEqual('1_2_3 6_5_4');
+		expect(new Polycube({ shape: [[[0, 0, 0, 1, 1, 0, 0, 0, 0]]] }).serialized)
+			.toEqual('3x0_1_1_4x0');
+		expect(new Polycube({ shape: [[[1, 1, 0, 0]]] }).serialized)
+			.toEqual('1_1_0_0');
 		expect(new Polycube({ shape: utils.shape.rotate.x([[[1, 2, 3], [6, 5, 4]]]) }).serialized)
 			.toEqual('6_1 5_2 4_3');
 		expect(new Polycube({ shape: utils.shape.rotate.y([[[1, 2, 3], [6, 5, 4]]]) }).serialized)
@@ -97,27 +103,114 @@ describe('Polycube', () => {
 
 	// `polycube.rotation` has been removed since it was not fully supported
 	describe('rotations', () => {
-		test.skip('no rotation', () => {
-			const polycube = new Polycube({ shape: [[[1]]] });
-			const rotations = polycube.rotations();
+		test('identity', () => {
+			const identityShape = utils.shape.create(2, 3, 4);
+			identityShape[0][0][0] = 1;
+			identityShape[1][0][0] = 1;
+			identityShape[0][1][0] = 1;
+			identityShape[0][2][0] = 1;
+			identityShape[0][0][1] = 1;
+			identityShape[0][0][2] = 1;
+			identityShape[0][0][3] = 1;
+			expect(identityShape).toEqual([[[1, 1, 1, 1], [1, 0, 0, 0], [1, 0, 0, 0]], [[1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]]);
+
+			const rotations = new Polycube({ shape: identityShape }).rotations(false);
+
+			// the first one is the one we passed in
+			expect(rotations[0].shape).toBe(identityShape);
+
+			// they are all unique
+			rotations.forEach((r1, idx1) => {
+				rotations.forEach((r2, idx2) => {
+					if (idx1 !== idx2) {
+						expect(utils.shape.equals(r1.shape, r2.shape)).toBe(false);
+					}
+				});
+			});
+
+			// there are 24 unique rotations for a 3d cube
 			expect(rotations.length).toBe(24);
-			expect(rotations[0]).toBe(polycube);
-			expect(rotations[0].rotation).toBe(undefined);
-			rotations.forEach((rotation) => {
-				expect(rotation.shape).toBe(polycube.shape);
+		});
+
+		describe('dedup rotations', () => {
+			test('one', () => {
+				const shape = [[[1, 1], [1, 1]], [[1, 1], [1, 1]]];
+				let rotations = new Polycube({ shape }).rotations(false);
+				expect(rotations.length).toBe(24);
+				rotations = new Polycube({ shape }).rotations(true);
+				expect(rotations.length).toBe(1);
+			});
+			test('two', () => {
+				const shape = [[[0, 1], [1, 0]], [[1, 0], [0, 1]]];
+				const rotations = new Polycube({ shape }).rotations(true);
+				expect(rotations.length).toBe(2);
+			});
+		});
+	});
+
+	describe('normalize', () => {
+		test('normalizes equivalent rotations and preserves orientation', () => {
+			const polycube = new Polycube({ shape: [[[0, 1], [1, 1]]], orientation: 7 });
+			const normalized = new Polycube({ shape: [[[1, 1], [1, 0]]], orientation: 7 }).normalize();
+
+			expect(normalized).toBeInstanceOf(Polycube);
+			expect(normalized.shape).toEqual([[[1, 1], [1, 0]]]);
+			expect(normalized.orientation).toBe(7);
+			expect(polycube.equals(normalized)).toBe(false);
+			expect(polycube.normalize().equals(normalized)).toBe(true);
+		});
+
+		describe('SM_MD_MD: 1, 2, 2', () => {
+			const namedCases = (cases) => cases.map((c) => ({ ...c, name: JSON.stringify(c.shape) }));
+			test.each(namedCases([
+				{ shape: [[[1, 1], [1, 0]]], normalized: [[[1, 1], [1, 0]]] },
+				{ shape: [[[1, 1], [0, 1]]], normalized: [[[1, 1], [1, 0]]] },
+				{ shape: [[[1, 0], [1, 1]]], normalized: [[[1, 1], [1, 0]]] },
+				{ shape: [[[0, 1], [1, 1]]], normalized: [[[1, 1], [1, 0]]] },
+			]))('$name', ({ shape, normalized }) => {
+				expect(utils.shape.size(shape)).toEqual([1, 2, 2]);
+				expect(utils.shape.size(normalized)).toEqual([1, 2, 2]);
+				const orientation = utils.shape.orientation(1, 2, 2);
+				expect(new Polycube({ shape, orientation }).normalize().shape).toEqual(normalized);
 			});
 		});
 
-		test.skip('starting rotation', () => {
-			const polycube = new Polycube({ shape: [[[1]]], rotation: 'x' });
-			const rotations = polycube.rotations();
-			expect(rotations.length).toBe(24);
-			expect(rotations[0]).not.toBe(polycube); // this time it isn't the first one
-			expect(rotations[0].rotation).toBe(undefined); // the first one is still the unrotated version
-			// XXX index 1 isn't special, it's just the first rotation in `utils.rotation.allNames`
-			expect(rotations[1]).toBe(polycube); // it is in the list tho
-			rotations.forEach((rotation) => {
-				expect(rotation.shape).toBe(polycube.shape);
+		describe('rotation invariance by bounding-box orientation', () => {
+			test.each([
+				{
+					name: 'SM_SM_SM: 2, 2, 2',
+					shape: [[[1, 0], [0, 0]], [[1, 0], [1, 0]]],
+					normalizedSerial: '1_1 1_0/0_0 0_0',
+					normalizedShape: [[[1, 1], [1, 0]], [[0, 0], [0, 0]]],
+					size: [2, 2, 2],
+				},
+				{
+					name: 'SM_SM_MD: 2, 2, 3',
+					shape: [[[1, 0, 0], [0, 0, 0]], [[1, 0, 0], [1, 1, 1]]],
+					normalizedSerial: '3x1 3x0/0_0_1 0_0_1',
+					normalizedShape: [[[1, 1, 1], [0, 0, 0]], [[0, 0, 1], [0, 0, 1]]],
+					size: [2, 2, 3],
+				},
+				{
+					name: 'SM_MD_MD: 1, 3, 3',
+					shape: [[[1, 1, 1], [0, 0, 1], [0, 0, 1]]],
+					normalizedSerial: '3x1 1_0_0 1_0_0',
+					normalizedShape: [[[1, 1, 1], [1, 0, 0], [1, 0, 0]]],
+					size: [1, 3, 3],
+				},
+				{
+					name: 'SM_MD_LG: 2, 3, 4',
+					shape: [[[1, 1, 1, 1], [0, 0, 0, 1], [1, 1, 1, 1]], [[0, 0, 0, 0], [0, 0, 0, 0], [1, 0, 0, 0]]],
+					normalizedSerial: '4x1 3x0_1 4x1/4x0 4x0 1_3x0',
+					normalizedShape: [[[1, 1, 1, 1], [0, 0, 0, 1], [1, 1, 1, 1]], [[0, 0, 0, 0], [0, 0, 0, 0], [1, 0, 0, 0]]],
+					size: [2, 3, 4],
+				},
+			])('$name', ({ shape, normalizedSerial, normalizedShape, size }) => {
+				expect(utils.shape.size(shape)).toEqual(size);
+				const orientation = utils.shape.orientation(...size);
+				const normalized = new Polycube({ shape, orientation }).normalize();
+				expect(normalized.serialized).toEqual(normalizedSerial);
+				expect(normalized.shape).toEqual(normalizedShape);
 			});
 		});
 	});

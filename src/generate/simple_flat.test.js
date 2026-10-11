@@ -12,11 +12,14 @@ describe('generate flat', () => {
 		test('n=2 => 1', () => {
 			const gs = generateNextFlat([n1]);
 			expect(gs.length).toBe(1);
+			expect(gs[0].serialized).toBe(n2.serialized);
 		});
 
 		test('n=3 => 2', () => {
 			const gs = generateNextFlat([n2]);
 			expect(gs.length).toBe(2);
+			const serialized = gs.map((g) => g.serialized).sort();
+			expect(serialized).toEqual([n3a.serialized, n3b.serialized].sort());
 		});
 
 		test('n=4 => 8', () => {
@@ -44,12 +47,20 @@ describe('generate flat', () => {
 			expect(gs.length).toBe(6922);
 		});
 
-		test.todo('n=9');
+		test.todo('n=9 => 48311');
 
-		test.todo('n=10');
+		test.todo('n=10 => 346543');
 
-		test.todo('n=11');
+		test.todo('n=11 => 2522522');
 
-		test.todo('n=12');
+		test.todo('n=12 => 18598427');
+
+		test.todo('n=13 => 138462649');
+
+		test.todo('n=14 => 1039496297');
+
+		test.todo('n=15 => 7859514470');
+
+		test.todo('n=16 => 59795121480');
 	});
 });
