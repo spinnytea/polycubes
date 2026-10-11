@@ -1,8 +1,6 @@
 const Polycube = require('../Polycube');
 const utils = require('../utils');
-
-// TODO (techdebt) remove dependency
-const { listLocationsToGrow, grow } = require('./simple_layers');
+const { listLocationsToGrow, grow } = require('./simple_layers'); // TODO (techdebt) remove dependency
 
 /**
 	n=(n-1) => size groups -> rotate and local dedup -> aggregate
@@ -40,7 +38,7 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 		const locations = listLocationsToGrow(polycube);
 		const nexts = locations
 			.map((location) => grow(polycube, location))
-			.map((next) => (new Polycube(utils.shape.normalizeOrientation(next.shape))));
+			.map((next) => new Polycube(utils.shape.normalizeOrientation(next.shape)));
 
 		nexts.forEach((next) => {
 			const sizeGroup = getSizeGroup(next);
@@ -48,14 +46,18 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 		});
 		if (verbose > 2) {
 			let nextsCount = 0;
-			sizeGroups.forEach((list) => { nextsCount += list.size; });
+			sizeGroups.forEach((list) => {
+				nextsCount += list.size;
+			});
 			console.info(`   ${idx + 1} of ${polycubes.length}: found ${nextsCount} total options`);
 		}
 	});
 	if (verbose) console.timeEnd(' … extending / grouping');
 	let nextsCount = 0;
 	if (verbose > 1) {
-		sizeGroups.forEach((list) => { nextsCount += list.size; });
+		sizeGroups.forEach((list) => {
+			nextsCount += list.size;
+		});
 		console.info(`   found ${nextsCount} options, across ${sizeGroups.size} groups`);
 	}
 
@@ -70,14 +72,17 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 			const polycube = list.values().next().value;
 			const [xLength, yLength, zLength] = polycube.size();
 			const squareness = (xLength / zLength).toFixed(1);
-			const pointVsArray = ((3 * polycube.n()) / (xLength * yLength * zLength));
+			const pointVsArray = (3 * polycube.n()) / (xLength * yLength * zLength);
 			pointVsArrayTotal += pointVsArray * list.size;
-			console.info(`   ${currGroupIdx} of ${sizeGroups.size}: ${key} (${squareness}, ${pointVsArray.toFixed(1)}) found ${foundHere.length} shapes`);
+			console.info(
+				`   ${currGroupIdx} of ${sizeGroups.size}: ${key} (${squareness}, ${pointVsArray.toFixed(1)}) found ${foundHere.length} shapes`
+			);
 			currGroupIdx += 1;
 		}
 	});
 	found.sort((a, b) => b.serialized.localeCompare(a.serialized));
-	if (verbose > 2) console.info(`   ratio 'point : array' projected memory ${(pointVsArrayTotal / nextsCount).toFixed(1)}`);
+	if (verbose > 2)
+		console.info(`   ratio 'point : array' projected memory ${(pointVsArrayTotal / nextsCount).toFixed(1)}`);
 	if (verbose) console.timeEnd(' … rotating / uniqing');
 	if (verbose > 1) console.info(`   ending with ${found.length} options`);
 

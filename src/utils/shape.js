@@ -1,9 +1,7 @@
 const { ORIENTATION } = require('../constants');
 
 const utilsShape = {
-	clone: (shape) => (
-		shape.map((ys) => ys.map((zs) => zs.map((v) => v)))
-	),
+	clone: (shape) => shape.map((ys) => ys.map((zs) => zs.map((v) => v))),
 
 	create: (xLength, yLength, zLength) => {
 		const shape = [];
@@ -21,14 +19,13 @@ const utilsShape = {
 		return shape;
 	},
 
-	every: (shape, callback) => (
-		shape.every((ys, x) => ys.every((zs, y) => zs.every((v, z) => callback(x, y, z, v))))
-	),
+	every: (shape, callback) => shape.every((ys, x) => ys.every((zs, y) => zs.every((v, z) => callback(x, y, z, v)))),
 
-	equals: (a, b) => (
-		a.length === b.length && a[0].length === b[0].length && a[0][0].length === b[0][0].length
-			&& utilsShape.every(a, (x, y, z, v) => v === b[x][y][z])
-	),
+	equals: (a, b) =>
+		a.length === b.length &&
+		a[0].length === b[0].length &&
+		a[0][0].length === b[0][0].length &&
+		utilsShape.every(a, (x, y, z, v) => v === b[x][y][z]),
 
 	/**
 		returns the dimensions of the shape
@@ -36,9 +33,7 @@ const utilsShape = {
 		@usage `const [xLength, yLength, zLength] = utils.shape.size(shape);`
 		@returns {number[]}
 	*/
-	size: (shape) => (
-		[shape.length, shape[0].length, shape[0][0].length]
-	),
+	size: (shape) => [shape.length, shape[0].length, shape[0][0].length],
 
 	expand: {
 		/**
@@ -285,9 +280,10 @@ const utilsShape = {
 					rotations.push(utilsShape.rotate[axis](utilsShape.rotate[axis](shape)));
 				});
 				// console.assert(rotations.length === 4, 'expected 4 distinct rotations');
-			}
-			else {
-				const uniqueAxisIndex = dimensions.findIndex((length) => dimensions.filter((value) => value === length).length === 1);
+			} else {
+				const uniqueAxisIndex = dimensions.findIndex(
+					(length) => dimensions.filter((value) => value === length).length === 1
+				);
 				const spinAxis = axes[uniqueAxisIndex];
 				let rotation = shape;
 
@@ -309,9 +305,7 @@ const utilsShape = {
 
 				// console.assert(rotations.length === 8, 'expected 8 distinct rotations');
 			}
-		}
-
-		else if (orientation === ORIENTATION.SM_MD_LG || orientation === ORIENTATION.SM_SM_MD) {
+		} else if (orientation === ORIENTATION.SM_MD_LG || orientation === ORIENTATION.SM_SM_MD) {
 			// seed it
 			rotations.push(shape);
 			// spin it 3 times
@@ -332,9 +326,7 @@ const utilsShape = {
 			rotations.push(shape);
 			shape = utilsShape.rotate.z(shape);
 			rotations.push(shape);
-		}
-
-		else if (orientation === ORIENTATION.SM_MD_MD) {
+		} else if (orientation === ORIENTATION.SM_MD_MD) {
 			// seed it
 			rotations.push(shape);
 			// spin it 3 times
@@ -355,9 +347,7 @@ const utilsShape = {
 			rotations.push(shape);
 			shape = utilsShape.rotate.x(shape);
 			rotations.push(shape);
-		}
-
-		else {
+		} else {
 			// does not have a unique axis, so we need to check all 24
 			// orientation === ORIENTATION.SM_SM_SM
 			// orientation === undefined
@@ -439,7 +429,7 @@ const utilsShape = {
 			const [next, rotations] = frontier.shift();
 
 			if (utilsShape.equals(next, to)) {
-				if (!skip.some((s) => (s.join('') === rotations.join('')))) {
+				if (!skip.some((s) => s.join('') === rotations.join(''))) {
 					return rotations;
 				}
 			}
@@ -452,11 +442,10 @@ const utilsShape = {
 		return null;
 	},
 
-	orientation: (xLength, yLength, zLength) => (
-		(xLength > yLength ? (xLength > zLength ? 4 : 2) : (xLength > zLength ? 2 : 1)) // eslint-disable-line no-nested-ternary
-		+ (yLength > xLength ? (yLength > zLength ? 32 : 16) : (yLength > zLength ? 16 : 8)) // eslint-disable-line no-nested-ternary
-		+ (zLength > xLength ? (zLength > yLength ? 256 : 128) : (zLength > yLength ? 128 : 64)) // eslint-disable-line no-nested-ternary
-	),
+	orientation: (xLength, yLength, zLength) =>
+		(xLength > yLength ? (xLength > zLength ? 4 : 2) : xLength > zLength ? 2 : 1) +
+		(yLength > xLength ? (yLength > zLength ? 32 : 16) : yLength > zLength ? 16 : 8) +
+		(zLength > xLength ? (zLength > yLength ? 256 : 128) : zLength > yLength ? 128 : 64),
 
 	normalizeOrientation: (shape) => {
 		const smX = 1;
@@ -473,8 +462,8 @@ const utilsShape = {
 
 		switch (orientation) {
 			case smX + smY + smZ:
-			// case mdX + mdY + mdZ:
-			// case lgX + lgY + lgZ:
+				// case mdX + mdY + mdZ:
+				// case lgX + lgY + lgZ:
 				return {
 					shape,
 					orientation: ORIENTATION.SM_SM_SM,
@@ -482,7 +471,7 @@ const utilsShape = {
 
 			// case smX + smY + mdZ:
 			case smX + smY + lgZ:
-			// case mdX + mdY + lgZ:
+				// case mdX + mdY + lgZ:
 				return {
 					shape,
 					orientation: ORIENTATION.SM_SM_MD,
@@ -490,7 +479,7 @@ const utilsShape = {
 
 			// case smX + mdY + smZ:
 			case smX + lgY + smZ:
-			// case mdX + lgY + mdZ:
+				// case mdX + lgY + mdZ:
 				return {
 					shape: utilsShape.rotate.x(shape),
 					orientation: ORIENTATION.SM_SM_MD,
@@ -498,31 +487,31 @@ const utilsShape = {
 
 			// case mdX + smY + smZ:
 			case lgX + smY + smZ:
-			// case lgX + mdY + mdZ:
+				// case lgX + mdY + mdZ:
 				return {
 					shape: utilsShape.rotate.y(shape),
 					orientation: ORIENTATION.SM_SM_MD,
 				};
 
 			case smX + mdY + mdZ:
-			// case smX + lgY + lgZ:
-			// case mdX + lgY + lgZ:
+				// case smX + lgY + lgZ:
+				// case mdX + lgY + lgZ:
 				return {
 					shape,
 					orientation: ORIENTATION.SM_MD_MD,
 				};
 
 			case mdX + smY + mdZ:
-			// case lgX + smY + lgZ:
-			// case lgX + mdY + lgZ:
+				// case lgX + smY + lgZ:
+				// case lgX + mdY + lgZ:
 				return {
 					shape: utilsShape.rotate.z(shape),
 					orientation: ORIENTATION.SM_MD_MD,
 				};
 
 			case mdX + mdY + smZ:
-			// case lgX + lgY + smZ:
-			// case lgX + lgY + mdZ:
+				// case lgX + lgY + smZ:
+				// case lgX + lgY + mdZ:
 				return {
 					shape: utilsShape.rotate.y(shape),
 					orientation: ORIENTATION.SM_MD_MD,
@@ -568,7 +557,6 @@ const utilsShape = {
 				throw new Error(`orientation ${orientation} is not accounted for`);
 		}
 	},
-
 };
 
 module.exports = utilsShape;

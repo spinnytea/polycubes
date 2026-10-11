@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest';
 const path = require('path');
 const utils = require('.');
 

@@ -5,12 +5,15 @@
   "main": "index.js",
   "scripts": {
     "prof": "node --cpu-prof index.js -vvv enumerate",
-    "coverage": "jest --coverage",
-    "lint": "eslint . || exit 0",
-    "gen:task-labels": "node scripts/find-task-labels.mjs",
-    "check:all": "npm run lint && npm run coverage && npm run gen:task-labels",
     "start": "node index.js",
-    "test": "jest --watch"
+    "fix": "npm run lint && npm run format",
+    "lint": "eslint . --fix",
+    "format": "prettier --write --list-different .",
+    "test": "vitest -u all",
+    "test:cov": "vitest run --coverage",
+    "gen:task-labels": "node scripts/find-task-labels.mjs",
+    "prerelease": "npm run lint && npm run gen:task-labels && npm run format && npm run test:cov",
+    "release": "git prune & npm prune"
   },
   "repository": {
     "type": "git",
@@ -22,28 +25,18 @@
   },
   "homepage": "https://github.com/spinnytea/polycubes#readme",
   "dependencies": {
-    "yargs": "^17.7.2"
+    "yargs": "^18.2.0"
   },
   "devDependencies": {
-    "eslint": "^8.44.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-jest": "^27.2.3",
-    "jest": "^29.6.1"
-  },
-  "jest": {
-    "collectCoverageFrom": [
-      "src/**/*.js"
-    ],
-    "coverageReporters": [
-      "lcov"
-    ],
-    "restoreMocks": true,
-    "roots": [
-      "src"
-    ],
-    "snapshotFormat": {
-      "escapeString": false,
-      "printBasicPrototype": true
-    }
+    "@eslint/js": "^10.0.1",
+    "@vitest/coverage-v8": "^5.0.3",
+    "@vitest/eslint-plugin": "^1.6.27",
+    "eslint": "^10.12.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import-x": "^4.17.1",
+    "globals": "^17.13.0",
+    "prettier": "^3.9.10",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.3"
   }
 }

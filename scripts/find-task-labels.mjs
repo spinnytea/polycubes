@@ -61,4 +61,5 @@ const output =
 	'\n';
 writeFileSync(outputPath, output, 'utf8');
 
+// eslint-disable-next-line no-undef
 console.log(`${taskCount} tasks, ${sortedLabels.length} labels`);

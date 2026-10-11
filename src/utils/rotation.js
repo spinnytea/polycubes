@@ -14,10 +14,12 @@ const utilsRotation = {
 		x: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === rxl && oyl === rzl && ozl === ryl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[x][z][ryl - y - 1]
-				));
+			return (
+				oxl === rxl &&
+				oyl === rzl &&
+				ozl === ryl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[x][z][ryl - y - 1])
+			);
 		},
 
 		/**
@@ -32,10 +34,12 @@ const utilsRotation = {
 		nX: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === rxl && oyl === rzl && ozl === ryl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[x][rzl - z - 1][y]
-				));
+			return (
+				oxl === rxl &&
+				oyl === rzl &&
+				ozl === ryl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[x][rzl - z - 1][y])
+			);
 		},
 
 		/**
@@ -50,10 +54,12 @@ const utilsRotation = {
 		y: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === rzl && oyl === ryl && ozl === rxl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[z][y][rxl - x - 1]
-				));
+			return (
+				oxl === rzl &&
+				oyl === ryl &&
+				ozl === rxl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[z][y][rxl - x - 1])
+			);
 		},
 
 		/**
@@ -68,10 +74,12 @@ const utilsRotation = {
 		nY: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === rzl && oyl === ryl && ozl === rxl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[rzl - z - 1][y][x]
-				));
+			return (
+				oxl === rzl &&
+				oyl === ryl &&
+				ozl === rxl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[rzl - z - 1][y][x])
+			);
 		},
 
 		/**
@@ -86,10 +94,12 @@ const utilsRotation = {
 		z: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === ryl && oyl === rxl && ozl === rzl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[y][rxl - x - 1][z]
-				));
+			return (
+				oxl === ryl &&
+				oyl === rxl &&
+				ozl === rzl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[y][rxl - x - 1][z])
+			);
 		},
 
 		/**
@@ -104,10 +114,12 @@ const utilsRotation = {
 		nZ: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === ryl && oyl === rxl && ozl === rzl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[ryl - y - 1][x][z]
-				));
+			return (
+				oxl === ryl &&
+				oyl === rxl &&
+				ozl === rzl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[ryl - y - 1][x][z])
+			);
 		},
 
 		/**
@@ -123,10 +135,12 @@ const utilsRotation = {
 		xx: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === rxl && oyl === ryl && ozl === rzl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[x][ryl - y - 1][rzl - z - 1]
-				));
+			return (
+				oxl === rxl &&
+				oyl === ryl &&
+				ozl === rzl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[x][ryl - y - 1][rzl - z - 1])
+			);
 		},
 
 		/**
@@ -142,10 +156,12 @@ const utilsRotation = {
 		xy: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === ryl && oyl === rzl && ozl === rxl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[ryl - y - 1][z][rxl - x - 1]
-				));
+			return (
+				oxl === ryl &&
+				oyl === rzl &&
+				ozl === rxl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[ryl - y - 1][z][rxl - x - 1])
+			);
 		},
 
 		/**
@@ -161,10 +177,12 @@ const utilsRotation = {
 		xz: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === rzl && oyl === rxl && ozl === ryl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[z][rxl - x - 1][ryl - y - 1]
-				));
+			return (
+				oxl === rzl &&
+				oyl === rxl &&
+				ozl === ryl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[z][rxl - x - 1][ryl - y - 1])
+			);
 		},
 
 		/**
@@ -180,10 +198,12 @@ const utilsRotation = {
 		xnY: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === ryl && oyl === rzl && ozl === rxl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[y][z][x]
-				));
+			return (
+				oxl === ryl &&
+				oyl === rzl &&
+				ozl === rxl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[y][z][x])
+			);
 		},
 
 		/**
@@ -199,10 +219,12 @@ const utilsRotation = {
 		xnZ: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === rzl && oyl === rxl && ozl === ryl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[rzl - z - 1][x][ryl - y - 1]
-				));
+			return (
+				oxl === rzl &&
+				oyl === rxl &&
+				ozl === ryl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[rzl - z - 1][x][ryl - y - 1])
+			);
 		},
 
 		/**
@@ -218,10 +240,12 @@ const utilsRotation = {
 		yy: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === rxl && oyl === ryl && ozl === rzl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[rxl - x - 1][y][rzl - z - 1]
-				));
+			return (
+				oxl === rxl &&
+				oyl === ryl &&
+				ozl === rzl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[rxl - x - 1][y][rzl - z - 1])
+			);
 		},
 
 		/**
@@ -237,10 +261,12 @@ const utilsRotation = {
 		yz: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === ryl && oyl === rzl && ozl === rxl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[y][rzl - z - 1][rxl - x - 1]
-				));
+			return (
+				oxl === ryl &&
+				oyl === rzl &&
+				ozl === rxl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[y][rzl - z - 1][rxl - x - 1])
+			);
 		},
 
 		/**
@@ -256,10 +282,12 @@ const utilsRotation = {
 		ynX: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === rzl && oyl === rxl && ozl === ryl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[z][x][y]
-				));
+			return (
+				oxl === rzl &&
+				oyl === rxl &&
+				ozl === ryl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[z][x][y])
+			);
 		},
 
 		/**
@@ -275,10 +303,12 @@ const utilsRotation = {
 		zz: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === rxl && oyl === ryl && ozl === rzl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[rxl - x - 1][ryl - y - 1][z]
-				));
+			return (
+				oxl === rxl &&
+				oyl === ryl &&
+				ozl === rzl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[rxl - x - 1][ryl - y - 1][z])
+			);
 		},
 
 		/**
@@ -294,10 +324,12 @@ const utilsRotation = {
 		znY: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === rzl && oyl === rxl && ozl === ryl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[rzl - z - 1][rxl - x - 1][y]
-				));
+			return (
+				oxl === rzl &&
+				oyl === rxl &&
+				ozl === ryl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[rzl - z - 1][rxl - x - 1][y])
+			);
 		},
 
 		/**
@@ -313,10 +345,12 @@ const utilsRotation = {
 		nXnY: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === ryl && oyl === rzl && ozl === rxl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[ryl - y - 1][rzl - z - 1][x]
-				));
+			return (
+				oxl === ryl &&
+				oyl === rzl &&
+				ozl === rxl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[ryl - y - 1][rzl - z - 1][x])
+			);
 		},
 
 		/**
@@ -333,10 +367,12 @@ const utilsRotation = {
 		xxy: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === rzl && oyl === ryl && ozl === rxl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[rzl - z - 1][ryl - y - 1][rxl - x - 1]
-				));
+			return (
+				oxl === rzl &&
+				oyl === ryl &&
+				ozl === rxl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[rzl - z - 1][ryl - y - 1][rxl - x - 1])
+			);
 		},
 
 		/**
@@ -353,10 +389,12 @@ const utilsRotation = {
 		xxz: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === ryl && oyl === rxl && ozl === rzl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[ryl - y - 1][rxl - x - 1][rzl - z - 1]
-				));
+			return (
+				oxl === ryl &&
+				oyl === rxl &&
+				ozl === rzl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[ryl - y - 1][rxl - x - 1][rzl - z - 1])
+			);
 		},
 
 		/**
@@ -373,10 +411,12 @@ const utilsRotation = {
 		xxnY: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === rzl && oyl === ryl && ozl === rxl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[z][ryl - y - 1][x]
-				));
+			return (
+				oxl === rzl &&
+				oyl === ryl &&
+				ozl === rxl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[z][ryl - y - 1][x])
+			);
 		},
 
 		/**
@@ -393,10 +433,12 @@ const utilsRotation = {
 		xxnZ: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === ryl && oyl === rxl && ozl === rzl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[y][x][rzl - z - 1]
-				));
+			return (
+				oxl === ryl &&
+				oyl === rxl &&
+				ozl === rzl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[y][x][rzl - z - 1])
+			);
 		},
 
 		/**
@@ -413,10 +455,12 @@ const utilsRotation = {
 		xyy: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === rxl && oyl === rzl && ozl === ryl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[rxl - x - 1][z][y]
-				));
+			return (
+				oxl === rxl &&
+				oyl === rzl &&
+				ozl === ryl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[rxl - x - 1][z][y])
+			);
 		},
 
 		/**
@@ -433,10 +477,12 @@ const utilsRotation = {
 		xzz: (original, rotated) => {
 			const [oxl, oyl, ozl] = utilsShape.size(original);
 			const [rxl, ryl, rzl] = utilsShape.size(rotated);
-			return oxl === rxl && oyl === rzl && ozl === ryl
-				&& utilsShape.every(rotated, (x, y, z, v) => (
-					v === original[rxl - x - 1][rzl - z - 1][ryl - y - 1]
-				));
+			return (
+				oxl === rxl &&
+				oyl === rzl &&
+				ozl === ryl &&
+				utilsShape.every(rotated, (x, y, z, v) => v === original[rxl - x - 1][rzl - z - 1][ryl - y - 1])
+			);
 		},
 	},
 

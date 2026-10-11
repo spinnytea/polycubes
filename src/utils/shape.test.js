@@ -1,12 +1,15 @@
+import { describe, test, expect } from 'vitest';
 const { ORIENTATION } = require('../constants');
 const utils = require('.');
 
 describe('utils.shape', () => {
+	// prettier-ignore
 	test('clone', async () => {
 		expect(utils.shape.clone([[[1]]])).toEqual([[[1]]]);
 		expect(utils.shape.clone([[[1, 1], [1, 0]], [[1, 0], [1, 1]]])).toEqual([[[1, 1], [1, 0]], [[1, 0], [1, 1]]]);
 	});
 
+	// prettier-ignore
 	test('size', () => {
 		expect(utils.shape.size([[[1]]])).toEqual([1, 1, 1]);
 		expect(utils.shape.size([[[1, 1]]])).toEqual([1, 1, 2]);
@@ -17,6 +20,7 @@ describe('utils.shape', () => {
 		expect(utils.shape.size([[[1, 1], [1, 0]], [[1, 0], [1, 1]], [[1, 0], [0, 0]]])).toEqual([3, 2, 2]);
 	});
 
+	// prettier-ignore
 	describe('equals', () => {
 		test('true', () => {
 			expect(utils.shape.equals([[[1]]], [[[1]]])).toBe(true);
@@ -51,6 +55,7 @@ describe('utils.shape', () => {
 
 	describe('expand', () => {
 		test('x', () => {
+			// prettier-ignore
 			const shape = [[[1, 1], [1, 0]], [[1, 0], [1, 1]]];
 			expect(utils.shape.size(shape)).toEqual([2, 2, 2]);
 			expect(shape[0][0][0]).toBe(1);
@@ -72,6 +77,7 @@ describe('utils.shape', () => {
 		});
 
 		test('nX', () => {
+			// prettier-ignore
 			const shape = [[[1, 1], [1, 0]], [[1, 0], [1, 1]]];
 			expect(utils.shape.size(shape)).toEqual([2, 2, 2]);
 			expect(shape[0][0][0]).toBe(1);
@@ -93,6 +99,7 @@ describe('utils.shape', () => {
 		});
 
 		test('y', () => {
+			// prettier-ignore
 			const shape = [[[1, 1], [1, 0]], [[1, 0], [1, 1]]];
 			expect(utils.shape.size(shape)).toEqual([2, 2, 2]);
 			expect(shape[0][0][0]).toBe(1);
@@ -114,6 +121,7 @@ describe('utils.shape', () => {
 		});
 
 		test('nY', () => {
+			// prettier-ignore
 			const shape = [[[1, 1], [1, 0]], [[1, 0], [1, 1]]];
 			expect(utils.shape.size(shape)).toEqual([2, 2, 2]);
 			expect(shape[0][0][0]).toBe(1);
@@ -135,6 +143,7 @@ describe('utils.shape', () => {
 		});
 
 		test('z', () => {
+			// prettier-ignore
 			const shape = [[[1, 1], [1, 0]], [[1, 0], [1, 1]]];
 			expect(utils.shape.size(shape)).toEqual([2, 2, 2]);
 			expect(shape[0][0][0]).toBe(1);
@@ -156,6 +165,7 @@ describe('utils.shape', () => {
 		});
 
 		test('nZ', () => {
+			// prettier-ignore
 			const shape = [[[1, 1], [1, 0]], [[1, 0], [1, 1]]];
 			expect(utils.shape.size(shape)).toEqual([2, 2, 2]);
 			expect(shape[0][0][0]).toBe(1);
@@ -177,6 +187,7 @@ describe('utils.shape', () => {
 		});
 	});
 
+	// prettier-ignore
 	describe('rotate', () => {
 		test('x', () => {
 			// 1 2       4 1
@@ -267,6 +278,7 @@ describe('utils.shape', () => {
 			identityShape[0][0][1] = 1;
 			identityShape[0][0][2] = 1;
 			identityShape[0][0][3] = 1;
+			// prettier-ignore
 			expect(identityShape).toEqual([[[1, 1, 1, 1], [1, 0, 0, 0], [1, 0, 0, 0]], [[1, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]]);
 
 			const rotations = utils.shape.makeRotations(identityShape);
@@ -278,6 +290,7 @@ describe('utils.shape', () => {
 			rotations.forEach((r1, idx1) => {
 				rotations.forEach((r2, idx2) => {
 					if (idx1 !== idx2) {
+						// eslint-disable-next-line vitest/no-conditional-expect
 						expect(utils.shape.equals(r1, r2)).toBe(false);
 					}
 				});
@@ -308,13 +321,11 @@ describe('utils.shape', () => {
 			shape[0][0][0] = 1;
 			const size = utils.shape.size(shape);
 			const orientation = utils.shape.orientation(...size);
-			const expected = utils.shape.makeRotations(shape, orientation)
-				.filter((rotation) => utils.shape.size(rotation).every((length, idx) => length === size[idx]));
+			const expected = utils.shape.makeRotations(shape, orientation).filter((rotation) => utils.shape.size(rotation).every((length, idx) => length === size[idx]));
 			const actual = utils.shape.makeRotations(shape, orientation, false, true);
 
 			expect(actual[0]).toBe(shape);
-			expect(actual.map((rotation) => JSON.stringify(rotation)).sort())
-				.toEqual(expected.map((rotation) => JSON.stringify(rotation)).sort());
+			expect(actual.map((rotation) => JSON.stringify(rotation)).sort()).toEqual(expected.map((rotation) => JSON.stringify(rotation)).sort());
 		});
 	});
 
@@ -341,7 +352,6 @@ describe('utils.shape', () => {
 			${2} | ${4} | ${2} | ${[2, 2, 4]} | ${ORIENTATION.SM_SM_MD}
 			${2} | ${4} | ${3} | ${[2, 3, 4]} | ${ORIENTATION.SM_MD_LG}
 			${2} | ${4} | ${4} | ${[2, 4, 4]} | ${ORIENTATION.SM_MD_MD}
-
 			${3} | ${2} | ${2} | ${[2, 2, 3]} | ${ORIENTATION.SM_SM_MD}
 			${3} | ${2} | ${3} | ${[2, 3, 3]} | ${ORIENTATION.SM_MD_MD}
 			${3} | ${2} | ${4} | ${[2, 3, 4]} | ${ORIENTATION.SM_MD_LG}
@@ -351,7 +361,6 @@ describe('utils.shape', () => {
 			${3} | ${4} | ${2} | ${[2, 3, 4]} | ${ORIENTATION.SM_MD_LG}
 			${3} | ${4} | ${3} | ${[3, 3, 4]} | ${ORIENTATION.SM_SM_MD}
 			${3} | ${4} | ${4} | ${[3, 4, 4]} | ${ORIENTATION.SM_MD_MD}
-
 			${4} | ${2} | ${2} | ${[2, 2, 4]} | ${ORIENTATION.SM_SM_MD}
 			${4} | ${2} | ${3} | ${[2, 3, 4]} | ${ORIENTATION.SM_MD_LG}
 			${4} | ${2} | ${4} | ${[2, 4, 4]} | ${ORIENTATION.SM_MD_MD}
@@ -369,12 +378,7 @@ describe('utils.shape', () => {
 
 			const { shape: after, orientation } = utils.shape.normalizeOrientation(before);
 
-			expect([
-				orientation,
-				prettyPrintOrientation(orientation),
-				'original:',
-				prettyPrintOrientation(utils.shape.orientation(x, y, z)),
-			]).toEqual([
+			expect([orientation, prettyPrintOrientation(orientation), 'original:', prettyPrintOrientation(utils.shape.orientation(x, y, z))]).toEqual([
 				o,
 				prettyPrintOrientation(o),
 				'original:',

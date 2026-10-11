@@ -1,0 +1,10 @@
+package.json
+package-lock.json
+README-todo-labels.md
+client/shape.html
+src/Polycube.test.js
+src/generate/simple_layers.test.js
+
+coverage/
+node_modules/
+precomputed/

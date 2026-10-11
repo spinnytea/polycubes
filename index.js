@@ -1,25 +1,27 @@
 #!/usr/bin/env node
-const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
-
-const { generateNextFlat: generateNext } = require('./src/generate/simple_flat');
+const yargs = require('yargs/yargs');
 const dynamic = require('./src/dynamic');
+const { generateNextFlat: generateNext } = require('./src/generate/simple_flat');
 const Polycube = require('./src/Polycube');
 const utils = require('./src/utils');
 
 yargs(hideBin(process.argv))
 	.demandCommand()
-	.command('enumerate [n]', 'enumerate polycubes of size n', (_yargs) => (
-		_yargs
-			.positional('n', {
+	.command(
+		'enumerate [n]',
+		'enumerate polycubes of size n',
+		(_yargs) =>
+			_yargs.positional('n', {
 				describe: 'how large are the polycubes (how many cubical cells)',
 				type: 'number',
 				default: 1,
-			})
-	), (argv) => {
-		if (argv.verbose) console.info(`generating polycubes of size ${argv.n}`);
-		enumerate(argv);
-	})
+			}),
+		(argv) => {
+			if (argv.verbose) console.info(`generating polycubes of size ${argv.n}`);
+			enumerate(argv);
+		}
+	)
 	.command('clean', 'remove old precomputed files', () => {
 		clean();
 	})

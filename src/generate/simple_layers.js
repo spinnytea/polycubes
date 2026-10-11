@@ -19,7 +19,7 @@ const utils = require('../utils');
 function generateNextSimple(polycubes, { verbose } = {}) {
 	if (verbose) console.time(' … additions');
 	if (verbose > 1) console.info();
-	const nexts = (DEDUP_ADDITIONS ? new Map() : []);
+	const nexts = DEDUP_ADDITIONS ? new Map() : [];
 	polycubes.forEach((polycube, idx) => {
 		const locations = listLocationsToGrow(polycube);
 		const ns = locations
@@ -30,11 +30,13 @@ function generateNextSimple(polycubes, { verbose } = {}) {
 			ns.forEach((n) => {
 				nexts.set(n.serialized, n);
 			});
-		}
-		else {
+		} else {
 			Array.prototype.push.apply(nexts, ns);
 		}
-		if (verbose > 1) console.info(`   ${idx + 1} of ${polycubes.length}: found ${(DEDUP_ADDITIONS ? nexts.size : nexts.length)} options`);
+		if (verbose > 1)
+			console.info(
+				`   ${idx + 1} of ${polycubes.length}: found ${DEDUP_ADDITIONS ? nexts.size : nexts.length} options`
+			);
 	});
 	if (verbose) console.timeEnd(' … additions');
 
@@ -42,8 +44,10 @@ function generateNextSimple(polycubes, { verbose } = {}) {
 	if (verbose > 1) console.info();
 	const nextsRotated = (DEDUP_ADDITIONS ? Array.from(nexts.values()) : nexts).map((next) => next.rotations());
 	if (verbose > 1) {
-		console.info(`   ${(DEDUP_ADDITIONS ? nexts.size : nexts.length)}`
-			+ ` into total rotations ${nextsRotated.reduce((ret, r) => ret + r.length, 0)}`);
+		console.info(
+			`   ${DEDUP_ADDITIONS ? nexts.size : nexts.length}` +
+				` into total rotations ${nextsRotated.reduce((ret, r) => ret + r.length, 0)}`
+		);
 	}
 	if (verbose) console.timeEnd(' … rotate');
 
@@ -73,7 +77,8 @@ function generateNextSimple(polycubes, { verbose } = {}) {
 	@returns {Polycube[]} all polycubes of size=(n+1)
 */
 function generateNextGroupBySize(polycubes, { verbose } = {}) {
-	if (verbose && !NORMALIZE_ROTATIONS) console.warn('generateNextGroupBySize must normalize rotations; NORMALIZE_ROTATIONS=false will be ignored');
+	if (verbose && !NORMALIZE_ROTATIONS)
+		console.warn('generateNextGroupBySize must normalize rotations; NORMALIZE_ROTATIONS=false will be ignored');
 
 	if (verbose) console.time(' … additions');
 	if (verbose > 1) console.info();
@@ -81,29 +86,28 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 	function getSizeGroup(polycube) {
 		const size = polycube.sizeGroup();
 		if (!sizeGroups.has(size)) {
-			sizeGroups.set(size, (DEDUP_ADDITIONS ? new Map() : []));
+			sizeGroups.set(size, DEDUP_ADDITIONS ? new Map() : []);
 		}
 		return sizeGroups.get(size);
 	}
 
 	polycubes.forEach((polycube, idx) => {
 		const locations = listLocationsToGrow(polycube);
-		const nexts = locations
-			.map((location) => grow(polycube, location))
-			.map((next) => normalizeOrientation(next));
+		const nexts = locations.map((location) => grow(polycube, location)).map((next) => normalizeOrientation(next));
 
 		nexts.forEach((next) => {
 			const sizeGroup = getSizeGroup(next);
 			if (DEDUP_ADDITIONS) {
 				sizeGroup.set(next.serialized, next);
-			}
-			else {
+			} else {
 				sizeGroup.push(next);
 			}
 		});
 		if (verbose > 1) {
 			let nestsCount = 0;
-			sizeGroups.forEach((list) => { nestsCount += (DEDUP_ADDITIONS ? list.size : list.length); });
+			sizeGroups.forEach((list) => {
+				nestsCount += DEDUP_ADDITIONS ? list.size : list.length;
+			});
 			console.info(`   ${idx + 1} of ${polycubes.length}: found ${nestsCount} options`);
 		}
 	});
@@ -113,10 +117,15 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 	if (verbose > 1) console.info();
 	sizeGroups.forEach((v, size) => {
 		if (DEDUP_ADDITIONS) {
-			sizeGroups.set(size, Array.from(v.values()).map((next) => next.rotations()));
-		}
-		else {
-			sizeGroups.set(size, v.map((next) => next.rotations()));
+			sizeGroups.set(
+				size,
+				Array.from(v.values()).map((next) => next.rotations())
+			);
+		} else {
+			sizeGroups.set(
+				size,
+				v.map((next) => next.rotations())
+			);
 		}
 	});
 
@@ -143,10 +152,15 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 		const foundHere = aggregate(nextsRotated);
 		Array.prototype.push.apply(found, foundHere);
 		if (verbose > 1) {
-			console.info(`   ${size} (${groupNum} of ${sizeGroups.size})`
-				+ ` found ${foundHere.length.toString().padStart(maxRotatedPadding)}`
-				+ ` from ${nextsRotated.length.toString().padStart(maxRotatedPadding)}`
-				+ ` (↻ ${nextsRotated.reduce((s, rotations) => s + rotations.length, 0).toString().padStart(maxRotatedSumPadding)})`);
+			console.info(
+				`   ${size} (${groupNum} of ${sizeGroups.size})` +
+					` found ${foundHere.length.toString().padStart(maxRotatedPadding)}` +
+					` from ${nextsRotated.length.toString().padStart(maxRotatedPadding)}` +
+					` (↻ ${nextsRotated
+						.reduce((s, rotations) => s + rotations.length, 0)
+						.toString()
+						.padStart(maxRotatedSumPadding)})`
+			);
 		}
 	});
 	found.sort((a, b) => b.serialized.localeCompare(a.serialized));
@@ -210,30 +224,24 @@ function grow(polycube, [x, y, z]) {
 		utils.shape.expand.nX(shape);
 		// we shifted the whole thing over to make room for this
 		x = 0;
-	}
-	else if (x === xLength) {
+	} else if (x === xLength) {
 		utils.shape.expand.x(shape);
 		// x is now valid
-	}
-	else if (y === -1) {
+	} else if (y === -1) {
 		utils.shape.expand.nY(shape);
 		// we shifted the whole thing over to make room for this
 		y = 0;
-	}
-	else if (y === yLength) {
+	} else if (y === yLength) {
 		utils.shape.expand.y(shape);
 		// y is now valid
-	}
-	else if (z === -1) {
+	} else if (z === -1) {
 		utils.shape.expand.nZ(shape);
 		// we shifted the whole thing over to make room for this
 		z = 0;
-	}
-	else if (z === zLength) {
+	} else if (z === zLength) {
 		utils.shape.expand.z(shape);
 		// z is now valid
-	}
-	else if (shape[x][y][z] === 1) {
+	} else if (shape[x][y][z] === 1) {
 		// return null;
 		throw new Error(`[${x},${y},${z}] is already filled in, this should be prevented sooner`);
 	}
@@ -257,14 +265,11 @@ function aggregate(nextsRotated) {
 	nextsRotated.forEach((rotations) => {
 		if (foundMap.size === 0) {
 			foundMap.set(rotations[0].serialized, rotations[0]);
-		}
-		else {
+		} else {
 			// the first of the rotations is our vanguard, the one we want to add
 			// all the rest are other rotations, basically duplicates
 			// if any of the rotations are a match, then we don't add our vanguard
-			const alreadyExists = rotations.some((polycube) => (
-				foundMap.has(polycube.serialized)
-			));
+			const alreadyExists = rotations.some((polycube) => foundMap.has(polycube.serialized));
 			if (!alreadyExists) {
 				foundMap.set(rotations[0].serialized, rotations[0]);
 			}

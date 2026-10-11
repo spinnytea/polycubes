@@ -1,5 +1,5 @@
+import { describe, test, expect } from 'vitest';
 const Polycube = require('../Polycube');
-
 const {
 	generateNextGroupBySize,
 	generateNextSimple,
