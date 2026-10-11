@@ -3,6 +3,6 @@
   6 (benchmark)
   2 (documentation)
   2 (modivation)
- 11 (optimize)
-  1 (techdebt)
+ 12 (optimize)
+  4 (techdebt)
   2 (validation)

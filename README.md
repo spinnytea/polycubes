@@ -14,7 +14,7 @@ Enumerating polycubes
 
 `major.minor.patch`
  - **major**: highest `n` we can "reasonably" solve (e.g. are we willing to wait for it yet)
- - **minir**: number of different implementations (e.g. so far, only a super simple dynamic algorithm, so 1)
+ - **minir**: reasonable progress towards next goal, pivots, refactors ~~number of different implementations~~
  - **patch**: undecided - whenever there's a milestone, probably just based on the feature or something
 
 ## `major`
@@ -45,7 +45,10 @@ Doing things in layers was a nice tutorial, but now it's time to get started. Br
 \b((F)IXME|BUG|HACK|TODO|XXX|REVIEW|IDEA)\b(\s+\([\w\d\-]+\))+
 \b(BUG|HACK|TODO|XXX|REVIEW|IDEA)\b(\S|\s[^(])
 
-- TODO (optimize) worker pool / ThreadPool
+- TODO (techdebt) switch to prettier
+- TODO (techdebt) switch to vitest
+- TODO (techdebt) switch to upgrade all dependencies
+- TODO (optimize) `npm install workerpool`
   - start multi-threading
   - make a worker than can do each stage independently
   - spin up a pool of workers ask for a job and handle it independently
