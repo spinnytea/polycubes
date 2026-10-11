@@ -4,5 +4,5 @@
   2 (documentation)
   2 (modivation)
  12 (optimize)
-  4 (techdebt)
+  1 (techdebt)
   2 (validation)
