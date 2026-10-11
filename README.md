@@ -45,6 +45,14 @@ Doing things in layers was a nice tutorial, but now it's time to get started. Br
 \b((F)IXME|BUG|HACK|TODO|XXX|REVIEW|IDEA)\b(\s+\([\w\d\-]+\))+
 \b(BUG|HACK|TODO|XXX|REVIEW|IDEA)\b(\S|\s[^(])
 
+- TODO (optimize) worker pool / ThreadPool
+  - start multi-threading
+  - make a worker than can do each stage independently
+  - spin up a pool of workers ask for a job and handle it independently
+  - e.g. break up generateNextFlat like
+    - extending / grouping (only 1 job) => load `${n-1}.json`, create sizeGroups, write each group to separate file
+    - rotating / uniqing (1 job per group, across n workers) => load group, do aggregate, write foundHere
+    - reduce => combine all foundHere into one list, write `${n}.json`
 - TODO (benchmark) Add progress reporting, elapsed-time estimates, and checkpoint/resume for long enumeration runs.
 - TODO (optimize) Reduce memory use by streaming or aggregating candidates instead of retaining large intermediate collections.
 - TODO (benchmark) Profile and optimize duplicate detection, especially rotation and canonicalization.
