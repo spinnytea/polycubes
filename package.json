@@ -4,7 +4,7 @@
   "description": "Enumerating polycubes",
   "main": "index.js",
   "scripts": {
-    "prof": "node --cpu-prof index.js -vvv enumerate",
+    "prof": "node --cpu-prof index.js enumerate",
     "start": "node index.js",
     "fix": "npm run lint && npm run format",
     "lint": "eslint . --fix",

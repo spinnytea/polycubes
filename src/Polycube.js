@@ -113,7 +113,7 @@ class Polycube {
 			this.shape[xMax][0][zMax] +
 			this.shape[0][yMax][zMax] +
 			this.shape[xMax][yMax][zMax];
-		return `${xLength}/${yLength}/${zLength}+${corners}`;
+		return `${xLength}x${yLength}x${zLength}+${corners}`;
 	}
 
 	/**

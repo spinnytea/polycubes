@@ -15,6 +15,13 @@ describe('generate flat', () => {
 		expect(n3b.serialized).toBe('1_1 1_0');
 	});
 
+	test('sizeGroup', () => {
+		expect(n1.sizeGroup()).toBe('1x1x1+8');
+		expect(n2.sizeGroup()).toBe('1x1x2+8');
+		expect(n3a.sizeGroup()).toBe('1x1x3+8');
+		expect(n3b.sizeGroup()).toBe('1x2x2+6');
+	});
+
 	// FIXME consider how to interact with the unit tests
 	describe('generateNextPGA', () => {
 		test.todo('n=2 => 1');

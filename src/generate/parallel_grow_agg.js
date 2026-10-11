@@ -33,11 +33,21 @@ exports.generateNextPGA = generateNextPGA;
 //  - extending / grouping
 //  - rotating / uniqing
 async function workerFlow(workers, { n, verbose }) {
+	// not trying to over-do the benchmarks, that can be done via --cpu-prof or `npm run prof 7`
+	// but for simple readout, we want to see "how long did each step take" and "how long did each worker take"
+	//  - so each worker function has a start/end logging (other file)
+	//  - each stage in the worker flow has a start/end logging (this file)
+	// FIXME ^^ review notes when finished with impl
 	if (verbose) console.time(` … [n=${n}] [main] checking previous run`);
-	return workers.checkPreviousRun({ n, verbose }).then(function () {
-		if (verbose) console.timeEnd(` … [n=${n}] [main] checking previous run`);
+	return workers
+		.checkPreviousRun({ n, verbose })
+		.then(() => {
+			if (verbose) console.timeEnd(` … [n=${n}] [main] checking previous run`);
 
-		// FIXME okay to proceed
-		console.log('hello world');
-	});
+			if (verbose) console.time(` … [n=${n}] [main] grow and group`);
+			return workers.growAndGroup({ n, verbose });
+		})
+		.then((sizeGroupsKeys) => {
+			if (verbose) console.timeEnd(` … [n=${n}] [main] grow and group`);
+		});
 }
