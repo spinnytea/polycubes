@@ -1,4 +1,8 @@
 const workerpool = require('workerpool');
+const fs = require('node:fs');
+const readline = require('node:readline');
+const { Readable } = require('node:stream');
+const { pipeline } = require('node:stream/promises');
 const { threadId } = require('node:worker_threads');
 const Polycube = require('../Polycube');
 const utils = require('../utils');
@@ -122,14 +126,30 @@ async function combineSizeGroups({ n, verbose }) {
 	const foundFilepaths = (await utils.file.listFiles(TMP_DIR)).filter((fp) => fp.endsWith('found.json'));
 	if (verbose > 2) console.info(`   [n=${n}] [worker ${threadId}] found ${foundFilepaths.length} size groups`);
 
-	const found = [];
-	for (const fp of foundFilepaths) {
-		const loaded = await utils.file.loadJson(fp);
-		Array.prototype.push.apply(found, loaded);
-	}
-
+	// "cat" files of the shape `saveArrayJson`
+	// stream the list of files into a single output file
 	const nFilepath = `./precomputed/${n}.json`;
-	await utils.file.saveArrayJson(nFilepath, found);
+	let shapeCount = 0;
+	async function* streamShapes() {
+		yield '[\n';
+		let first = true;
+		for (const fp of foundFilepaths) {
+			const lines = readline.createInterface({
+				input: fs.createReadStream(fp),
+				crlfDelay: Infinity,
+			});
+			for await (const line of lines) {
+				const shape = line.trim();
+				if (!shape || shape === '[' || shape === ']') continue;
+				yield `${first ? '' : ',\n'}${shape.endsWith(',') ? shape.slice(0, -1) : shape}`;
+				first = false;
+				shapeCount++;
+			}
+		}
+		yield '\n]';
+	}
+	await pipeline(Readable.from(streamShapes()), fs.createWriteStream(nFilepath));
+	if (verbose > 1) console.info(`   [n=${n}] [worker ${threadId}] combined ${shapeCount} shapes`);
 
 	if (verbose) console.timeEnd(` … [n=${n}] [worker ${threadId}] combine size group`);
 }
