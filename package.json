@@ -13,7 +13,7 @@
     "test:cov": "vitest run --coverage",
     "gen:task-labels": "node scripts/find-task-labels.mjs",
     "prerelease": "npm run lint && npm run gen:task-labels && npm run format && npm run test:cov",
-    "release": "git prune & npm prune"
+    "release": "git prune & npm prune --no-audit --no-fund"
   },
   "repository": {
     "type": "git",

@@ -13,7 +13,7 @@ const { listLocationsToGrow, grow } = require('./simple_layers'); // FIXME remov
 
 const TMP_DIR = './precomputed/tmp';
 
-workerpool.worker({ checkPreviousRun, growAndGroup });
+workerpool.worker({ checkPreviousRun, growAndGroup, rotateAndUniqueSizeGroup });
 
 async function checkPreviousRun({ n, verbose }) {
 	if (verbose) console.time(` … [n=${n}] [worker ${threadId}] checking previous run`);
@@ -78,10 +78,10 @@ async function growAndGroup({ n, verbose }) {
 
 	const promises = [];
 	for (const [size, list] of sizeGroups) {
-		const sizeGroupFilepath = `${TMP_DIR}/${size}.json`;
+		const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.json`;
 		const shapes = [];
 		for (const polycube of list.values()) shapes.push(polycube.shape);
-		promises.push(utils.file.saveJson(sizeGroupFilepath, shapes));
+		promises.push(utils.file.saveJson(sizeGroupCandidateFilepath, shapes));
 		if (verbose > 2) {
 			console.info(`   [n=${n}] [worker ${threadId}] saving group ${size} with ${shapes.length} candidate shapes`);
 		}
@@ -92,4 +92,26 @@ async function growAndGroup({ n, verbose }) {
 	if (verbose) console.timeEnd(` … [n=${n}] [worker ${threadId}] extending / grouping`);
 
 	return Array.from(sizeGroups.keys());
+}
+
+async function rotateAndUniqueSizeGroup({ n, size, verbose }) {
+	if (verbose) console.time(` … [n=${n}] [worker ${threadId}] [${size}] rotate and unique size group`);
+
+	const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.json`;
+	const sizeGroupFoundFilepath = `${TMP_DIR}/${size} found.json`;
+	const polycubes = (await utils.file.loadJson(sizeGroupCandidateFilepath)).map((shape) => new Polycube({ shape }));
+	if (verbose > 2) {
+		console.info(`   [n=${n}] [worker ${threadId}] [${size}] loaded ${polycubes.length} candidate shapes`);
+	}
+
+	const foundMap = new Map();
+	polycubes.forEach((polycube) => {
+		const normalized = polycube.normalize();
+		foundMap.set(normalized.serialized, normalized);
+	});
+	const found = Array.from(foundMap.values()).map((polycube) => polycube.shape);
+	await utils.file.saveJson(sizeGroupFoundFilepath, found);
+	if (verbose > 1) console.info(`   [n=${n}] [worker ${threadId}] [${size}] found/saved ${found.length} shapes`);
+
+	if (verbose) console.timeEnd(` … [n=${n}] [worker ${threadId}] [${size}] rotate and unique size group`);
 }

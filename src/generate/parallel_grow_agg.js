@@ -49,5 +49,11 @@ async function workerFlow(workers, { n, verbose }) {
 		})
 		.then((sizeGroupsKeys) => {
 			if (verbose) console.timeEnd(` … [n=${n}] [main] grow and group`);
+
+			if (verbose) console.time(` … [n=${n}] [main] rotate and unique size group`);
+			return Promise.all(sizeGroupsKeys.map((size) => workers.rotateAndUniqueSizeGroup({ n, size, verbose })));
+		})
+		.then(() => {
+			if (verbose) console.timeEnd(` … [n=${n}] [main] rotate and unique size group`);
 		});
 }

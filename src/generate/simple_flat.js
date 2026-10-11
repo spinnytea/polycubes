@@ -65,7 +65,7 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 	const found = [];
 	let pointVsArrayTotal = 0;
 	let currGroupIdx = 1;
-	sizeGroups.forEach((list, key) => {
+	sizeGroups.forEach((list, size) => {
 		const foundHere = aggregate(list);
 		Array.prototype.push.apply(found, foundHere);
 		if (verbose > 2) {
@@ -75,7 +75,7 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 			const pointVsArray = (3 * polycube.n()) / (xLength * yLength * zLength);
 			pointVsArrayTotal += pointVsArray * list.size;
 			console.info(
-				`   ${currGroupIdx} of ${sizeGroups.size}: ${key} (${squareness}, ${pointVsArray.toFixed(1)}) found ${foundHere.length} shapes`
+				`   ${currGroupIdx} of ${sizeGroups.size}: ${size} (${squareness}, ${pointVsArray.toFixed(1)}) found ${foundHere.length} shapes`
 			);
 			currGroupIdx += 1;
 		}
