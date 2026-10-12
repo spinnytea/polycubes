@@ -25,11 +25,9 @@ const utilsFile = {
 			});
 		}),
 
-	/** like ndjson, but still json */
-	saveArrayJson: (filepath, array) =>
+	saveFile: (filepath, data) =>
 		new Promise((resolve, reject) => {
-			const content = `[\n${array.map((v) => JSON.stringify(v)).join(',\n')}\n]`;
-			fs.writeFile(filepath, content, (err) => {
+			fs.writeFile(filepath, typeof data === 'function' ? data() : data, (err) => {
 				if (err) {
 					reject(err);
 				} else {
@@ -38,22 +36,14 @@ const utilsFile = {
 			});
 		}),
 
-	saveNDJson: (filepath, array) =>
-		new Promise((resolve, reject) => {
-			const content = array.map((v) => JSON.stringify(v)).join('\n');
-			fs.writeFile(filepath, content, (err) => {
-				if (err) {
-					reject(err);
-				} else {
-					resolve();
-				}
-			});
-		}),
+	/** @deprecated like ndjson, but still json */
+	saveArrayJson: (filepath, array) =>
+		utilsFile.saveFile(filepath, () => `[\n${array.map((v) => JSON.stringify(v)).join(',\n')}\n]`),
+
+	saveNDJson: (filepath, array) => utilsFile.saveFile(filepath, () => array.map((v) => JSON.stringify(v)).join('\n')),
 
 	loadNDJson: (filepath) =>
-		utilsFile.loadFile(filepath).then((content) => {
-			return content.split('\n').map((line) => JSON.parse(line));
-		}),
+		utilsFile.loadFile(filepath).then((data) => data.split('\n').map((line) => JSON.parse(line))),
 
 	listFiles: (folder) =>
 		new Promise((resolve, reject) => {

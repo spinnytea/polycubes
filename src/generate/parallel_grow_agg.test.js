@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest';
 import { generateNextPGA } from './parallel_grow_agg';
 const Polycube = require('../Polycube');
 
-describe('generate flat', () => {
+describe('generate parallel workers', () => {
 	const n1 = new Polycube({ shape: [[[1]]] });
 	const n2 = new Polycube({ shape: [[[1, 1]]] });
 	const n3a = new Polycube({ shape: [[[1, 1, 1]]] });

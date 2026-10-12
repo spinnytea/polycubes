@@ -1,9 +1,6 @@
 import { describe, test, expect } from 'vitest';
 const Polycube = require('../Polycube');
-const {
-	generateNextGroupBySize,
-	generateNextSimple,
-} = require('./simple_layers');
+const { generateNextGroupBySize, generateNextSimple } = require('./simple_layers');
 
 describe('generate simple', () => {
 	const n1 = new Polycube({ shape: [[[1]]] });

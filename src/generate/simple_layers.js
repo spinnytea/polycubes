@@ -13,6 +13,16 @@ const utils = require('../utils');
 */
 
 /**
+	## Benchmarking
+	- `n=2` -
+	- `n=3` -
+	- `n=4` -
+	- `n=5` 3 ms
+	- `n=6` 10 ms
+	- `n=7` 70 ms
+	- `n=8` 400 ms
+	- `n=9` "JavaScript heap out of memory"
+
 	@param {Polycube[]} polycubes all polycubes of size=n
 	@returns {Polycube[]} all polycubes of size=(n+1)
 */
@@ -73,6 +83,16 @@ function generateNextSimple(polycubes, { verbose } = {}) {
 	i mean, we _could_ do it without normalize, but it doesn't quite make sense to support that
 	 - i guess a naive way would be to group by x+y+z lengths, and have too many things in the lists; it'd be _better_
 	 - or we could, well, normalize the x,y,z without rotating them, and then generate all 24 rotations, but srsly, this is awful
+
+	## Benchmarking
+	- `n=2` -
+	- `n=3` -
+	- `n=4` -
+	- `n=5` 2.5 ms
+	- `n=6` 9 ms
+	- `n=7` 70 ms
+	- `n=8` 400 ms
+	- `n=9` "JavaScript heap out of memory"
 
 	@param {Polycube[]} polycubes all polycubes of size=n
 	@returns {Polycube[]} all polycubes of size=(n+1)

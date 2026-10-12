@@ -67,6 +67,10 @@ exports.DEDUP_ROTATIONS = DEDUP_ROTATIONS;
 /**
 	node index.js clean && node index.js enumerate 9
 
+	## `generateNextSimple` and `generateNextGroupBySize`
+	 - can compute 8 polycubes in 400 ms
+	 - 11 polycubes explodes at growAndGroup with "JavaScript heap out of memory"
+
 	## `generateNextFlat`
 	 - can compute 9 polycubes in 1.8 seconds
 	 - can sometimes compute 10 polycubes in 22 seconds, or will sometimes just explode with "JavaScript heap out of memory"
