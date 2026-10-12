@@ -33,25 +33,36 @@ async function dynamic(generateNext, { n, verbose }) {
 	console.time(`time to generate polycubes for n=${n}`);
 	if (verbose) console.info(`\ngenerating n=${n}…`);
 
-	if (generateNext.managesFiles) {
-		const foundShapeCount = await generateNext(undefined, { n, verbose });
-		console.info(`found ${foundShapeCount} shapes for n=${n}`);
-	} else {
-		// load
-		if (verbose) console.info(`loading polycubes for n=${n - 1}`);
-		const shapes = await utils.file.loadNDJson(`./precomputed/${n - 1}.ndjson`);
-		const polycubes = shapes.map((shape) => new Polycube({ shape }));
+	let peakRss = process.memoryUsage().rss;
+	const memoryUsageInterval = setInterval(() => {
+		peakRss = Math.max(peakRss, process.memoryUsage().rss);
+	}, 100);
+	try {
+		if (generateNext.managesFiles) {
+			const foundShapeCount = await generateNext(undefined, { n, verbose });
+			console.info(`found ${foundShapeCount} shapes for n=${n}`);
+		} else {
+			// load
+			if (verbose) console.info(`loading polycubes for n=${n - 1}`);
+			const shapes = await utils.file.loadNDJson(`./precomputed/${n - 1}.ndjson`);
+			const polycubes = shapes.map((shape) => new Polycube({ shape }));
 
-		// do
-		const foundPolycubes = generateNext(polycubes, { n, verbose });
+			// do
+			const foundPolycubes = generateNext(polycubes, { n, verbose });
 
-		// save
-		console.info(`saving ${foundPolycubes.length} shapes for n=${n}`);
-		const foundShapes = foundPolycubes.map((polycube) => polycube.shape);
-		await utils.file.saveNDJson(`./precomputed/${n}.ndjson`, foundShapes);
+			// save
+			console.info(`saving ${foundPolycubes.length} shapes for n=${n}`);
+			const foundShapes = foundPolycubes.map((polycube) => polycube.shape);
+			await utils.file.saveNDJson(`./precomputed/${n}.ndjson`, foundShapes);
+		}
+	} finally {
+		peakRss = Math.max(peakRss, process.memoryUsage().rss);
+		clearInterval(memoryUsageInterval);
 	}
 
 	console.timeEnd(`time to generate polycubes for n=${n}`);
+	if (verbose) console.info('memory usage (bytes):', process.memoryUsage());
+	console.info(`peak sampled memory: ${(peakRss / 1024 / 1024).toFixed(1)} MiB`);
 }
 
 module.exports = dynamic;
