@@ -24,7 +24,7 @@ async function dynamic(generateNext, { n, verbose }) {
 
 	// check if we have generated the one below
 	// if not, do so first
-	if (!utils.file.existsSync(`./precomputed/${n - 1}.json`)) {
+	if (!utils.file.existsSync(`./precomputed/${n - 1}.ndjson`)) {
 		if (verbose) console.info(`precomputing n=${n - 1}`);
 		await dynamic(generateNext, { n: n - 1, verbose });
 	}
@@ -39,7 +39,7 @@ async function dynamic(generateNext, { n, verbose }) {
 	} else {
 		// load
 		if (verbose) console.info(`loading polycubes for n=${n - 1}`);
-		const shapes = await utils.file.loadJson(`./precomputed/${n - 1}.json`);
+		const shapes = await utils.file.loadNDJson(`./precomputed/${n - 1}.ndjson`);
 		const polycubes = shapes.map((shape) => new Polycube({ shape }));
 
 		// do
@@ -48,7 +48,7 @@ async function dynamic(generateNext, { n, verbose }) {
 		// save
 		console.info(`saving ${foundPolycubes.length} shapes for n=${n}`);
 		const foundShapes = foundPolycubes.map((polycube) => polycube.shape);
-		await utils.file.saveArrayJson(`./precomputed/${n}.json`, foundShapes);
+		await utils.file.saveNDJson(`./precomputed/${n}.ndjson`, foundShapes);
 	}
 
 	console.timeEnd(`time to generate polycubes for n=${n}`);

@@ -50,11 +50,7 @@ Doing things in layers was a nice tutorial, but now it's time to get started. Br
 \([5432]-priority\)
 ```
 
-- TODO (2-priority) (ndjson) saveNDJson/loadNDJson instead of saveArrayJson/loadJson
-   - swap it out completely, retest the old
-   - delete saveArrayJson
-   - global search for loadJson
-- IDEA (2-priority) (ndjson) all "maps" could be "files" where each key is just a folder or file
+- TODO (2-priority) (ndjson) all "maps" could be "files" where each key is just a folder or file
    - generally we are using maps to de-dup items or lists
    - we could write the item or list into the file on it's own line (ndjson)
 - TODO (benchmark) Add progress reporting, elapsed-time estimates, and checkpoint/resume for long enumeration runs.

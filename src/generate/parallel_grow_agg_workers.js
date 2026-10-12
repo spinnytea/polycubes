@@ -21,7 +21,7 @@ workerpool.worker({ checkPreviousRun, growAndGroup, rotateAndUniqueSizeGroup, co
 async function checkPreviousRun({ n, verbose }) {
 	if (verbose > 1) console.time(` … [n=${n}] [worker ${threadId}] checking previous run`);
 
-	const filepath = `./precomputed/${n - 1}.json`;
+	const filepath = `./precomputed/${n - 1}.ndjson`;
 	if (!utils.file.existsSync(filepath)) {
 		throw new Error(`previous run '${filepath}' does not exist`);
 	}
@@ -44,8 +44,8 @@ async function checkPreviousRun({ n, verbose }) {
 async function growAndGroup({ n, verbose }) {
 	if (verbose > 1) console.time(` … [n=${n}] [worker ${threadId}] grow and group`);
 
-	const filepath = `./precomputed/${n - 1}.json`;
-	const polycubes = (await utils.file.loadJson(filepath)).map((shape) => new Polycube({ shape }));
+	const filepath = `./precomputed/${n - 1}.ndjson`;
+	const polycubes = (await utils.file.loadNDJson(filepath)).map((shape) => new Polycube({ shape }));
 	if (verbose > 2) {
 		console.info(`   [n=${n}] [worker ${threadId}] loaded ${polycubes.length} shapes from n-1=${n - 1}`);
 	}
@@ -129,15 +129,13 @@ async function combineSizeGroups({ n, verbose }) {
 	const foundFilepaths = (await utils.file.listFiles(TMP_DIR)).filter((fp) => fp.endsWith('found.ndjson'));
 	if (verbose > 3) console.info(`   [n=${n}] [worker ${threadId}] found ${foundFilepaths.length} size groups`);
 
-	// "cat" files of the shape `saveArrayJson`
+	// "cat" files of the shape `ndjson`
 	// stream the list of files into a single output file
 	// TODO (2-priority) (ndjson) move stream save/load ndjson (all imports) into `utils.file`
 	//  - i.e. pass function* streamShapes and filepath
-	const nFilepath = `./precomputed/${n}.json`;
+	const nFilepath = `./precomputed/${n}.ndjson`;
 	let shapeCount = 0;
 	async function* streamShapes() {
-		yield '[\n';
-		let first = true;
 		for (const fp of foundFilepaths) {
 			const lines = readline.createInterface({
 				input: fs.createReadStream(fp),
@@ -146,12 +144,10 @@ async function combineSizeGroups({ n, verbose }) {
 			for await (const line of lines) {
 				const shape = line.trim();
 				if (!shape || shape === '[' || shape === ']') continue;
-				yield `${first ? '' : ',\n'}${shape}`;
-				first = false;
+				yield `${shape}\n`;
 				shapeCount++;
 			}
 		}
-		yield '\n]';
 	}
 	await pipeline(Readable.from(streamShapes()), fs.createWriteStream(nFilepath));
 	if (verbose > 2) console.info(`   [n=${n}] [worker ${threadId}] combined ${shapeCount} shapes`);

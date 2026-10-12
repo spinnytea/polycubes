@@ -35,7 +35,7 @@ async function generateNextPGA(polycubes, { n, verbose, returnPolycubes } = {}) 
 
 	if (returnPolycubes) {
 		return utils.file
-			.loadJson(`./precomputed/${n}.json`)
+			.loadNDJson(`./precomputed/${n}.ndjson`)
 			.then((shapes) => shapes.map((shape) => new Polycube({ shape })));
 	}
 

@@ -19,7 +19,7 @@ The generator scans readable files under the repository root, excluding `.git`, 
 
 ## Architecture
 
-The CLI in `index.js` selects `src/generate/simple_flat.js` and passes it to `src/dynamic.js`. The dynamic controller loads the previous level from `precomputed/<n-1>.json`, wraps each stored shape as a `Polycube`, calls the generator, and saves the new level. Level 1 is checked in as the seed; file paths are relative to the working directory.
+The CLI in `index.js` selects `src/generate/simple_flat.js` and passes it to `src/dynamic.js`. The dynamic controller loads the previous level from `precomputed/<n-1>.ndjson`, wraps each stored shape as a `Polycube`, calls the generator, and saves the new level. Level 1 is checked in as the seed; file paths are relative to the working directory.
 
 The active generator builds each next shape by adding one cube at every unoccupied face-adjacent position (`listLocationsToGrow` and `grow` in `simple_layers.js`). It normalizes candidate orientations, groups candidates by dimensions and corner occupancy, then removes rotational duplicates. `simple_layers.js` also contains simpler reference implementations of the same generation approach.
 

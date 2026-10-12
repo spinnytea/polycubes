@@ -36,14 +36,16 @@ const utilsFile = {
 			});
 		}),
 
-	/** @deprecated like ndjson, but still json */
-	saveArrayJson: (filepath, array) =>
-		utilsFile.saveFile(filepath, () => `[\n${array.map((v) => JSON.stringify(v)).join(',\n')}\n]`),
-
-	saveNDJson: (filepath, array) => utilsFile.saveFile(filepath, () => array.map((v) => JSON.stringify(v)).join('\n')),
+	saveNDJson: (filepath, array) =>
+		utilsFile.saveFile(filepath, () => array.map((v) => JSON.stringify(v)).join('\n') + '\n'),
 
 	loadNDJson: (filepath) =>
-		utilsFile.loadFile(filepath).then((data) => data.split('\n').map((line) => JSON.parse(line))),
+		utilsFile.loadFile(filepath).then((data) =>
+			data
+				.trim()
+				.split('\n')
+				.map((line) => JSON.parse(line))
+		),
 
 	listFiles: (folder) =>
 		new Promise((resolve, reject) => {

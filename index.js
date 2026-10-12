@@ -3,6 +3,7 @@ const { hideBin } = require('yargs/helpers');
 const yargs = require('yargs/yargs');
 const dynamic = require('./src/dynamic');
 const { generateNextPGA: generateNext } = require('./src/generate/parallel_grow_agg');
+const { generateNextFlat } = require('./src/generate/simple_flat');
 const Polycube = require('./src/Polycube');
 const utils = require('./src/utils');
 
@@ -47,19 +48,19 @@ function enumerate(argv) {
 }
 
 async function dummy() {
-	const shapes = await utils.file.loadJson('./precomputed/1.json');
+	const shapes = await utils.file.loadNDJson('./precomputed/1.ndjson');
 	console.info(JSON.stringify(shapes, null, 2));
 	const polycube = new Polycube({ shape: shapes[0] });
 	console.info(polycube, polycube.size());
-	await utils.file.saveArrayJson('./precomputed/1.json', shapes);
-	console.info(JSON.stringify(generateNext([polycube])));
+	await utils.file.saveNDJson('./precomputed/1.ndjson', shapes);
+	console.info(JSON.stringify(generateNextFlat([polycube])));
 }
 
 function clean() {
 	utils.file.listFiles('./precomputed').then((filepaths) => {
 		filepaths.forEach((filepath) => {
 			if (filepath.endsWith('tmp')) return;
-			if (filepath.endsWith('1.json')) return;
+			if (filepath.endsWith('1.ndjson')) return;
 
 			console.info(`deleting ${filepath}`);
 			utils.file.unlinkSync(filepath);
