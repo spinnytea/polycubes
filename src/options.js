@@ -67,15 +67,18 @@ exports.DEDUP_ROTATIONS = DEDUP_ROTATIONS;
 /**
 	node index.js clean && node index.js enumerate 9
 
-	last checked:  2 is -
-	last checked:  3 is -
-	last checked:  4 is 1 ms (12 ms alone)
-	last checked:  5 is 2 ms (15 ms alone)
-	last checked:  6 is 7 ms (20 ms alone)
-	last checked:  7 is 45 ms (60 ms alone)
-	last checked:  8 is 300 ms (360 ms alone)
-	last checked:  9 is 1.8 s (1.9 s alone)
-	last checked: 10 is 22 s (25 s alone) … or "JavaScript heap out of memory"
+	## `generateNextSimple` and `generateNextGroupBySize`
+	 - can compute 8 polycubes in 400 ms
+	 - 11 polycubes explodes at growAndGroup with "JavaScript heap out of memory"
+
+	## `generateNextFlat`
+	 - can compute 9 polycubes in 1.8 seconds
+	 - can sometimes compute 10 polycubes in 22 seconds, or will sometimes just explode with "JavaScript heap out of memory"
+
+	## `generateNextPGA`
+	 - can compute 9 polycubes in 1.5 seconds
+	 - can compute 10 polycubes in 12 seconds
+	 - 11 polycubes explodes at growAndGroup with "JS heap out of memory"
 */
-const MAX_N = 9;
+const MAX_N = 10;
 exports.MAX_N = MAX_N;

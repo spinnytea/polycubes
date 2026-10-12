@@ -1,6 +1,5 @@
 const Polycube = require('../Polycube');
 const utils = require('../utils');
-const { listLocationsToGrow, grow } = require('./simple_layers'); // TODO (techdebt) remove dependency
 
 /**
 	n=(n-1) => size groups -> rotate and local dedup -> aggregate
@@ -16,6 +15,18 @@ const { listLocationsToGrow, grow } = require('./simple_layers'); // TODO (techd
 	IDEA (optimize) once a single size group gets too large, that can also be split
 	 - we can do it in batches, write multiple files; since we can sort the items, they can all be sorted
 	 - then we can stream the files and do a sorted unique as we go
+
+
+	## Benchmarking
+	- `n=2` -
+	- `n=3` -
+	- `n=4` 1 ms (12 ms alone)
+	- `n=5` 2 ms (15 ms alone)
+	- `n=6` 7 ms (20 ms alone)
+	- `n=7` 45 ms (60 ms alone)
+	- `n=8` 300 ms (360 ms alone)
+	- `n=9` 1.8 s (1.9 s alone)
+	- `n=10` 22 s (25 s alone) … or "JavaScript heap out of memory"
 
 	@param {Polycube[]} polycubes all polycubes of size=n
 	@returns {Polycube[]} all polycubes of size=(n+1)
@@ -35,10 +46,11 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 	}
 
 	polycubes.forEach((polycube, idx) => {
-		const locations = listLocationsToGrow(polycube);
-		const nexts = locations
-			.map((location) => grow(polycube, location))
-			.map((next) => new Polycube(utils.shape.normalizeOrientation(next.shape)));
+		const locations = utils.shape.grow.listLocationsToGrow(polycube.shape);
+		const nexts = locations.map(
+			(location) =>
+				new Polycube(utils.shape.normalizeOrientation(utils.shape.grow.growAtLocation(polycube.shape, location)))
+		);
 
 		nexts.forEach((next) => {
 			const sizeGroup = getSizeGroup(next);
@@ -65,7 +77,7 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 	const found = [];
 	let pointVsArrayTotal = 0;
 	let currGroupIdx = 1;
-	sizeGroups.forEach((list, key) => {
+	sizeGroups.forEach((list, size) => {
 		const foundHere = aggregate(list);
 		Array.prototype.push.apply(found, foundHere);
 		if (verbose > 2) {
@@ -75,7 +87,7 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 			const pointVsArray = (3 * polycube.n()) / (xLength * yLength * zLength);
 			pointVsArrayTotal += pointVsArray * list.size;
 			console.info(
-				`   ${currGroupIdx} of ${sizeGroups.size}: ${key} (${squareness}, ${pointVsArray.toFixed(1)}) found ${foundHere.length} shapes`
+				`   ${currGroupIdx} of ${sizeGroups.size}: ${size} (${squareness}, ${pointVsArray.toFixed(1)}) found ${foundHere.length} shapes`
 			);
 			currGroupIdx += 1;
 		}

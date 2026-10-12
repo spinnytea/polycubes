@@ -2,7 +2,7 @@
 const { hideBin } = require('yargs/helpers');
 const yargs = require('yargs/yargs');
 const dynamic = require('./src/dynamic');
-const { generateNextFlat: generateNext } = require('./src/generate/simple_flat');
+const { generateNextPGA: generateNext } = require('./src/generate/parallel_grow_agg');
 const Polycube = require('./src/Polycube');
 const utils = require('./src/utils');
 
@@ -58,7 +58,7 @@ async function dummy() {
 function clean() {
 	utils.file.listFiles('./precomputed').then((filepaths) => {
 		filepaths.forEach((filepath) => {
-			if (filepath.endsWith('.gitignore')) return;
+			if (filepath.endsWith('tmp')) return;
 			if (filepath.endsWith('1.json')) return;
 
 			console.info(`deleting ${filepath}`);

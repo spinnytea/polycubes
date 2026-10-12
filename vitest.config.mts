@@ -8,7 +8,7 @@ export default defineConfig({
 			provider: 'v8',
 			reporter: ['html'],
 			reportsDirectory: 'coverage',
-			include: ['**/*.js'],
+			include: ['src/**/*.js'],
 			exclude: ['__mocks__/**', '**/node_modules/**', 'coverage/**', 'precomputed/**'],
 		},
 		exclude: ['**/node_modules/**'],

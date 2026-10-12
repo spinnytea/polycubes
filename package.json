@@ -4,7 +4,7 @@
   "description": "Enumerating polycubes",
   "main": "index.js",
   "scripts": {
-    "prof": "node --cpu-prof index.js -vvv enumerate",
+    "prof": "node --cpu-prof index.js enumerate",
     "start": "node index.js",
     "fix": "npm run lint && npm run format",
     "lint": "eslint . --fix",
@@ -13,7 +13,7 @@
     "test:cov": "vitest run --coverage",
     "gen:task-labels": "node scripts/find-task-labels.mjs",
     "prerelease": "npm run lint && npm run gen:task-labels && npm run format && npm run test:cov",
-    "release": "git prune & npm prune"
+    "release": "git prune & npm prune --no-audit --no-fund"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/spinnytea/polycubes#readme",
   "dependencies": {
+    "workerpool": "^10.0.3",
     "yargs": "^18.2.0"
   },
   "devDependencies": {

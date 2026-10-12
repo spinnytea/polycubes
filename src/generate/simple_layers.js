@@ -13,6 +13,16 @@ const utils = require('../utils');
 */
 
 /**
+	## Benchmarking
+	- `n=2` -
+	- `n=3` -
+	- `n=4` -
+	- `n=5` 3 ms
+	- `n=6` 10 ms
+	- `n=7` 70 ms
+	- `n=8` 400 ms
+	- `n=9` "JavaScript heap out of memory"
+
 	@param {Polycube[]} polycubes all polycubes of size=n
 	@returns {Polycube[]} all polycubes of size=(n+1)
 */
@@ -21,10 +31,11 @@ function generateNextSimple(polycubes, { verbose } = {}) {
 	if (verbose > 1) console.info();
 	const nexts = DEDUP_ADDITIONS ? new Map() : [];
 	polycubes.forEach((polycube, idx) => {
-		const locations = listLocationsToGrow(polycube);
+		const locations = utils.shape.grow.listLocationsToGrow(polycube.shape);
 		const ns = locations
-			.map((location) => grow(polycube, location))
-			.map((p) => (NORMALIZE_ROTATIONS ? normalizeOrientation(p) : p));
+			.map((location) => utils.shape.grow.growAtLocation(polycube.shape, location))
+			.map((shape) => (NORMALIZE_ROTATIONS ? utils.shape.normalizeOrientation(shape) : { shape }))
+			.map((no) => new Polycube(no));
 
 		if (DEDUP_ADDITIONS) {
 			ns.forEach((n) => {
@@ -73,6 +84,16 @@ function generateNextSimple(polycubes, { verbose } = {}) {
 	 - i guess a naive way would be to group by x+y+z lengths, and have too many things in the lists; it'd be _better_
 	 - or we could, well, normalize the x,y,z without rotating them, and then generate all 24 rotations, but srsly, this is awful
 
+	## Benchmarking
+	- `n=2` -
+	- `n=3` -
+	- `n=4` -
+	- `n=5` 2.5 ms
+	- `n=6` 9 ms
+	- `n=7` 70 ms
+	- `n=8` 400 ms
+	- `n=9` "JavaScript heap out of memory"
+
 	@param {Polycube[]} polycubes all polycubes of size=n
 	@returns {Polycube[]} all polycubes of size=(n+1)
 */
@@ -92,8 +113,11 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 	}
 
 	polycubes.forEach((polycube, idx) => {
-		const locations = listLocationsToGrow(polycube);
-		const nexts = locations.map((location) => grow(polycube, location)).map((next) => normalizeOrientation(next));
+		const locations = utils.shape.grow.listLocationsToGrow(polycube.shape);
+		const nexts = locations.map(
+			(location) =>
+				new Polycube(utils.shape.normalizeOrientation(utils.shape.grow.growAtLocation(polycube.shape, location)))
+		);
 
 		nexts.forEach((next) => {
 			const sizeGroup = getSizeGroup(next);
@@ -169,97 +193,6 @@ function generateNextGroupBySize(polycubes, { verbose } = {}) {
 	return found;
 }
 
-/**
-	list all the places we could place the next cube
-
-	@param {Polycube} polycube
-*/
-function listLocationsToGrow(polycube) {
-	const locations = [];
-
-	function checkNewLocation(x, y, z) {
-		if (polycube.shape[x]?.[y]?.[z] !== 1) {
-			locations.push([x, y, z]);
-		}
-	}
-
-	polycube.shape.forEach((ys, x) => {
-		ys.forEach((zs, y) => {
-			zs.forEach((v, z) => {
-				if (v === 1) {
-					// x,y,z is filled in
-					// we can do any of the adjacent squares
-					// don't grow to a new location if it's already filled in
-					checkNewLocation(x + 1, y, z);
-					checkNewLocation(x - 1, y, z);
-					checkNewLocation(x, y + 1, z);
-					checkNewLocation(x, y - 1, z);
-					checkNewLocation(x, y, z + 1);
-					checkNewLocation(x, y, z - 1);
-				}
-			});
-		});
-	});
-
-	return locations;
-}
-
-/**
-	@param {Polycube} polycube
-	@param {number[]} location
-	@returns {Polycube}
-*/
-function grow(polycube, [x, y, z]) {
-	const shape = utils.shape.clone(polycube.shape);
-	const [xLength, yLength, zLength] = polycube.size();
-
-	// if (x < -1) throw new Error('x is too small');
-	// if (x > xLength) throw new Error('x is too large');
-	// if (y < -1) throw new Error('y is too small');
-	// if (y > yLength) throw new Error('y is too large');
-	// if (z < -1) throw new Error('z is too small');
-	// if (z > zLength) throw new Error('z is too large');
-
-	if (x === -1) {
-		utils.shape.expand.nX(shape);
-		// we shifted the whole thing over to make room for this
-		x = 0;
-	} else if (x === xLength) {
-		utils.shape.expand.x(shape);
-		// x is now valid
-	} else if (y === -1) {
-		utils.shape.expand.nY(shape);
-		// we shifted the whole thing over to make room for this
-		y = 0;
-	} else if (y === yLength) {
-		utils.shape.expand.y(shape);
-		// y is now valid
-	} else if (z === -1) {
-		utils.shape.expand.nZ(shape);
-		// we shifted the whole thing over to make room for this
-		z = 0;
-	} else if (z === zLength) {
-		utils.shape.expand.z(shape);
-		// z is now valid
-	} else if (shape[x][y][z] === 1) {
-		// return null;
-		throw new Error(`[${x},${y},${z}] is already filled in, this should be prevented sooner`);
-	}
-
-	shape[x][y][z] = 1;
-	return new Polycube({ shape });
-}
-
-/**
-	rotate the polycube across all dimensions
-
-	@param {Polycube} polycube
-	@returns {Polycube} same shape, but rotated so the size is [sm, md, lg]
-*/
-function normalizeOrientation(polycube) {
-	return new Polycube(utils.shape.normalizeOrientation(polycube.shape));
-}
-
 function aggregate(nextsRotated) {
 	const foundMap = new Map();
 	nextsRotated.forEach((rotations) => {
@@ -280,5 +213,3 @@ function aggregate(nextsRotated) {
 
 exports.generateNextSimple = generateNextSimple;
 exports.generateNextGroupBySize = generateNextGroupBySize;
-exports.listLocationsToGrow = listLocationsToGrow;
-exports.grow = grow;
