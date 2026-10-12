@@ -47,14 +47,14 @@ async function growAndGroup({ n, verbose }) {
 	}
 
 	const sizeGroups = new Map();
-	function getSizeGroup(polycube) {
+	function addToSizeGroup(polycube) {
 		const size = polycube.sizeGroup();
 		let sizeGroup = sizeGroups.get(size);
 		if (!sizeGroup) {
 			sizeGroup = new Map();
 			sizeGroups.set(size, sizeGroup);
 		}
-		return sizeGroup;
+		sizeGroup.set(polycube.serialized, polycube);
 	}
 
 	polycubes.forEach((polycube, idx) => {
@@ -65,8 +65,7 @@ async function growAndGroup({ n, verbose }) {
 		);
 
 		nexts.forEach((next) => {
-			const sizeGroup = getSizeGroup(next);
-			sizeGroup.set(next.serialized, next);
+			addToSizeGroup(next);
 		});
 		if (verbose > 3) {
 			let nextsCount = 0;
@@ -82,11 +81,14 @@ async function growAndGroup({ n, verbose }) {
 	const promises = [];
 	for (const [size, list] of sizeGroups) {
 		const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.ndjson`;
-		const shapes = [];
-		for (const polycube of list.values()) shapes.push(polycube.shape);
-		promises.push(utils.file.saveNDJson(sizeGroupCandidateFilepath, shapes));
+		function* streamShapes() {
+			for (const polycube of list.values()) {
+				yield `${JSON.stringify(polycube.shape)}\n`;
+			}
+		}
+		promises.push(utils.file.pipelineWriteStream(sizeGroupCandidateFilepath, streamShapes));
 		if (verbose > 3) {
-			console.info(`   [n=${n}] [worker ${threadId}] saving group ${size} with ${shapes.length} candidate shapes`);
+			console.info(`   [n=${n}] [worker ${threadId}] saving group ${size} with ${list.size} candidate shapes`);
 		}
 	}
 	await Promise.all(promises);

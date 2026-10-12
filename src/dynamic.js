@@ -61,7 +61,7 @@ async function dynamic(generateNext, { n, verbose }) {
 	}
 
 	console.timeEnd(`time to generate polycubes for n=${n}`);
-	if (verbose) console.info('memory usage (bytes):', process.memoryUsage());
+	if (verbose > 1) console.info('memory usage (bytes):', process.memoryUsage());
 	console.info(`peak sampled memory: ${(peakRss / 1024 / 1024).toFixed(1)} MiB`);
 }
 
