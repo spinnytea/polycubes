@@ -76,9 +76,10 @@ exports.DEDUP_ROTATIONS = DEDUP_ROTATIONS;
 	 - can sometimes compute 10 polycubes in 22 seconds, or will sometimes just explode with "JavaScript heap out of memory"
 
 	## `generateNextPGA`
-	 - can compute 9 polycubes in 1.5 seconds
-	 - can compute 10 polycubes in 12 seconds
+	 - can compute 9 polycubes in 1.3 seconds / 940 MiB
+	 - can compute 10 polycubes in 9 seconds / 2200 MiB
 	 - 11 polycubes explodes at growAndGroup with "JS heap out of memory"
+	   did get past the "grow and group" phase one time
 */
 const MAX_N = 10;
 exports.MAX_N = MAX_N;

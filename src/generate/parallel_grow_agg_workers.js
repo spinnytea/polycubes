@@ -51,10 +51,10 @@ async function growAndGroup({ n, verbose }) {
 		const size = polycube.sizeGroup();
 		let sizeGroup = sizeGroups.get(size);
 		if (!sizeGroup) {
-			sizeGroup = new Map();
+			sizeGroup = new Set();
 			sizeGroups.set(size, sizeGroup);
 		}
-		sizeGroup.set(polycube.serialized, polycube);
+		sizeGroup.add(utils.serial.string.shapeToCompact(polycube.shape));
 	}
 
 	polycubes.forEach((polycube, idx) => {
@@ -80,10 +80,10 @@ async function growAndGroup({ n, verbose }) {
 
 	const promises = [];
 	for (const [size, list] of sizeGroups) {
-		const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.ndjson`;
+		const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.compact.txt`;
 		function* streamShapes() {
-			for (const polycube of list.values()) {
-				yield `${JSON.stringify(polycube.shape)}\n`;
+			for (const compact of list.values()) {
+				yield `${compact}\n`;
 			}
 		}
 		promises.push(utils.file.pipelineWriteStream(sizeGroupCandidateFilepath, streamShapes));
@@ -102,9 +102,15 @@ async function growAndGroup({ n, verbose }) {
 async function rotateAndUniqueSizeGroup({ n, size, verbose }) {
 	if (verbose > 1) console.time(` … [n=${n}] [worker ${threadId}] [${size}] rotate and unique size group`);
 
-	const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.ndjson`;
+	const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.compact.txt`;
 	const sizeGroupFoundFilepath = `${TMP_DIR}/${size} found.ndjson`;
-	const polycubes = (await utils.file.loadNDJson(sizeGroupCandidateFilepath)).map((shape) => new Polycube({ shape }));
+
+	const polycubes = [];
+	for await (const line of utils.file.readlineStream(sizeGroupCandidateFilepath)) {
+		const compact = line.trim();
+		if (!compact) continue;
+		polycubes.push(new Polycube({ shape: utils.serial.string.compactToShape(compact) }));
+	}
 	if (verbose > 3) {
 		console.info(`   [n=${n}] [worker ${threadId}] [${size}] loaded ${polycubes.length} candidate shapes`);
 	}
