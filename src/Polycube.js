@@ -1,46 +1,6 @@
 const { DEDUP_ROTATIONS } = require('./options');
 const utils = require('./utils');
 
-/**
-	Encode runs of three or more z values as `{count}x{value}` to shorten Map keys.
-	This does no provide a substantial runtime difference, but it does reduce the final serial (68→52).
-
-	@example
-		`1_1_1_1_0_0_0` → `4x1_3x0`
-*/
-function serializeZValues(values) {
-	// return values.join('_');
-
-	/*
-	// first pass to check if there are any consecutive runs to collapse
-	let index = 0;
-	while (index + 2 < values.length
-		&& !(values[index] === values[index + 1] && values[index] === values[index + 2])) {
-		index += 1;
-	}
-	if (index + 2 >= values.length) return values.join('_');
-	*/
-
-	const serialized = [];
-	for (let index = 0; index < values.length;) {
-		let end = index + 1;
-		while (end < values.length && values[end] === values[index]) {
-			end += 1;
-		}
-
-		const count = end - index;
-		if (count >= 3) {
-			serialized.push(`${count}x${values[index]}`);
-		} else {
-			for (let i = 0; i < count; i += 1) {
-				serialized.push(values[index]);
-			}
-		}
-		index = end;
-	}
-	return serialized.join('_');
-}
-
 class Polycube {
 	/**
 		@param {number[][][]} shape - rectangular matrix; 0s are empty, 1s are full
@@ -55,16 +15,9 @@ class Polycube {
 
 	get serialized() {
 		if (!this.$serialized) {
-			// collapsing all consecutive z values is not worthwhile; e.g. n=7 has 0,0,0,0,0 at 47/1023 = 5%
-			// running a convolution (or other hash) over the serial doesn't buy much; this is used as a key, not just equality
 			// NOTE deduping is primarily done with a Map key, rather than Polycube.equals
 			// prettier-ignore
-			this.$serialized = this.shape.map((ys) => (
-				ys.map((zs) => (
-					serializeZValues(zs)
-					// zs.join('_') // '_' provides visual clarity, could use 'z' for technical clarity
-				)).join(' ') // ' ' provides visual clarity, could use 'y' for technical clarity
-			)).join('/'); // '/' provides visual clarity, could use 'x' for technical clarity
+			this.$serialized = utils.serial.string.shapeToPretty(this.shape);
 		}
 		return this.$serialized;
 	}
@@ -100,20 +53,7 @@ class Polycube {
 		@returns {string} "x/y/z+corners"
 	*/
 	sizeGroup() {
-		const [xLength, yLength, zLength] = this.size();
-		const xMax = xLength - 1;
-		const yMax = yLength - 1;
-		const zMax = zLength - 1;
-		const corners =
-			this.shape[0][0][0] +
-			this.shape[xMax][0][0] +
-			this.shape[0][yMax][0] +
-			this.shape[xMax][yMax][0] +
-			this.shape[0][0][zMax] +
-			this.shape[xMax][0][zMax] +
-			this.shape[0][yMax][zMax] +
-			this.shape[xMax][yMax][zMax];
-		return `${xLength}x${yLength}x${zLength}+${corners}`;
+		return utils.serial.string.calcSizeGroupFromShape(this.shape);
 	}
 
 	/**

@@ -1,5 +1,6 @@
 const utilsShape = require('./shape');
 
+// TODO (experiment) use this instead of actually rotating the shapes
 const utilsRotation = {
 	equals: {
 		/**
