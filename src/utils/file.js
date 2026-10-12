@@ -25,6 +25,7 @@ const utilsFile = {
 			});
 		}),
 
+	/** like ndjson, but still json */
 	saveArrayJson: (filepath, array) =>
 		new Promise((resolve, reject) => {
 			const content = `[\n${array.map((v) => JSON.stringify(v)).join(',\n')}\n]`;
@@ -35,6 +36,23 @@ const utilsFile = {
 					resolve();
 				}
 			});
+		}),
+
+	saveNDJson: (filepath, array) =>
+		new Promise((resolve, reject) => {
+			const content = array.map((v) => JSON.stringify(v)).join('\n');
+			fs.writeFile(filepath, content, (err) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve();
+				}
+			});
+		}),
+
+	loadNDJson: (filepath) =>
+		utilsFile.loadFile(filepath).then((content) => {
+			return content.split('\n').map((line) => JSON.parse(line));
 		}),
 
 	listFiles: (folder) =>

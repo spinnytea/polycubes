@@ -41,7 +41,7 @@ async function checkPreviousRun({ n, verbose }) {
 	if (verbose > 1) console.timeEnd(` … [n=${n}] [worker ${threadId}] checking previous run`);
 }
 
-// FIXME review this impl, right now we are just YOLO to get it running
+// TODO (2-priority) (benchmark) this is blowing up memory
 async function growAndGroup({ n, verbose }) {
 	if (verbose > 1) console.time(` … [n=${n}] [worker ${threadId}] grow and group`);
 
@@ -52,7 +52,6 @@ async function growAndGroup({ n, verbose }) {
 	}
 
 	const sizeGroups = new Map();
-	// FIXME convert to "addToSizeGroup"
 	function getSizeGroup(polycube) {
 		const size = polycube.sizeGroup();
 		let sizeGroup = sizeGroups.get(size);
@@ -86,10 +85,10 @@ async function growAndGroup({ n, verbose }) {
 
 	const promises = [];
 	for (const [size, list] of sizeGroups) {
-		const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.json`;
+		const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.ndjson`;
 		const shapes = [];
 		for (const polycube of list.values()) shapes.push(polycube.shape);
-		promises.push(utils.file.saveArrayJson(sizeGroupCandidateFilepath, shapes));
+		promises.push(utils.file.saveNDJson(sizeGroupCandidateFilepath, shapes));
 		if (verbose > 3) {
 			console.info(`   [n=${n}] [worker ${threadId}] saving group ${size} with ${shapes.length} candidate shapes`);
 		}
@@ -102,13 +101,12 @@ async function growAndGroup({ n, verbose }) {
 	return Array.from(sizeGroups.keys());
 }
 
-// FIXME review this impl, right now we are just YOLO to get it running
 async function rotateAndUniqueSizeGroup({ n, size, verbose }) {
 	if (verbose > 1) console.time(` … [n=${n}] [worker ${threadId}] [${size}] rotate and unique size group`);
 
-	const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.json`;
-	const sizeGroupFoundFilepath = `${TMP_DIR}/${size} found.json`;
-	const polycubes = (await utils.file.loadJson(sizeGroupCandidateFilepath)).map((shape) => new Polycube({ shape }));
+	const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.ndjson`;
+	const sizeGroupFoundFilepath = `${TMP_DIR}/${size} found.ndjson`;
+	const polycubes = (await utils.file.loadNDJson(sizeGroupCandidateFilepath)).map((shape) => new Polycube({ shape }));
 	if (verbose > 3) {
 		console.info(`   [n=${n}] [worker ${threadId}] [${size}] loaded ${polycubes.length} candidate shapes`);
 	}
@@ -119,7 +117,7 @@ async function rotateAndUniqueSizeGroup({ n, size, verbose }) {
 		foundMap.set(normalized.serialized, normalized);
 	});
 	const found = Array.from(foundMap.values()).map((polycube) => polycube.shape);
-	await utils.file.saveArrayJson(sizeGroupFoundFilepath, found);
+	await utils.file.saveNDJson(sizeGroupFoundFilepath, found);
 	if (verbose > 2) console.info(`   [n=${n}] [worker ${threadId}] [${size}] found/saved ${found.length} shapes`);
 
 	if (verbose > 1) console.timeEnd(` … [n=${n}] [worker ${threadId}] [${size}] rotate and unique size group`);
@@ -128,11 +126,13 @@ async function rotateAndUniqueSizeGroup({ n, size, verbose }) {
 async function combineSizeGroups({ n, verbose }) {
 	if (verbose > 1) console.time(` … [n=${n}] [worker ${threadId}] combine size group`);
 
-	const foundFilepaths = (await utils.file.listFiles(TMP_DIR)).filter((fp) => fp.endsWith('found.json'));
+	const foundFilepaths = (await utils.file.listFiles(TMP_DIR)).filter((fp) => fp.endsWith('found.ndjson'));
 	if (verbose > 3) console.info(`   [n=${n}] [worker ${threadId}] found ${foundFilepaths.length} size groups`);
 
 	// "cat" files of the shape `saveArrayJson`
 	// stream the list of files into a single output file
+	// TODO (2-priority) (ndjson) move stream save/load ndjson (all imports) into `utils.file`
+	//  - i.e. pass function* streamShapes and filepath
 	const nFilepath = `./precomputed/${n}.json`;
 	let shapeCount = 0;
 	async function* streamShapes() {
@@ -146,7 +146,7 @@ async function combineSizeGroups({ n, verbose }) {
 			for await (const line of lines) {
 				const shape = line.trim();
 				if (!shape || shape === '[' || shape === ']') continue;
-				yield `${first ? '' : ',\n'}${shape.endsWith(',') ? shape.slice(0, -1) : shape}`;
+				yield `${first ? '' : ',\n'}${shape}`;
 				first = false;
 				shapeCount++;
 			}

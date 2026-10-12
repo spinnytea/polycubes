@@ -53,30 +53,30 @@ describe('generate flat', () => {
 			expect(gs).toBe(166);
 		});
 
-		test('n=7 => 1023', async () => {
+		test('n=7 => 1_023', async () => {
 			const gs = await generateNextPGA(undefined, { n: 7 });
-			expect(gs).toBe(1023);
+			expect(gs).toBe(1_023);
 		});
 
-		test('n=8 => 6922', async () => {
+		test('n=8 => 6_922', async () => {
 			const gs = await generateNextPGA(undefined, { n: 8 });
-			expect(gs).toBe(6922);
+			expect(gs).toBe(6_922);
 		});
 
-		test.todo('n=9 => 48311');
+		test.todo('n=9 => 48_311');
 
-		test.todo('n=10 => 346543');
+		test.todo('n=10 => 346_543');
 
-		test.todo('n=11 => 2522522');
+		test.todo('n=11 => 2_522_522');
 
-		test.todo('n=12 => 18598427');
+		test.todo('n=12 => 18_598_427');
 
-		test.todo('n=13 => 138462649');
+		test.todo('n=13 => 138_462_649');
 
-		test.todo('n=14 => 1039496297');
+		test.todo('n=14 => 1_039_496_297');
 
-		test.todo('n=15 => 7859514470');
+		test.todo('n=15 => 7_859_514_470');
 
-		test.todo('n=16 => 59795121480');
+		test.todo('n=16 => 59_795_121_480');
 	});
 });
