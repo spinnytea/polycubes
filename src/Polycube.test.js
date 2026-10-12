@@ -1,3 +1,4 @@
+import { describe, test, expect } from 'vitest';
 const Polycube = require('./Polycube');
 const utils = require('./utils');
 
@@ -123,6 +124,7 @@ describe('Polycube', () => {
 			rotations.forEach((r1, idx1) => {
 				rotations.forEach((r2, idx2) => {
 					if (idx1 !== idx2) {
+						// eslint-disable-next-line vitest/no-conditional-expect
 						expect(utils.shape.equals(r1.shape, r2.shape)).toBe(false);
 					}
 				});

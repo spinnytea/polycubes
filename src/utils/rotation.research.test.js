@@ -1,6 +1,8 @@
+import { describe, test, expect } from 'vitest';
 const utils = require('.');
 
 describe('utils.rotation research', () => {
+	// prettier-ignore
 	const shape = [[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12]], [[13, 14, 15, 16], [17, 18, 19, 20], [21, 22, 23, 24]]];
 
 	/**
@@ -103,8 +105,7 @@ describe('utils.rotation research', () => {
 			['x', 'z', 'z'],
 		]);
 
-		const rotationNames = rotatedDirs
-			.map((ds) => (ds.length ? ds.join('') : undefined));
+		const rotationNames = rotatedDirs.map((ds) => (ds.length ? ds.join('') : undefined));
 		expect(rotationNames.length).toBe(24);
 		expect(rotationNames).toEqual(utils.rotation.allNames);
 	});
@@ -118,25 +119,39 @@ describe('utils.rotation research', () => {
 		/** neg (inverseSingle) */
 		function neg(d) {
 			switch (d) {
-				case 'x': return 'nX';
-				case 'y': return 'nY';
-				case 'z': return 'nZ';
-				case 'nX': return 'x';
-				case 'nY': return 'y';
-				case 'nZ': return 'z';
-				default: throw new Error(`whoops: ${d}`);
+				case 'x':
+					return 'nX';
+				case 'y':
+					return 'nY';
+				case 'z':
+					return 'nZ';
+				case 'nX':
+					return 'x';
+				case 'nY':
+					return 'y';
+				case 'nZ':
+					return 'z';
+				default:
+					throw new Error(`whoops: ${d}`);
 			}
 		}
 
 		function rotateCoord([x, y, z], d) {
 			switch (d) {
-				case 'x': return [x, z, neg(y)];
-				case 'nX': return [x, neg(z), y];
-				case 'y': return [z, y, neg(x)];
-				case 'nY': return [neg(z), y, x];
-				case 'z': return [y, neg(x), z];
-				case 'nZ': return [neg(y), x, z];
-				default: throw new Error(`whoops: ${d}`);
+				case 'x':
+					return [x, z, neg(y)];
+				case 'nX':
+					return [x, neg(z), y];
+				case 'y':
+					return [z, y, neg(x)];
+				case 'nY':
+					return [neg(z), y, x];
+				case 'z':
+					return [y, neg(x), z];
+				case 'nZ':
+					return [neg(y), x, z];
+				default:
+					throw new Error(`whoops: ${d}`);
 			}
 		}
 
@@ -152,8 +167,7 @@ describe('utils.rotation research', () => {
 					// combine 'n', 'X' into 'nX'
 					rotations.push(ds[i] + ds[i + 1]);
 					i += 1;
-				}
-				else {
+				} else {
 					rotations.push(ds[i]);
 				}
 			}
@@ -185,7 +199,11 @@ describe('utils.rotation research', () => {
 
 		test('inverseRotations', () => {
 			Object.entries(utils.rotation.inverseRotations).forEach(([k, v]) => {
-				expect(splitStrToRotations(k).map((d) => neg(d)).reverse()).toEqual(v);
+				expect(
+					splitStrToRotations(k)
+						.map((d) => neg(d))
+						.reverse()
+				).toEqual(v);
 			});
 		});
 
@@ -234,15 +252,14 @@ describe('utils.rotation research', () => {
 			};
 
 			Object.keys(utils.rotation.equals).forEach((k) => {
-				test(k, () => {
-					expect(splitStrToRotations(k).reduce((coords, d) => rotateCoord(coords, d), ['x', 'y', 'z']))
-						.toEqual(expected[k]);
+				test(`${k}`, () => {
+					expect(splitStrToRotations(k).reduce((coords, d) => rotateCoord(coords, d), ['x', 'y', 'z'])).toEqual(expected[k]);
 				});
 			});
 
 			describe('duplicates', () => {
 				Object.entries(expected).forEach(([k, v]) => {
-					test(k, () => {
+					test(`${k}`, () => {
 						const found = Object.entries(expected).find(([k2, v2]) => k2 !== k && v2.join('') === v.join(''));
 						expect(found).toBe(undefined);
 					});
@@ -258,7 +275,9 @@ describe('utils.rotation research', () => {
 				const coords = ['x', 'y', 'z'];
 				const rotatedCoords = [coords];
 				const rotatedDirs = [[]];
-				function coordsEqual(a, b) { return a[0] === b[0] && a[1] === b[1] && a[2] === b[2]; }
+				function coordsEqual(a, b) {
+					return a[0] === b[0] && a[1] === b[1] && a[2] === b[2];
+				}
 
 				// brute force
 				const dirs = ['x', 'y', 'z', 'nX', 'nY', 'nZ'];
@@ -316,15 +335,14 @@ describe('utils.rotation research', () => {
 				// rotate should have a length of 24
 				expect(rotatedCoords.length).toBe(24);
 				expect(rotatedDirs.length).toBe(24);
-				expect(rotatedDirs.map((c) => (c.join('') || 'undefined'))).toEqual(Object.keys(expected));
+				expect(rotatedDirs.map((c) => c.join('') || 'undefined')).toEqual(Object.keys(expected));
 				const expectedDirs = Object.values(expected);
 				rotatedCoords.forEach((c) => {
 					const exists = expectedDirs.find((r) => r.join('') === c.join(''));
 					expect(c).toEqual(exists);
 				});
 
-				const rotationNames = rotatedDirs
-					.map((ds) => (ds.length ? ds.join('') : undefined));
+				const rotationNames = rotatedDirs.map((ds) => (ds.length ? ds.join('') : undefined));
 				expect(rotationNames.length).toBe(24);
 				expect(rotationNames).toEqual(utils.rotation.allNames);
 			});

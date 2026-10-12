@@ -31,8 +31,7 @@ function serializeZValues(values) {
 		const count = end - index;
 		if (count >= 3) {
 			serialized.push(`${count}x${values[index]}`);
-		}
-		else {
+		} else {
 			for (let i = 0; i < count; i += 1) {
 				serialized.push(values[index]);
 			}
@@ -59,6 +58,7 @@ class Polycube {
 			// collapsing all consecutive z values is not worthwhile; e.g. n=7 has 0,0,0,0,0 at 47/1023 = 5%
 			// running a convolution (or other hash) over the serial doesn't buy much; this is used as a key, not just equality
 			// NOTE deduping is primarily done with a Map key, rather than Polycube.equals
+			// prettier-ignore
 			this.$serialized = this.shape.map((ys) => (
 				ys.map((zs) => (
 					serializeZValues(zs)
@@ -104,15 +104,16 @@ class Polycube {
 		const xMax = xLength - 1;
 		const yMax = yLength - 1;
 		const zMax = zLength - 1;
-		const corners = this.shape[0][0][0]
-			+ this.shape[xMax][0][0]
-			+ this.shape[0][yMax][0]
-			+ this.shape[xMax][yMax][0]
-			+ this.shape[0][0][zMax]
-			+ this.shape[xMax][0][zMax]
-			+ this.shape[0][yMax][zMax]
-			+ this.shape[xMax][yMax][zMax];
-		return `${xLength}/${yLength}/${zLength}+${corners}`;
+		const corners =
+			this.shape[0][0][0] +
+			this.shape[xMax][0][0] +
+			this.shape[0][yMax][0] +
+			this.shape[xMax][yMax][0] +
+			this.shape[0][0][zMax] +
+			this.shape[xMax][0][zMax] +
+			this.shape[0][yMax][zMax] +
+			this.shape[xMax][yMax][zMax];
+		return `${xLength}x${yLength}x${zLength}+${corners}`;
 	}
 
 	/**
@@ -123,7 +124,14 @@ class Polycube {
 		@returns {number}
 	*/
 	n() {
-		return this.shape.reduce((rx, ys) => (rx + ys.reduce((ry, zs) => (ry + zs.reduce((rz, v) => (rz + (v === 1 ? 1 : 0)), 0)), 0)), 0);
+		// prettier-ignore
+		return this.shape.reduce((rx, ys) => (
+			rx + ys.reduce((ry, zs) => (
+				ry + zs.reduce((rz, v) => (
+					rz + (v === 1 ? 1 : 0)
+				), 0)
+			), 0)
+		), 0);
 	}
 
 	/**
@@ -152,7 +160,8 @@ class Polycube {
 	*/
 	rotations(dedupRotations = DEDUP_ROTATIONS) {
 		const { shape, orientation } = this;
-		return utils.shape.makeRotations(shape, orientation, dedupRotations)
+		return utils.shape
+			.makeRotations(shape, orientation, dedupRotations)
 			.map((s) => (s === shape ? this : new Polycube({ shape: s, orientation })));
 	}
 
@@ -164,11 +173,10 @@ class Polycube {
 	*/
 	normalize() {
 		const { shape, orientation } = this;
-		return utils.shape.makeRotations(shape, orientation, false, true)
+		return utils.shape
+			.makeRotations(shape, orientation, false, true)
 			.map((rotatedShape) => new Polycube({ shape: rotatedShape, orientation }))
-			.reduce((best, candidate) => (
-				candidate.serialized > best.serialized ? candidate : best
-			));
+			.reduce((best, candidate) => (candidate.serialized > best.serialized ? candidate : best));
 	}
 }
 

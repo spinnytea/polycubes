@@ -1,11 +1,12 @@
+import { describe, test, expect } from 'vitest';
 const Polycube = require('../Polycube');
-
 const { generateNextFlat } = require('./simple_flat');
 
 describe('generate flat', () => {
 	const n1 = new Polycube({ shape: [[[1]]] });
 	const n2 = new Polycube({ shape: [[[1, 1]]] });
 	const n3a = new Polycube({ shape: [[[1, 1, 1]]] });
+	// prettier-ignore
 	const n3b = new Polycube({ shape: [[[1, 1], [1, 0]]] });
 
 	describe('generateNextFlat', () => {
