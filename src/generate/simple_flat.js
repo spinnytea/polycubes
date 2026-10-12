@@ -1,6 +1,5 @@
 const Polycube = require('../Polycube');
 const utils = require('../utils');
-const { listLocationsToGrow, grow } = require('./simple_layers'); // TODO (techdebt) remove dependency
 
 /**
 	n=(n-1) => size groups -> rotate and local dedup -> aggregate
@@ -47,10 +46,11 @@ function generateNextFlat(polycubes, { verbose } = {}) {
 	}
 
 	polycubes.forEach((polycube, idx) => {
-		const locations = listLocationsToGrow(polycube);
-		const nexts = locations
-			.map((location) => grow(polycube, location))
-			.map((next) => new Polycube(utils.shape.normalizeOrientation(next.shape)));
+		const locations = utils.shape.grow.listLocationsToGrow(polycube.shape);
+		const nexts = locations.map(
+			(location) =>
+				new Polycube(utils.shape.normalizeOrientation(utils.shape.grow.growAtLocation(polycube.shape, location)))
+		);
 
 		nexts.forEach((next) => {
 			const sizeGroup = getSizeGroup(next);

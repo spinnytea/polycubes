@@ -35,6 +35,82 @@ const utilsShape = {
 	*/
 	size: (shape) => [shape.length, shape[0].length, shape[0][0].length],
 
+	grow: {
+		/** list all the places we could place the next cube */
+		listLocationsToGrow: (shape) => {
+			const locations = [];
+
+			function checkNewLocation(x, y, z) {
+				if (shape[x]?.[y]?.[z] !== 1) {
+					locations.push([x, y, z]);
+				}
+			}
+
+			shape.forEach((ys, x) => {
+				ys.forEach((zs, y) => {
+					zs.forEach((v, z) => {
+						if (v === 1) {
+							// x,y,z is filled in
+							// we can do any of the adjacent squares
+							// don't grow to a new location if it's already filled in
+							checkNewLocation(x + 1, y, z);
+							checkNewLocation(x - 1, y, z);
+							checkNewLocation(x, y + 1, z);
+							checkNewLocation(x, y - 1, z);
+							checkNewLocation(x, y, z + 1);
+							checkNewLocation(x, y, z - 1);
+						}
+					});
+				});
+			});
+
+			return locations;
+		},
+
+		/** add the cube at this location, expand the shape if needed */
+		growAtLocation: (shape, location) => {
+			let [x, y, z] = location;
+			shape = utilsShape.clone(shape);
+			const [xLength, yLength, zLength] = utilsShape.size(shape);
+
+			// if (x < -1) throw new Error('x is too small');
+			// if (x > xLength) throw new Error('x is too large');
+			// if (y < -1) throw new Error('y is too small');
+			// if (y > yLength) throw new Error('y is too large');
+			// if (z < -1) throw new Error('z is too small');
+			// if (z > zLength) throw new Error('z is too large');
+
+			if (x === -1) {
+				utilsShape.expand.nX(shape);
+				// we shifted the whole thing over to make room for this
+				x = 0;
+			} else if (x === xLength) {
+				utilsShape.expand.x(shape);
+				// x is now valid
+			} else if (y === -1) {
+				utilsShape.expand.nY(shape);
+				// we shifted the whole thing over to make room for this
+				y = 0;
+			} else if (y === yLength) {
+				utilsShape.expand.y(shape);
+				// y is now valid
+			} else if (z === -1) {
+				utilsShape.expand.nZ(shape);
+				// we shifted the whole thing over to make room for this
+				z = 0;
+			} else if (z === zLength) {
+				utilsShape.expand.z(shape);
+				// z is now valid
+			} else if (shape[x][y][z] === 1) {
+				// return null;
+				throw new Error(`[${x},${y},${z}] is already filled in, this should be prevented sooner`);
+			}
+
+			shape[x][y][z] = 1;
+			return shape;
+		},
+	},
+
 	expand: {
 		/**
 			@sideeffects

@@ -6,7 +6,6 @@ const { pipeline } = require('node:stream/promises');
 const { threadId } = require('node:worker_threads');
 const Polycube = require('../Polycube');
 const utils = require('../utils');
-const { listLocationsToGrow, grow } = require('./simple_layers'); // FIXME remove dependency
 
 /*
 	NOTE about threading and workers
@@ -63,10 +62,11 @@ async function growAndGroup({ n, verbose }) {
 	}
 
 	polycubes.forEach((polycube, idx) => {
-		const locations = listLocationsToGrow(polycube);
-		const nexts = locations
-			.map((location) => grow(polycube, location))
-			.map((next) => new Polycube(utils.shape.normalizeOrientation(next.shape)));
+		const locations = utils.shape.grow.listLocationsToGrow(polycube.shape);
+		const nexts = locations.map(
+			(location) =>
+				new Polycube(utils.shape.normalizeOrientation(utils.shape.grow.growAtLocation(polycube.shape, location)))
+		);
 
 		nexts.forEach((next) => {
 			const sizeGroup = getSizeGroup(next);

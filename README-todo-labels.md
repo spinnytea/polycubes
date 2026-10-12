@@ -6,5 +6,4 @@
   2 (modivation)
   3 (ndjson)
   8 (optimize)
-  1 (techdebt)
   2 (validation)
