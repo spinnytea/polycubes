@@ -1,8 +1,4 @@
 const workerpool = require('workerpool');
-const fs = require('node:fs');
-const readline = require('node:readline');
-const { Readable } = require('node:stream');
-const { pipeline } = require('node:stream/promises');
 const { threadId } = require('node:worker_threads');
 const Polycube = require('../Polycube');
 const utils = require('../utils');
@@ -131,25 +127,19 @@ async function combineSizeGroups({ n, verbose }) {
 
 	// "cat" files of the shape `ndjson`
 	// stream the list of files into a single output file
-	// TODO (2-priority) (ndjson) move stream save/load ndjson (all imports) into `utils.file`
-	//  - i.e. pass function* streamShapes and filepath
 	const nFilepath = `./precomputed/${n}.ndjson`;
 	let shapeCount = 0;
 	async function* streamShapes() {
 		for (const fp of foundFilepaths) {
-			const lines = readline.createInterface({
-				input: fs.createReadStream(fp),
-				crlfDelay: Infinity,
-			});
-			for await (const line of lines) {
+			for await (const line of utils.file.readlineStream(fp)) {
 				const shape = line.trim();
-				if (!shape || shape === '[' || shape === ']') continue;
+				if (!shape) continue;
 				yield `${shape}\n`;
 				shapeCount++;
 			}
 		}
 	}
-	await pipeline(Readable.from(streamShapes()), fs.createWriteStream(nFilepath));
+	await utils.file.pipelineWriteStream(nFilepath, streamShapes);
 	if (verbose > 2) console.info(`   [n=${n}] [worker ${threadId}] combined ${shapeCount} shapes`);
 
 	if (verbose > 1) console.timeEnd(` … [n=${n}] [worker ${threadId}] combine size group`);
