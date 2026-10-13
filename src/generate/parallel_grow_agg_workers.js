@@ -40,12 +40,6 @@ async function checkPreviousRun({ n, verbose }) {
 async function growAndGroup({ n, verbose }) {
 	if (verbose > 1) console.time(` … [n=${n}] [worker ${threadId}] grow and group`);
 
-	const filepath = `./precomputed/${n - 1}.ndjson`;
-	const polycubes = (await utils.file.loadNDJson(filepath)).map((shape) => new Polycube({ shape }));
-	if (verbose > 2) {
-		console.info(`   [n=${n}] [worker ${threadId}] loaded ${polycubes.length} shapes from n-1=${n - 1}`);
-	}
-
 	const sizeGroups = new Map();
 	function addToSizeGroup(polycube) {
 		const size = polycube.sizeGroup();
@@ -57,26 +51,28 @@ async function growAndGroup({ n, verbose }) {
 		sizeGroup.add(utils.serial.string.shapeToCompact(polycube.shape));
 	}
 
-	polycubes.forEach((polycube, idx) => {
-		const locations = utils.shape.grow.listLocationsToGrow(polycube.shape);
-		const nexts = locations.map(
-			(location) =>
-				new Polycube(utils.shape.normalizeOrientation(utils.shape.grow.growAtLocation(polycube.shape, location)))
-		);
+	const filepath = `./precomputed/${n - 1}.ndjson`;
+	for await (const line of utils.file.readlineStream(filepath)) {
+		const s = line.trim();
+		if (!s) continue;
+		const shape = JSON.parse(line);
 
+		const locations = utils.shape.grow.listLocationsToGrow(shape);
+		const nexts = locations.map(
+			(location) => new Polycube(utils.shape.normalizeOrientation(utils.shape.grow.growAtLocation(shape, location)))
+		);
 		nexts.forEach((next) => {
 			addToSizeGroup(next);
 		});
+
 		if (verbose > 3) {
 			let nextsCount = 0;
 			sizeGroups.forEach((list) => {
 				nextsCount += list.size;
 			});
-			console.info(
-				`   [n=${n}] [worker ${threadId}] ${idx + 1} of ${polycubes.length}: found ${nextsCount} total options`
-			);
+			console.info(`   [n=${n}] [worker ${threadId}] found ${nextsCount} total options`);
 		}
-	});
+	}
 
 	const promises = [];
 	for (const [size, list] of sizeGroups) {
