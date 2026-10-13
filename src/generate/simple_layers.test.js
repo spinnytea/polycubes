@@ -34,7 +34,7 @@ describe('generate simple', () => {
 			expect(gs.length).toBe(166);
 		});
 
-		test.todo('n=7 => 1023');
+		test.todo('n=7 => 1_023');
 	});
 
 	describe('generateNextGroupBySize', () => {
@@ -63,11 +63,11 @@ describe('generate simple', () => {
 			expect(gs.length).toBe(166);
 		});
 
-		test('n=7 => 1023', () => {
+		test('n=7 => 1_023', () => {
 			const gs = generateNextGroupBySize(generateNextGroupBySize(generateNextGroupBySize(generateNextGroupBySize([n3a, n3b]))));
-			expect(gs.length).toBe(1023);
+			expect(gs.length).toBe(1_023);
 		});
 
-		test.todo('n=8 => 6922');
+		test.todo('n=8 => 6_922');
 	});
 });

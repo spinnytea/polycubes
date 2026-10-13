@@ -105,24 +105,27 @@ async function rotateAndUniqueSizeGroup({ n, size, verbose }) {
 	const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.compact.txt`;
 	const sizeGroupFoundFilepath = `${TMP_DIR}/${size} found.ndjson`;
 
-	const polycubes = [];
+	const foundMap = new Map();
+	let candidateCount = 0;
 	for await (const line of utils.file.readlineStream(sizeGroupCandidateFilepath)) {
 		const compact = line.trim();
 		if (!compact) continue;
-		polycubes.push(new Polycube({ shape: utils.serial.string.compactToShape(compact) }));
-	}
-	if (verbose > 3) {
-		console.info(`   [n=${n}] [worker ${threadId}] [${size}] loaded ${polycubes.length} candidate shapes`);
-	}
-
-	const foundMap = new Map();
-	polycubes.forEach((polycube) => {
+		const polycube = new Polycube({ shape: utils.serial.string.compactToShape(compact) });
 		const normalized = polycube.normalize();
 		foundMap.set(normalized.serialized, normalized);
-	});
-	const found = Array.from(foundMap.values()).map((polycube) => polycube.shape);
-	await utils.file.saveNDJson(sizeGroupFoundFilepath, found);
-	if (verbose > 2) console.info(`   [n=${n}] [worker ${threadId}] [${size}] found/saved ${found.length} shapes`);
+		candidateCount++;
+	}
+
+	function* streamShapes() {
+		for (const polycube of foundMap.values()) {
+			yield `${JSON.stringify(polycube.shape)}\n`;
+		}
+	}
+	await utils.file.pipelineWriteStream(sizeGroupFoundFilepath, streamShapes);
+	if (verbose > 3) {
+		console.info(`   [n=${n}] [worker ${threadId}] [${size}] processed ${candidateCount} candidate shapes`);
+	}
+	if (verbose > 2) console.info(`   [n=${n}] [worker ${threadId}] [${size}] found/saved ${foundMap.size} shapes`);
 
 	if (verbose > 1) console.timeEnd(` … [n=${n}] [worker ${threadId}] [${size}] rotate and unique size group`);
 }
