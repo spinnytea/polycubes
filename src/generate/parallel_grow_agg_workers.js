@@ -40,6 +40,11 @@ async function checkPreviousRun({ n, verbose }) {
 async function growAndGroup({ n, verbose }) {
 	if (verbose > 1) console.time(` … [n=${n}] [worker ${threadId}] grow and group`);
 
+	// - TODO (2-priority) (ndjson) could this map be a list of files instead?
+	//    - generally we are using maps to de-dup items or lists
+	//    - this does dedup using a Set, which we would have to defer (larger list of candidates)
+	//    - we could do a "set dedup" pass
+	//    - that would be a ton of "open this file, write one line, close this file"
 	const sizeGroups = new Map();
 	function addToSizeGroup(polycube) {
 		const size = polycube.sizeGroup();
@@ -95,6 +100,15 @@ async function growAndGroup({ n, verbose }) {
 	return Array.from(sizeGroups.keys());
 }
 
+// TODO (2-priority) (benchmark) we did manage to get through growAndGroup once, only to crash at this part
+//  - each "job" could be "run again" or rather;
+//    - checkPreviousRun is one job, has to happen in one node evocation
+//    - growAndGroup is one job, has to happen in one node evocation
+//    - rotateAndUniqueSizeGroup runs once for each sizeGroup, each size group needs one evocation, but there are many groups
+//    - combineSizeGroups is ... just streaming files together that one is fine
+//  - what if we deleted files as we were done with them (if we cleaned up tmp afterwards)
+//    - that really only helps with "rotateAndUniqueSizeGroup", but then again, that's what we need now
+//    - if we had growAndGroup backed by fs instead of memory map, there'd be a second simple dedup
 async function rotateAndUniqueSizeGroup({ n, size, verbose }) {
 	if (verbose > 1) console.time(` … [n=${n}] [worker ${threadId}] [${size}] rotate and unique size group`);
 

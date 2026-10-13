@@ -50,9 +50,6 @@ Doing things in layers was a nice tutorial, but now it's time to get started. Br
 \([5432]-priority\)
 ```
 
-- TODO (2-priority) (ndjson) all "maps" could be "files" where each key is just a folder or file
-   - generally we are using maps to de-dup items or lists
-   - we could write the item or list into the file on it's own line (ndjson)
 - TODO (benchmark) Add progress reporting, elapsed-time estimates, and checkpoint/resume for long enumeration runs.
 - TODO (optimize) Reduce memory use by streaming or aggregating candidates instead of retaining large intermediate collections.
 - TODO (benchmark) Profile and optimize duplicate detection, especially rotation and canonicalization.
@@ -69,10 +66,14 @@ Doing things in layers was a nice tutorial, but now it's time to get started. Br
      symmetry detection is per unique parent, not per candidate child.
      The real question is whether that one-time cost saves enough child generation and canonicalization
      across the parent’s growth sites.
+   - or another way: we need to rotate all the children and check for matches;
+     how expensive is it to rotate the parents and detect ~~symetries~~ matches
 - TODO (optimize) Track each shape's empty face-neighbors incrementally instead of rescanning the full array to find growth locations.
 - TODO (optimize) Evaluate alternate shape representations - compact bitset or coordinate-based shape encodings to reduce array-copying, rotation, serialization, and hashing costs.
    - `utils.shape` → `utils.shape.array` + `utils.shape.points`
 - TODO (optimize) Define a canonical shape key from the smallest encoding among valid rotations and reuse it for deduplication.
+- IDEA (research) explore the distribution of sizeGroup, any way to break up the larger ones?
+- TODO (refactor) rename "sizeGroup" to "dimensions" or "bbox"
 
 # References
 
