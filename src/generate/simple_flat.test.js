@@ -38,30 +38,18 @@ describe('generate flat', () => {
 			expect(gs.length).toBe(166);
 		});
 
-		test('n=7 => 1023', () => {
+		test('n=7 => 1_023', () => {
 			const gs = generateNextFlat(generateNextFlat(generateNextFlat(generateNextFlat([n3a, n3b]))));
-			expect(gs.length).toBe(1023);
+			expect(gs.length).toBe(1_023);
 		});
 
-		test('n=8 => 6922', () => {
+		test('n=8 => 6_922', () => {
 			const gs = generateNextFlat(generateNextFlat(generateNextFlat(generateNextFlat(generateNextFlat([n3a, n3b])))));
-			expect(gs.length).toBe(6922);
+			expect(gs.length).toBe(6_922);
 		});
 
-		test.todo('n=9 => 48311');
+		test.todo('n=9 => 48_311');
 
-		test.todo('n=10 => 346543');
-
-		test.todo('n=11 => 2522522');
-
-		test.todo('n=12 => 18598427');
-
-		test.todo('n=13 => 138462649');
-
-		test.todo('n=14 => 1039496297');
-
-		test.todo('n=15 => 7859514470');
-
-		test.todo('n=16 => 59795121480');
+		test.todo('n=10 => 346_543');
 	});
 });

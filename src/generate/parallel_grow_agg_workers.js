@@ -1,8 +1,4 @@
 const workerpool = require('workerpool');
-const fs = require('node:fs');
-const readline = require('node:readline');
-const { Readable } = require('node:stream');
-const { pipeline } = require('node:stream/promises');
 const { threadId } = require('node:worker_threads');
 const Polycube = require('../Polycube');
 const utils = require('../utils');
@@ -21,7 +17,7 @@ workerpool.worker({ checkPreviousRun, growAndGroup, rotateAndUniqueSizeGroup, co
 async function checkPreviousRun({ n, verbose }) {
 	if (verbose > 1) console.time(` … [n=${n}] [worker ${threadId}] checking previous run`);
 
-	const filepath = `./precomputed/${n - 1}.json`;
+	const filepath = `./precomputed/${n - 1}.ndjson`;
 	if (!utils.file.existsSync(filepath)) {
 		throw new Error(`previous run '${filepath}' does not exist`);
 	}
@@ -44,21 +40,21 @@ async function checkPreviousRun({ n, verbose }) {
 async function growAndGroup({ n, verbose }) {
 	if (verbose > 1) console.time(` … [n=${n}] [worker ${threadId}] grow and group`);
 
-	const filepath = `./precomputed/${n - 1}.json`;
-	const polycubes = (await utils.file.loadJson(filepath)).map((shape) => new Polycube({ shape }));
+	const filepath = `./precomputed/${n - 1}.ndjson`;
+	const polycubes = (await utils.file.loadNDJson(filepath)).map((shape) => new Polycube({ shape }));
 	if (verbose > 2) {
 		console.info(`   [n=${n}] [worker ${threadId}] loaded ${polycubes.length} shapes from n-1=${n - 1}`);
 	}
 
 	const sizeGroups = new Map();
-	function getSizeGroup(polycube) {
+	function addToSizeGroup(polycube) {
 		const size = polycube.sizeGroup();
 		let sizeGroup = sizeGroups.get(size);
 		if (!sizeGroup) {
-			sizeGroup = new Map();
+			sizeGroup = new Set();
 			sizeGroups.set(size, sizeGroup);
 		}
-		return sizeGroup;
+		sizeGroup.add(utils.serial.string.shapeToCompact(polycube.shape));
 	}
 
 	polycubes.forEach((polycube, idx) => {
@@ -69,8 +65,7 @@ async function growAndGroup({ n, verbose }) {
 		);
 
 		nexts.forEach((next) => {
-			const sizeGroup = getSizeGroup(next);
-			sizeGroup.set(next.serialized, next);
+			addToSizeGroup(next);
 		});
 		if (verbose > 3) {
 			let nextsCount = 0;
@@ -85,12 +80,15 @@ async function growAndGroup({ n, verbose }) {
 
 	const promises = [];
 	for (const [size, list] of sizeGroups) {
-		const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.ndjson`;
-		const shapes = [];
-		for (const polycube of list.values()) shapes.push(polycube.shape);
-		promises.push(utils.file.saveNDJson(sizeGroupCandidateFilepath, shapes));
+		const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.compact.txt`;
+		function* streamShapes() {
+			for (const compact of list.values()) {
+				yield `${compact}\n`;
+			}
+		}
+		promises.push(utils.file.pipelineWriteStream(sizeGroupCandidateFilepath, streamShapes));
 		if (verbose > 3) {
-			console.info(`   [n=${n}] [worker ${threadId}] saving group ${size} with ${shapes.length} candidate shapes`);
+			console.info(`   [n=${n}] [worker ${threadId}] saving group ${size} with ${list.size} candidate shapes`);
 		}
 	}
 	await Promise.all(promises);
@@ -104,21 +102,30 @@ async function growAndGroup({ n, verbose }) {
 async function rotateAndUniqueSizeGroup({ n, size, verbose }) {
 	if (verbose > 1) console.time(` … [n=${n}] [worker ${threadId}] [${size}] rotate and unique size group`);
 
-	const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.ndjson`;
+	const sizeGroupCandidateFilepath = `${TMP_DIR}/${size} candidates.compact.txt`;
 	const sizeGroupFoundFilepath = `${TMP_DIR}/${size} found.ndjson`;
-	const polycubes = (await utils.file.loadNDJson(sizeGroupCandidateFilepath)).map((shape) => new Polycube({ shape }));
-	if (verbose > 3) {
-		console.info(`   [n=${n}] [worker ${threadId}] [${size}] loaded ${polycubes.length} candidate shapes`);
-	}
 
 	const foundMap = new Map();
-	polycubes.forEach((polycube) => {
+	let candidateCount = 0;
+	for await (const line of utils.file.readlineStream(sizeGroupCandidateFilepath)) {
+		const compact = line.trim();
+		if (!compact) continue;
+		const polycube = new Polycube({ shape: utils.serial.string.compactToShape(compact) });
 		const normalized = polycube.normalize();
 		foundMap.set(normalized.serialized, normalized);
-	});
-	const found = Array.from(foundMap.values()).map((polycube) => polycube.shape);
-	await utils.file.saveNDJson(sizeGroupFoundFilepath, found);
-	if (verbose > 2) console.info(`   [n=${n}] [worker ${threadId}] [${size}] found/saved ${found.length} shapes`);
+		candidateCount++;
+	}
+
+	function* streamShapes() {
+		for (const polycube of foundMap.values()) {
+			yield `${JSON.stringify(polycube.shape)}\n`;
+		}
+	}
+	await utils.file.pipelineWriteStream(sizeGroupFoundFilepath, streamShapes);
+	if (verbose > 3) {
+		console.info(`   [n=${n}] [worker ${threadId}] [${size}] processed ${candidateCount} candidate shapes`);
+	}
+	if (verbose > 2) console.info(`   [n=${n}] [worker ${threadId}] [${size}] found/saved ${foundMap.size} shapes`);
 
 	if (verbose > 1) console.timeEnd(` … [n=${n}] [worker ${threadId}] [${size}] rotate and unique size group`);
 }
@@ -129,31 +136,21 @@ async function combineSizeGroups({ n, verbose }) {
 	const foundFilepaths = (await utils.file.listFiles(TMP_DIR)).filter((fp) => fp.endsWith('found.ndjson'));
 	if (verbose > 3) console.info(`   [n=${n}] [worker ${threadId}] found ${foundFilepaths.length} size groups`);
 
-	// "cat" files of the shape `saveArrayJson`
+	// "cat" files of the shape `ndjson`
 	// stream the list of files into a single output file
-	// TODO (2-priority) (ndjson) move stream save/load ndjson (all imports) into `utils.file`
-	//  - i.e. pass function* streamShapes and filepath
-	const nFilepath = `./precomputed/${n}.json`;
+	const nFilepath = `./precomputed/${n}.ndjson`;
 	let shapeCount = 0;
 	async function* streamShapes() {
-		yield '[\n';
-		let first = true;
 		for (const fp of foundFilepaths) {
-			const lines = readline.createInterface({
-				input: fs.createReadStream(fp),
-				crlfDelay: Infinity,
-			});
-			for await (const line of lines) {
+			for await (const line of utils.file.readlineStream(fp)) {
 				const shape = line.trim();
-				if (!shape || shape === '[' || shape === ']') continue;
-				yield `${first ? '' : ',\n'}${shape}`;
-				first = false;
+				if (!shape) continue;
+				yield `${shape}\n`;
 				shapeCount++;
 			}
 		}
-		yield '\n]';
 	}
-	await pipeline(Readable.from(streamShapes()), fs.createWriteStream(nFilepath));
+	await utils.file.pipelineWriteStream(nFilepath, streamShapes);
 	if (verbose > 2) console.info(`   [n=${n}] [worker ${threadId}] combined ${shapeCount} shapes`);
 
 	if (verbose > 1) console.timeEnd(` … [n=${n}] [worker ${threadId}] combine size group`);

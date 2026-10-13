@@ -3,8 +3,8 @@ const path = require('path');
 const utils = require('.');
 
 describe('utils.file', () => {
-	test('loadJson', async () => {
-		const json = await utils.file.loadJson(path.join(__dirname, '..', '..', 'precomputed', '1.json'));
+	test('loadNDJson', async () => {
+		const json = await utils.file.loadNDJson(path.join(__dirname, '..', '..', 'precomputed', '1.ndjson'));
 		expect(json).toEqual([[[[1]]]]);
 	});
 });

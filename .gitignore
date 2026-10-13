@@ -1,5 +1,5 @@
 *.cpuprofile
-coverage
+coverage/
 node_modules/
-precomputed/
-!precomputed/1.json
+precomputed/*
+!precomputed/1.ndjson

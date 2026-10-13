@@ -18,7 +18,7 @@ async function generateNextPGA(polycubes, { n, verbose, returnPolycubes } = {}) 
 	if (polycubes) throw new Error('generateNextPGA does not require the list of polycubes');
 
 	// worker implementation lives in another file
-	const pool = workerpool.pool(__dirname + '/parallel_grow_agg_workers.js');
+	const pool = workerpool.pool(__dirname + '/parallel_grow_agg_workers.js', { maxWorkers: 4 });
 
 	// pool lifecycle
 	const shapeCount = await pool
@@ -35,7 +35,7 @@ async function generateNextPGA(polycubes, { n, verbose, returnPolycubes } = {}) 
 
 	if (returnPolycubes) {
 		return utils.file
-			.loadJson(`./precomputed/${n}.json`)
+			.loadNDJson(`./precomputed/${n}.ndjson`)
 			.then((shapes) => shapes.map((shape) => new Polycube({ shape })));
 	}
 
